@@ -1,20 +1,49 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, MoreVertical, X, ChevronDown, Loader2 } from "lucide-react";
+import { Search, Plus, MoreVertical, X, ChevronDown, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
+
+type Toast = { type: 'success' | 'error'; message: string };
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validateEmployee = (data: { name: string; email: string; role: string }) => {
+  const errors: Record<string, string> = {};
+  if (!data.name.trim()) errors.name = "Name is required.";
+  else if (data.name.trim().length < 2) errors.name = "Name must be at least 2 characters.";
+  if (!data.email.trim()) errors.email = "Email is required.";
+  else if (!emailRegex.test(data.email)) errors.email = "Please enter a valid email address.";
+  if (!data.role.trim()) errors.role = "Role / Job title is required.";
+  return errors;
+};
 
 const Employees = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  
+  const [toast, setToast] = useState<Toast | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
   const { employees, isLoading, fetchEmployees, createEmployee, updateEmployee, deleteEmployee } = useEmployeeStore();
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    role: "",
-  });
+
+  const showToast = (type: Toast['type'], message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const [formData, setFormData] = useState({ name: "", email: "", role: "" });
+
+  const updateField = (field: string, value: string) => {
+    setFormData(p => ({ ...p, [field]: value }));
+    setFormErrors(p => ({ ...p, [field]: "" }));
+  };
+
+  const fieldCls = (field: string) =>
+    `w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all ${
+      formErrors[field]
+        ? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
+        : "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+    }`;
 
   useEffect(() => {
     fetchEmployees();
@@ -22,38 +51,70 @@ const Employees = () => {
 
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createEmployee({
-      ...formData,
-      status: "Active",
-      basicSalary: 0,
-      allowances: 0,
-      deductions: 0,
-      joinedAt: new Date().toISOString(),
-    });
-    setIsModalOpen(false);
-    setFormData({ name: "", email: "", role: "" });
+    const errors = validateEmployee(formData);
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
+    setFormErrors({});
+    try {
+      await createEmployee({
+        ...formData,
+        status: "Active",
+        basicSalary: 0,
+        allowances: 0,
+        deductions: 0,
+        joinedAt: new Date().toISOString(),
+      });
+      const err = useEmployeeStore.getState().error;
+      if (err) {
+        showToast('error', `Failed to add employee: ${err}`);
+      } else {
+        showToast('success', 'Employee added successfully!');
+        setIsModalOpen(false);
+        setFormData({ name: "", email: "", role: "" });
+      }
+    } catch {
+      showToast('error', 'An unexpected error occurred.');
+    }
   };
 
   const handleEditEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmployee) return;
-    
-    await updateEmployee(selectedEmployee._id || selectedEmployee.id, {
-      ...formData,
-      status: selectedEmployee.status || "Active",
-      basicSalary: selectedEmployee.basicSalary || 0,
-      allowances: selectedEmployee.allowances || 0,
-      deductions: selectedEmployee.deductions || 0,
-    });
-    setIsEditModalOpen(false);
-    setSelectedEmployee(null);
-    setFormData({ name: "", email: "", role: "" });
+    try {
+      await updateEmployee(selectedEmployee._id || selectedEmployee.id, {
+        ...formData,
+        status: selectedEmployee.status || "Active",
+        basicSalary: selectedEmployee.basicSalary || 0,
+        allowances: selectedEmployee.allowances || 0,
+        deductions: selectedEmployee.deductions || 0,
+        joinedAt: selectedEmployee.joinedAt || new Date().toISOString(),
+      });
+      const err = useEmployeeStore.getState().error;
+      if (err) {
+        showToast('error', `Update failed: ${err}`);
+      } else {
+        showToast('success', 'Employee updated successfully!');
+        setIsEditModalOpen(false);
+        setSelectedEmployee(null);
+        setFormData({ name: "", email: "", role: "" });
+      }
+    } catch {
+      showToast('error', 'An unexpected error occurred.');
+    }
   };
 
   const handleDeleteEmployee = async (id: string) => {
-    console.log('Attempting to delete employee with ID:', id);
     if (window.confirm("Are you sure you want to delete this employee?")) {
-      await deleteEmployee(id);
+      try {
+        await deleteEmployee(id);
+        const err = useEmployeeStore.getState().error;
+        if (err) {
+          showToast('error', `Delete failed: ${err}`);
+        } else {
+          showToast('success', 'Employee deleted successfully!');
+        }
+      } catch {
+        showToast('error', 'An unexpected error occurred.');
+      }
     }
     setActiveMenu(null);
   };
@@ -71,6 +132,17 @@ const Employees = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      {/* Toast notification */}
+      {toast && (
+        <div className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold transition-all ${
+          toast.type === 'success'
+            ? 'bg-emerald-600 text-white'
+            : 'bg-rose-600 text-white'
+        }`}>
+          {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          {toast.message}
+        </div>
+      )}
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Employee Directory</h2>
@@ -227,53 +299,55 @@ const Employees = () => {
                 </button>
               </div>
 
-              <form className="space-y-5" onSubmit={handleAddEmployee}>
+              <form className="space-y-5" onSubmit={handleAddEmployee} noValidate>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="e.g. Adebayo Johnson" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("name", e.target.value)}
+                    placeholder="e.g. Adebayo Johnson"
+                    className={fieldCls("name") + " px-4 py-3.5"}
                   />
+                  {formErrors.name && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.name}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    placeholder="e.g. adebayo@company.com" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("email", e.target.value)}
+                    placeholder="e.g. adebayo@company.com"
+                    className={fieldCls("email") + " px-4 py-3.5"}
                   />
+                  {formErrors.email && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.email}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Role</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    placeholder="e.g. Senior Software Engineer" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("role", e.target.value)}
+                    placeholder="e.g. Senior Software Engineer"
+                    className={fieldCls("role") + " px-4 py-3.5"}
                   />
+                  {formErrors.role && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.role}</p>}
                 </div>
 
                 <div className="pt-4 flex gap-3">
-                  <button 
+                  <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => { setIsModalOpen(false); setFormErrors({}); }}
                     className="flex-1 py-3.5 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-all"
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
-                    className="flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/20"
+                    disabled={isLoading}
+                    className="flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 disabled:opacity-70"
                   >
+                    {isLoading && <Loader2 className="animate-spin" size={16} />}
                     Add Member
                   </button>
                 </div>
@@ -301,39 +375,39 @@ const Employees = () => {
                 </button>
               </div>
 
-              <form className="space-y-5" onSubmit={handleEditEmployee}>
+              <form className="space-y-5" onSubmit={handleEditEmployee} noValidate>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="e.g. Adebayo Johnson" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("name", e.target.value)}
+                    placeholder="e.g. Adebayo Johnson"
+                    className={fieldCls("name") + " px-4 py-3.5"}
                   />
+                  {formErrors.name && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.name}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    placeholder="e.g. adebayo@company.com" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("email", e.target.value)}
+                    placeholder="e.g. adebayo@company.com"
+                    className={fieldCls("email") + " px-4 py-3.5"}
                   />
+                  {formErrors.email && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.email}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Role</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    placeholder="e.g. Senior Software Engineer" 
-                    required
-                    className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] transition-all text-sm"
+                    onChange={(e) => updateField("role", e.target.value)}
+                    placeholder="e.g. Senior Software Engineer"
+                    className={fieldCls("role") + " px-4 py-3.5"}
                   />
+                  {formErrors.role && <p className="mt-1.5 text-xs text-rose-500 font-medium">{formErrors.role}</p>}
                 </div>
 
                 <div className="pt-4 flex gap-3">

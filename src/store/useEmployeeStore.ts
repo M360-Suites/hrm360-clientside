@@ -76,16 +76,24 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
   updateEmployee: async (id, data) => {
     set({ isLoading: true, error: null });
     const orgId = localStorage.getItem('orgId');
+    
+    // Explicitly pick only the fields from the schema to avoid sending extra data
+    const payload = {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      status: data.status || 'Active',
+      orgId: String(orgId),
+      basicSalary: Number(data.basicSalary || 0),
+      allowances: Number(data.allowances || 0),
+      deductions: Number(data.deductions || 0),
+      joinedAt: data.joinedAt
+    };
+
+    console.log('SENDING UPDATE BODY:', payload);
+
     try {
-      // Documentation explicitly includes orgId in PUT body
-      // Adding it to query as well to satisfy potential strict ownership validation
-      await api.put(`/employee/${id}?orgId=${orgId}`, { 
-        ...data, 
-        orgId,
-        basicSalary: Number(data.basicSalary || 0),
-        allowances: Number(data.allowances || 0),
-        deductions: Number(data.deductions || 0)
-      });
+      await api.put(`/employee/${id}`, payload);
       await get().fetchEmployees();
     } catch (error: any) {
       console.error('Update Employee Error:', error.response?.data);
@@ -95,11 +103,10 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
 
   deleteEmployee: async (id) => {
     set({ isLoading: true, error: null });
-    const orgId = localStorage.getItem('orgId');
     try {
       // Documentation: DELETE /employee/{id} with x-org-id header
-      // Adding orgId to query as well as a fallback for strict validation
-      await api.delete(`/employee/${id}?orgId=${orgId}`);
+      // Clean URL as per working curl
+      await api.delete(`/employee/${id}`);
       await get().fetchEmployees();
     } catch (error: any) {
       console.error('Delete Employee Error:', error.response?.data);
