@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Clock, Loader2, UserPlus, UserMinus, Search } from "lucide-react";
+import { Clock, UserPlus, UserMinus, Search } from "lucide-react";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 
@@ -46,8 +46,6 @@ const Attendance = () => {
     emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     emp.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const isLoading = isAttendanceLoading || isEmployeesLoading;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, MoreVertical, X, ChevronDown, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Search, Plus, MoreVertical, X, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 
 type Toast = { type: 'success' | 'error'; message: string };

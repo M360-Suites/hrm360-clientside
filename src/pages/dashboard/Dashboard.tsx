@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { TrendingUp, ChevronDown, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { TrendingUp, ChevronDown, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
 import { useLeaveStore } from "../../store/useLeaveStore";
 
 const Dashboard = () => {
   const { employees, fetchEmployees } = useEmployeeStore();
-  const { todayStats, fetchTodayStats, isLoading: attendanceLoading } = useAttendanceStore();
+  const { todayStats, fetchTodayStats } = useAttendanceStore();
   const { leaves, fetchLeaves } = useLeaveStore();
 
   useEffect(() => {

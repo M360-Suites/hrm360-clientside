@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signup: async (userData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.post('/auth/signup', userData);
+      await api.post('/auth/signup', userData);
       // Signup might also wrap data, though usually we just care about success
       set({ isLoading: false });
       return true;
