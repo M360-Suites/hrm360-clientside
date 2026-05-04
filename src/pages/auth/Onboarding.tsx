@@ -38,7 +38,7 @@ const Onboarding = () => {
         <p className="text-gray-500">Create your workspace to start managing your employees</p>
       </div>
 
-      <form className="space-y-6 bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-indigo-500/5" onSubmit={handleSubmit}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
         {error && (
           <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg border border-red-100">
             {error}
