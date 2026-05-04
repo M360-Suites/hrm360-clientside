@@ -7,7 +7,6 @@ const Attendance = () => {
   const { 
     dayAttendance, 
     todayStats, 
-    isLoading: isAttendanceLoading, 
     fetchDayAttendance, 
     fetchTodayStats,
     clockIn,
@@ -16,7 +15,6 @@ const Attendance = () => {
   
   const { 
     employees, 
-    isLoading: isEmployeesLoading, 
     fetchEmployees 
   } = useEmployeeStore();
   
