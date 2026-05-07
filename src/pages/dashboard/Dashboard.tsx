@@ -18,7 +18,7 @@ const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-800 mb-1">Welcome back, Ebenezer</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-1">Welcome back</h2>
         <p className="text-sm text-gray-500">Here is an overview of what is happening across your organization today</p>
       </div>
 
