@@ -10,6 +10,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Onboarding from "./pages/auth/Onboarding";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import Activation from "./pages/auth/Activation";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Employees from "./pages/employees/Employees";
 import Attendance from "./pages/attendance/Attendance";
@@ -34,6 +35,7 @@ const App = () => {
 						path='/forgot-password'
 						element={<ForgotPassword />}
 					/>
+					<Route path='/activation' element={<Activation />} />
 					<Route
 						path='/'
 						element={<Navigate to='/login' replace />}

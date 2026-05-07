@@ -19,8 +19,12 @@ const Onboarding = () => {
     e.preventDefault();
     const success = await createOrg({
       ...formData,
-      createdBy: user?.id || user?._id, // Handle both common ID formats
-      stats: [{}],
+      createdBy: user?.id || user?._id, 
+      stats: [
+        { label: "Employees", value: "0", icon: "users" },
+        { label: "Departments", value: "0", icon: "briefcase" },
+        { label: "Projects", value: "0", icon: "clipboard" }
+      ],
     });
     
     if (success) {
