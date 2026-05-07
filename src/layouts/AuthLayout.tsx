@@ -7,7 +7,7 @@ const carouselItems = [
   {
     image: a1,
     title: "Manage Organizations Efficiently",
-    description: "Seamlessly handle multiple client companies like CapitalCorp in one unified dashboard."
+    description: "Seamlessly handle multiple client companies in one unified dashboard."
   },
   {
     image: a2,
