@@ -1,68 +1,129 @@
-import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
+
+const getActivationToken = (searchParams: URLSearchParams) => {
+  const queryToken =
+    searchParams.get("token") ||
+    searchParams.get("activationToken") ||
+    searchParams.get("activation_token");
+
+  if (queryToken) return queryToken.trim();
+
+  const hash = window.location.hash;
+
+  if (hash.includes("?")) {
+    const hashQuery = hash.split("?")[1];
+    const hashParams = new URLSearchParams(hashQuery);
+
+    return (
+      hashParams.get("token") ||
+      hashParams.get("activationToken") ||
+      hashParams.get("activation_token") ||
+      ""
+    ).trim();
+  }
+
+  return "";
+};
 
 const Activation = () => {
   const [searchParams] = useSearchParams();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const { activateAccount, error } = useAuthStore();
-  const token = searchParams.get("token");
+
+  const hasActivated = useRef(false);
+
+  const [status, setStatus] = useState<"loading" | "success" | "failed">(
+    "loading"
+  );
 
   useEffect(() => {
-    const triggerActivation = async () => {
+    const runActivation = async () => {
+      if (hasActivated.current) return;
+      hasActivated.current = true;
+
+      const token = getActivationToken(searchParams);
+
+      console.log("ACTIVATION TOKEN FROM URL:", token);
+      console.log("FULL ACTIVATION URL:", window.location.href);
+
       if (!token) {
-        setStatus('error');
+        setStatus("failed");
         return;
       }
-      
+
       const success = await activateAccount(token);
-      setStatus(success ? 'success' : 'error');
+
+      setStatus(success ? "success" : "failed");
     };
 
-    triggerActivation();
-  }, [token, activateAccount]);
+    runActivation();
+  }, [searchParams, activateAccount]);
 
   return (
     <div className="w-full text-center">
-      {status === 'loading' && (
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="animate-spin text-[#3B00D9]" size={48} />
-          <h2 className="text-2xl font-bold text-gray-800">Activating your account...</h2>
-          <p className="text-gray-500">Please wait while we verify your activation link.</p>
-        </div>
+      {status === "loading" && (
+        <>
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-50 text-[#3B00D9] flex items-center justify-center">
+            <Loader2 size={32} className="animate-spin" />
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            Verifying account
+          </h2>
+
+          <p className="text-gray-500">
+            Please wait while we verify your email.
+          </p>
+        </>
       )}
 
-      {status === 'success' && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+      {status === "success" && (
+        <>
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <CheckCircle size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Account Activated!</h2>
-          <p className="text-gray-500">Your account is now active. You can proceed to login.</p>
-          <Link 
-            to="/login" 
-            className="mt-4 px-8 py-3 bg-[#3B00D9] text-white rounded-xl font-medium hover:bg-[#3500c0] transition-all"
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            Account verified
+          </h2>
+
+          <p className="text-gray-500 mb-8">
+            Your email has been verified successfully. You can now login and
+            continue onboarding.
+          </p>
+
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#3B00D9] text-white font-medium"
           >
-            Go to Login
+            Continue to Login
           </Link>
-        </div>
+        </>
       )}
 
-      {status === 'error' && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center">
-            <AlertCircle size={32} />
+      {status === "failed" && (
+        <>
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center">
+            <XCircle size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Activation Failed</h2>
-          <p className="text-gray-500">{error || "The activation link is invalid or has expired."}</p>
-          <Link 
-            to="/register" 
-            className="mt-4 px-8 py-3 bg-gray-100 text-gray-800 rounded-xl font-medium hover:bg-gray-200 transition-all"
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            Verification failed
+          </h2>
+
+          <p className="text-gray-500 mb-8">
+            {error || "The activation link is invalid, expired, or missing a token."}
+          </p>
+
+          <Link
+            to="/register"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#3B00D9] text-white font-medium"
           >
-            Register again
+            Create Account Again
           </Link>
-        </div>
+        </>
       )}
     </div>
   );

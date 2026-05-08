@@ -1,17 +1,65 @@
-import { create } from 'zustand';
-import api from '../api/axios';
+import { create } from "zustand";
+import api from "../api/axios";
+import { getCookie } from "../utils/cookies";
 
 interface EmployeeState {
   employees: any[];
   currentEmployee: any | null;
   isLoading: boolean;
   error: string | null;
+
   fetchEmployees: () => Promise<void>;
   fetchEmployeeById: (id: string) => Promise<void>;
-  createEmployee: (data: any) => Promise<void>;
-  updateEmployee: (id: string, data: any) => Promise<void>;
-  deleteEmployee: (id: string) => Promise<void>;
+  createEmployee: (data: any) => Promise<boolean>;
+  updateEmployee: (id: string, data: any) => Promise<boolean>;
+  deleteEmployee: (id: string) => Promise<boolean>;
 }
+
+const getOrgId = () => {
+  const orgId = getCookie("orgId");
+
+  if (!orgId) {
+    throw new Error("Organization ID missing. Please complete onboarding first.");
+  }
+
+  return orgId;
+};
+
+const getOrgConfig = () => {
+  const orgId = getOrgId();
+
+  return {
+    headers: {
+      "x-org-id": orgId,
+    },
+  };
+};
+
+const cleanPayload = (payload: any) => {
+  const cleaned = { ...payload };
+
+  Object.keys(cleaned).forEach((key) => {
+    if (
+      cleaned[key] === undefined ||
+      cleaned[key] === null ||
+      cleaned[key] === ""
+    ) {
+      delete cleaned[key];
+    }
+  });
+
+  return cleaned;
+};
+
+const normalizeEmployees = (responseData: any) => {
+  const data = responseData?.data || responseData?.employees || responseData;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.employees)) return data.employees;
+  if (Array.isArray(data?.data)) return data.data;
+
+  return [];
+};
 
 export const useEmployeeStore = create<EmployeeState>((set, get) => ({
   employees: [],
@@ -21,96 +69,160 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
 
   fetchEmployees: async () => {
     set({ isLoading: true, error: null });
+
     try {
-      const response = await api.get('/employees');
-      console.log('Fetch Employees Response:', response.data);
-      
-      let employeeData = response.data.data || response.data;
-      
-      // If the API returns an object instead of an array, try to find the array within it
-      if (!Array.isArray(employeeData) && typeof employeeData === 'object') {
-        employeeData = employeeData.employees || Object.values(employeeData).find(val => Array.isArray(val)) || [];
-      }
-      
-      set({ employees: Array.isArray(employeeData) ? employeeData : [], isLoading: false });
+      const response = await api.get("/employees", getOrgConfig());
+
+      set({
+        employees: normalizeEmployees(response.data),
+        isLoading: false,
+        error: null,
+      });
     } catch (error: any) {
-      console.error('Fetch Employees Error:', error);
-      set({ error: error.response?.data?.message || 'Failed to fetch employees', isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to fetch employees",
+        isLoading: false,
+      });
     }
   },
 
   fetchEmployeeById: async (id) => {
     set({ isLoading: true, error: null });
+
     try {
-      const response = await api.get(`/employee/${id}`);
-      set({ currentEmployee: response.data.data || response.data, isLoading: false });
+      const response = await api.get(`/employee/${id}`, getOrgConfig());
+
+      set({
+        currentEmployee: response.data?.data || response.data?.employee || response.data,
+        isLoading: false,
+        error: null,
+      });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch employee', isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to fetch employee",
+        isLoading: false,
+      });
     }
   },
 
   createEmployee: async (data) => {
     set({ isLoading: true, error: null });
-    const orgId = localStorage.getItem('orgId');
+
     try {
-      // Documentation says orgId is in body for POST
-      await api.post('/employee', { ...data, orgId });
+      const payload = cleanPayload({
+        name: data.name?.trim(),
+        email: data.email?.trim(),
+        role: data.role?.trim(),
+        status: data.status || "Active",
+        password: data.password?.trim(),
+        joinedAt: data.joinedAt || new Date().toISOString(),
+
+        basicSalary: Number(data.basicSalary || 0),
+        allowances: Number(data.allowances || 0),
+        deductions: Number(data.deductions || 0),
+
+        accountNumber: data.accountNumber,
+        bankCode: data.bankCode,
+        bankName: data.bankName,
+        accountName: data.accountName,
+        paystackRecipientCode: data.paystackRecipientCode,
+      });
+
+      console.log("CREATE EMPLOYEE PAYLOAD:", payload);
+      console.log("CREATE EMPLOYEE HEADERS:", getOrgConfig());
+
+      await api.post("/employee", payload, getOrgConfig());
+
       await get().fetchEmployees();
+
+      set({ isLoading: false, error: null });
+      return true;
     } catch (error: any) {
-      console.error('Create Employee Error:', error.response?.data);
-      // If server says orgId is not allowed, try without it
-      if (error.response?.data?.message?.includes('orgId')) {
-        try {
-          await api.post('/employee', data);
-          await get().fetchEmployees();
-          return;
-        } catch (retryError: any) {
-          set({ error: retryError.response?.data?.message || 'Failed to create employee', isLoading: false });
-          return;
-        }
-      }
-      set({ error: error.response?.data?.message || 'Failed to create employee', isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to create employee",
+        isLoading: false,
+      });
+
+      return false;
     }
   },
 
   updateEmployee: async (id, data) => {
     set({ isLoading: true, error: null });
-    const orgId = localStorage.getItem('orgId');
-    
-    // Explicitly pick only the fields from the schema to avoid sending extra data
-    const payload = {
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      status: data.status || 'Active',
-      orgId: String(orgId),
-      basicSalary: Number(data.basicSalary || 0),
-      allowances: Number(data.allowances || 0),
-      deductions: Number(data.deductions || 0),
-      joinedAt: data.joinedAt
-    };
-
-    console.log('SENDING UPDATE BODY:', payload);
 
     try {
-      await api.put(`/employee/${id}`, payload);
+      const payload = cleanPayload({
+        name: data.name?.trim(),
+        email: data.email?.trim(),
+        role: data.role?.trim(),
+        status: data.status || "Active",
+        password: data.password,
+        joinedAt: data.joinedAt,
+
+        basicSalary: Number(data.basicSalary || 0),
+        allowances: Number(data.allowances || 0),
+        deductions: Number(data.deductions || 0),
+
+        accountNumber: data.accountNumber,
+        bankCode: data.bankCode,
+        bankName: data.bankName,
+        accountName: data.accountName,
+        paystackRecipientCode: data.paystackRecipientCode,
+      });
+
+      await api.put(`/employee/${id}`, payload, getOrgConfig());
+
       await get().fetchEmployees();
+
+      set({ isLoading: false, error: null });
+      return true;
     } catch (error: any) {
-      console.error('Update Employee Error:', error.response?.data);
-      set({ error: error.response?.data?.message || 'Failed to update employee', isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to update employee",
+        isLoading: false,
+      });
+
+      return false;
     }
   },
 
   deleteEmployee: async (id) => {
     set({ isLoading: true, error: null });
+
     try {
-      // Documentation: DELETE /employee/{id} with x-org-id header
-      // Clean URL as per working curl
-      await api.delete(`/employee/${id}`);
+      await api.delete(`/employee/${id}`, getOrgConfig());
+
       await get().fetchEmployees();
+
+      set({ isLoading: false, error: null });
+      return true;
     } catch (error: any) {
-      console.error('Delete Employee Error:', error.response?.data);
-      set({ error: error.response?.data?.message || 'Failed to delete employee', isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to delete employee",
+        isLoading: false,
+      });
+
+      return false;
     }
   },
 }));
