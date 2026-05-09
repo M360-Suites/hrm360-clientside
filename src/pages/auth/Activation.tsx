@@ -3,29 +3,13 @@ import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 
-const getActivationToken = (searchParams: URLSearchParams) => {
-  const queryToken =
-    searchParams.get("token") ||
+const getActivationToken = (searchParams: URLSearchParams): string => {
+  return (
+    searchParams.get("code") ||
     searchParams.get("activationToken") ||
-    searchParams.get("activation_token");
-
-  if (queryToken) return queryToken.trim();
-
-  const hash = window.location.hash;
-
-  if (hash.includes("?")) {
-    const hashQuery = hash.split("?")[1];
-    const hashParams = new URLSearchParams(hashQuery);
-
-    return (
-      hashParams.get("token") ||
-      hashParams.get("activationToken") ||
-      hashParams.get("activation_token") ||
-      ""
-    ).trim();
-  }
-
-  return "";
+    searchParams.get("activation_token") ||
+    ""
+  ).trim();
 };
 
 const Activation = () => {
@@ -35,7 +19,7 @@ const Activation = () => {
   const hasActivated = useRef(false);
 
   const [status, setStatus] = useState<"loading" | "success" | "failed">(
-    "loading"
+    "loading",
   );
 
   useEffect(() => {
@@ -44,9 +28,8 @@ const Activation = () => {
       hasActivated.current = true;
 
       const token = getActivationToken(searchParams);
-
-      console.log("ACTIVATION TOKEN FROM URL:", token);
-      console.log("FULL ACTIVATION URL:", window.location.href);
+      // console.log("ACTIVATION TOKEN FROM URL:", token);
+      // console.log("FULL ACTIVATION URL:", window.location.href);
 
       if (!token) {
         setStatus("failed");
@@ -54,11 +37,14 @@ const Activation = () => {
       }
 
       const success = await activateAccount(token);
-
       setStatus(success ? "success" : "failed");
     };
 
     runActivation();
+
+    return () => {
+      hasActivated.current = false; // reset on cleanup
+    };
   }, [searchParams, activateAccount]);
 
   return (
@@ -114,7 +100,8 @@ const Activation = () => {
           </h2>
 
           <p className="text-gray-500 mb-8">
-            {error || "The activation link is invalid, expired, or missing a token."}
+            {error ||
+              "The activation link is invalid, expired, or missing a token."}
           </p>
 
           <Link

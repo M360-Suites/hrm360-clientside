@@ -3,426 +3,407 @@ import api from "../api/axios";
 import { getCookie, removeCookie, setCookie } from "../utils/cookies";
 
 interface AuthState {
-	user: any;
-	token: string | null;
-	resetToken: string | null;
-	isLoading: boolean;
-	error: string | null;
+  user: any;
+  token: string | null;
+  resetToken: string | null;
+  isLoading: boolean;
+  error: string | null;
 
-	login: (data: any) => Promise<boolean>;
-	signup: (data: any) => Promise<boolean>;
-	logout: () => void;
-	sendCode: (email: string, reason: string) => Promise<boolean>;
-	verifyCode: (
-		email: string,
-		code: string,
-		reason: string,
-	) => Promise<boolean>;
-	resetPassword: (data: {
-		token: string;
-		newPassword: string;
-	}) => Promise<boolean>;
-	activateAccount: (token: string) => Promise<boolean>;
-	setUser: (user: any) => void;
+  login: (data: any) => Promise<boolean>;
+  signup: (data: any) => Promise<boolean>;
+  logout: () => void;
+  sendCode: (email: string, reason: string) => Promise<boolean>;
+  verifyCode: (email: string, code: string, reason: string) => Promise<boolean>;
+  resetPassword: (data: {
+    token: string;
+    newPassword: string;
+  }) => Promise<boolean>;
+  activateAccount: (token: string) => Promise<boolean>;
+  setUser: (user: any) => void;
 }
 
 const safeParse = (value: string | null) => {
-	try {
-		return value ? JSON.parse(value) : null;
-	} catch {
-		return null;
-	}
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
 };
 
 const extractToken = (responseData: any) => {
-	return (
-		responseData?.token ||
-		responseData?.accessToken ||
-		responseData?.access_token ||
-		responseData?.jwt ||
-		responseData?.data?.token ||
-		responseData?.data?.accessToken ||
-		responseData?.data?.access_token ||
-		null
-	);
+  return (
+    responseData?.token ||
+    responseData?.accessToken ||
+    responseData?.access_token ||
+    responseData?.jwt ||
+    responseData?.data?.token ||
+    responseData?.data?.accessToken ||
+    responseData?.data?.access_token ||
+    null
+  );
 };
 
 const extractRefreshToken = (responseData: any) => {
-	return (
-		responseData?.refreshToken ||
-		responseData?.refresh_token ||
-		responseData?.data?.refreshToken ||
-		responseData?.data?.refresh_token ||
-		null
-	);
+  return (
+    responseData?.refreshToken ||
+    responseData?.refresh_token ||
+    responseData?.data?.refreshToken ||
+    responseData?.data?.refresh_token ||
+    null
+  );
 };
 
 const extractUser = (responseData: any) => {
-	return (
-		responseData?.user ||
-		responseData?.admin ||
-		responseData?.data?.user ||
-		responseData?.data?.admin ||
-		responseData?.data ||
-		null
-	);
+  return (
+    responseData?.user ||
+    responseData?.admin ||
+    responseData?.data?.user ||
+    responseData?.data?.admin ||
+    responseData?.data ||
+    null
+  );
 };
 
 const extractUserId = (user: any) => {
-	return user?._id || user?.id || user?.userId || null;
+  return user?._id || user?.id || user?.userId || null;
 };
 
 const extractOrgId = (user: any) => {
-	return (
-		user?.orgId ||
-		user?.organizationId ||
-		user?.organization?._id ||
-		user?.organization?.id ||
-		user?.org?._id ||
-		user?.org?.id ||
-		null
-	);
+  return (
+    user?.orgId ||
+    user?.organizationId ||
+    user?.organization?._id ||
+    user?.organization?.id ||
+    user?.org?._id ||
+    user?.org?.id ||
+    null
+  );
 };
 
 const extractOnboardingState = (user: any) => {
-	return Boolean(
-		user?.isOnboarded ||
-		user?.onboarded ||
-		user?.hasCompletedOnboarding ||
-		user?.onboardingCompleted ||
-		extractOrgId(user),
-	);
+  return Boolean(
+    user?.isOnboarded ||
+    user?.onboarded ||
+    user?.hasCompletedOnboarding ||
+    user?.onboardingCompleted ||
+    extractOrgId(user),
+  );
 };
 
 const normalizeOrganizations = (responseData: any) => {
-	const data =
-		responseData?.data || responseData?.organizations || responseData;
+  const data =
+    responseData?.data || responseData?.organizations || responseData;
 
-	if (Array.isArray(data)) return data;
-	if (Array.isArray(data?.organizations)) return data.organizations;
-	if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.organizations)) return data.organizations;
+  if (Array.isArray(data?.data)) return data.data;
 
-	return [];
+  return [];
 };
 
 const findUserOrganization = (organizations: any[], user: any) => {
-	const userId = extractUserId(user);
-	const companyName = user?.companyName;
+  const userId = extractUserId(user);
+  const companyName = user?.companyName;
 
-	return organizations.find((org) => {
-		const createdBy =
-			typeof org.createdBy === "object"
-				? org.createdBy?._id || org.createdBy?.id
-				: org.createdBy;
+  return organizations.find((org) => {
+    const createdBy =
+      typeof org.createdBy === "object"
+        ? org.createdBy?._id || org.createdBy?.id
+        : org.createdBy;
 
-		return (
-			createdBy === userId ||
-			org.userId === userId ||
-			org.ownerId === userId ||
-			org.name === companyName
-		);
-	});
+    return (
+      createdBy === userId ||
+      org.userId === userId ||
+      org.ownerId === userId ||
+      org.name === companyName
+    );
+  });
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-	user: safeParse(getCookie("user")),
-	token: getCookie("token"),
-	resetToken: getCookie("resetToken"),
-	isLoading: false,
-	error: null,
+  user: safeParse(getCookie("user")),
+  token: getCookie("token"),
+  resetToken: getCookie("resetToken"),
+  isLoading: false,
+  error: null,
 
-	setUser: (user) => {
-		const orgId = extractOrgId(user);
-		const isOnboarded = extractOnboardingState(user);
+  setUser: (user) => {
+    const orgId = extractOrgId(user);
+    const isOnboarded = extractOnboardingState(user);
 
-		const updatedUser = {
-			...user,
-			orgId,
-			isOnboarded,
-		};
+    const updatedUser = {
+      ...user,
+      orgId,
+      isOnboarded,
+    };
 
-		setCookie("user", JSON.stringify(updatedUser));
+    setCookie("user", JSON.stringify(updatedUser));
 
-		if (orgId) setCookie("orgId", orgId);
-		setCookie("isOnboarded", String(isOnboarded));
+    if (orgId) setCookie("orgId", orgId);
+    setCookie("isOnboarded", String(isOnboarded));
 
-		set({ user: updatedUser });
-	},
+    set({ user: updatedUser });
+  },
 
-	login: async (credentials) => {
-		set({ isLoading: true, error: null });
+  login: async (credentials) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			removeCookie("token");
-			removeCookie("refreshToken");
-			removeCookie("user");
-			removeCookie("orgId");
-			removeCookie("isOnboarded");
-			removeCookie("resetToken");
+    try {
+      removeCookie("token");
+      removeCookie("refreshToken");
+      removeCookie("user");
+      removeCookie("orgId");
+      removeCookie("isOnboarded");
+      removeCookie("resetToken");
 
-			const response = await api.post("/auth/signin", credentials);
+      const response = await api.post("/auth/signin", credentials);
 
-			console.log("LOGIN FULL RESPONSE:", response.data);
+      console.log("LOGIN FULL RESPONSE:", response.data);
 
-			const token = extractToken(response.data);
-			const refreshToken = extractRefreshToken(response.data);
-			const user = extractUser(response.data);
+      const token = extractToken(response.data);
+      const refreshToken = extractRefreshToken(response.data);
+      const user = extractUser(response.data);
 
-			if (!token)
-				throw new Error(
-					"Login successful, but no access token was returned.",
-				);
-			if (!user)
-				throw new Error(
-					"Login successful, but no user data was returned.",
-				);
+      if (!token)
+        throw new Error("Login successful, but no access token was returned.");
+      if (!user)
+        throw new Error("Login successful, but no user data was returned.");
 
-			setCookie("token", token);
+      setCookie("token", token);
 
-			if (refreshToken) {
-				setCookie("refreshToken", refreshToken);
-			}
+      if (refreshToken) {
+        setCookie("refreshToken", refreshToken);
+      }
 
-			let orgId = extractOrgId(user);
-			let isOnboarded = extractOnboardingState(user);
+      let orgId = extractOrgId(user);
+      let isOnboarded = extractOnboardingState(user);
 
-			if (!orgId) {
-				try {
-					const orgResponse = await api.get("/org");
-					const organizations = normalizeOrganizations(
-						orgResponse.data,
-					);
-					const userOrg = findUserOrganization(organizations, user);
+      if (!orgId) {
+        try {
+          const orgResponse = await api.get("/org");
+          const organizations = normalizeOrganizations(orgResponse.data);
+          const userOrg = findUserOrganization(organizations, user);
 
-					orgId =
-						userOrg?._id || userOrg?.id || userOrg?.orgId || null;
+          orgId = userOrg?._id || userOrg?.id || userOrg?.orgId || null;
 
-					if (orgId) {
-						isOnboarded = true;
-					}
-				} catch (orgError) {
-					console.warn(
-						"Could not fetch organization after login:",
-						orgError,
-					);
-				}
-			}
+          if (orgId) {
+            isOnboarded = true;
+          }
+        } catch (orgError) {
+          console.warn("Could not fetch organization after login:", orgError);
+        }
+      }
 
-			const updatedUser = {
-				...user,
-				orgId,
-				isOnboarded,
-			};
+      const updatedUser = {
+        ...user,
+        orgId,
+        isOnboarded,
+      };
 
-			setCookie("user", JSON.stringify(updatedUser));
+      setCookie("user", JSON.stringify(updatedUser));
 
-			if (orgId) {
-				setCookie("orgId", orgId);
-			}
+      if (orgId) {
+        setCookie("orgId", orgId);
+      }
 
-			setCookie("isOnboarded", String(isOnboarded));
+      setCookie("isOnboarded", String(isOnboarded));
 
-			set({
-				user: updatedUser,
-				token,
-				resetToken: null,
-				isLoading: false,
-				error: null,
-			});
+      set({
+        user: updatedUser,
+        token,
+        resetToken: null,
+        isLoading: false,
+        error: null,
+      });
 
-			return true;
-		} catch (error: any) {
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					error.message ||
-					"Login failed",
-				isLoading: false,
-			});
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Login failed",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	signup: async (userData) => {
-		set({ isLoading: true, error: null });
+  signup: async (userData) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			await api.post("/auth/signup", userData);
+    try {
+      await api.post("/auth/signup", userData);
 
-			set({ isLoading: false, error: null });
-			return true;
-		} catch (error: any) {
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					"Signup failed",
-				isLoading: false,
-			});
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Signup failed",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	sendCode: async (email, reason) => {
-		set({ isLoading: true, error: null });
+  sendCode: async (email, reason) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			await api.post("/auth/send-code", { email, reason });
+    try {
+      await api.post("/auth/send-code", { email, reason });
 
-			set({ isLoading: false, error: null });
-			return true;
-		} catch (error: any) {
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					"Failed to send verification code",
-				isLoading: false,
-			});
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to send verification code",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	verifyCode: async (email, code, reason) => {
-		set({ isLoading: true, error: null });
+  verifyCode: async (email, code, reason) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			const response = await api.post("/auth/verify-code", {
-				email,
-				code,
-				reason,
-			});
+    try {
+      const response = await api.post("/auth/verify-code", {
+        email,
+        code,
+        reason,
+      });
 
-			const responseData = response.data?.data || response.data;
+      const responseData = response.data?.data || response.data;
 
-			const resetToken =
-				typeof responseData === "string"
-					? responseData
-					: responseData?.token ||
-						responseData?.resetToken ||
-						responseData?.verificationToken ||
-						responseData?.accessToken ||
-						responseData?.reset_token ||
-						responseData?.passwordResetToken;
+      const resetToken =
+        typeof responseData === "string"
+          ? responseData
+          : responseData?.token ||
+            responseData?.resetToken ||
+            responseData?.verificationToken ||
+            responseData?.accessToken ||
+            responseData?.reset_token ||
+            responseData?.passwordResetToken;
 
-			if (!resetToken) {
-				throw new Error(
-					"Code verified, but no reset token was returned.",
-				);
-			}
+      if (!resetToken) {
+        throw new Error("Code verified, but no reset token was returned.");
+      }
 
-			setCookie("resetToken", resetToken);
+      setCookie("resetToken", resetToken);
 
-			set({
-				resetToken,
-				isLoading: false,
-				error: null,
-			});
+      set({
+        resetToken,
+        isLoading: false,
+        error: null,
+      });
 
-			return true;
-		} catch (error: any) {
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					error.message ||
-					"Invalid verification code",
-				isLoading: false,
-			});
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Invalid verification code",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	resetPassword: async ({ token, newPassword }) => {
-		set({ isLoading: true, error: null });
+  resetPassword: async ({ token, newPassword }) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			await api.post("/auth/reset", {
-				token,
-				newPassword,
-			});
+    try {
+      await api.post("/auth/reset", {
+        token,
+        newPassword,
+      });
 
-			removeCookie("resetToken");
+      removeCookie("resetToken");
 
-			set({
-				resetToken: null,
-				isLoading: false,
-				error: null,
-			});
+      set({
+        resetToken: null,
+        isLoading: false,
+        error: null,
+      });
 
-			return true;
-		} catch (error: any) {
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					"Password reset failed",
-				isLoading: false,
-			});
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Password reset failed",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	activateAccount: async (token) => {
-		set({ isLoading: true, error: null });
+  activateAccount: async (token) => {
+    set({ isLoading: true, error: null });
 
-		try {
-			if (!token) {
-				throw new Error("Activation token is missing.");
-			}
+    try {
+      if (!token) {
+        throw new Error("Activation token is missing.");
+      }
 
-			const response = await api.get("/auth/activation", {
-				params: {
-					token,
-				},
-			});
+      const response = await api.get("/auth/activation", {
+        params: {
+          token,
+        },
+      });
 
-			console.log("ACTIVATION RESPONSE:", response.data);
+      console.log("ACTIVATION RESPONSE:", response.data);
 
-			set({
-				isLoading: false,
-				error: null,
-			});
+      set({
+        isLoading: false,
+        error: null,
+      });
 
-			return true;
-		} catch (error: any) {
-			console.error(
-				"ACTIVATION ERROR:",
-				error.response?.data || error,
-			);
+      return true;
+    } catch (error: any) {
+      console.error("ACTIVATION ERROR:", error.response?.data || error);
 
-			set({
-				error:
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					error.message ||
-					"Activation failed",
-				isLoading: false,
-			});
+      set({
+        error:
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Activation failed",
+        isLoading: false,
+      });
 
-			return false;
-		}
-	},
+      return false;
+    }
+  },
 
-	logout: () => {
-		removeCookie("token");
-		removeCookie("refreshToken");
-		removeCookie("user");
-		removeCookie("orgId");
-		removeCookie("isOnboarded");
-		removeCookie("resetToken");
+  logout: () => {
+    removeCookie("token");
+    removeCookie("refreshToken");
+    removeCookie("user");
+    removeCookie("orgId");
+    removeCookie("isOnboarded");
+    removeCookie("resetToken");
 
-		set({
-			user: null,
-			token: null,
-			resetToken: null,
-			error: null,
-		});
-	},
+    set({
+      user: null,
+      token: null,
+      resetToken: null,
+      error: null,
+    });
+  },
 }));
