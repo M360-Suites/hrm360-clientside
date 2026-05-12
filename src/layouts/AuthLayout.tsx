@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { logo, a1, a2, a3 } from "../assets";
+import { a1, a2, a3 } from "../assets";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 

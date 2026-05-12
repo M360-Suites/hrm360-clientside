@@ -14,7 +14,6 @@ import {
   CheckCircle2, 
   Megaphone, 
   FileText,
-  Plus,
   X
 } from "lucide-react";
 import { useOrgStore } from "../store/useOrgStore";
