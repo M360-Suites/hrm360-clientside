@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, LogOut, ChevronDown } from "lucide-react";
+import { Bell, User, LogOut, ChevronDown, Menu } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
-const Topbar = () => {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+const Topbar = ({ onMenuClick }: TopbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
@@ -30,29 +34,39 @@ const Topbar = () => {
   }, []);
 
   return (
-    <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 shrink-0">
-      <h1 className="text-xl font-bold text-gray-900">{formattedTitle}</h1>
+    <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 shrink-0">
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-gray-500 hover:bg-gray-50 rounded-xl transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate max-w-[150px] sm:max-w-none">
+          {formattedTitle}
+        </h1>
+      </div>
 
-      <div className="flex items-center gap-6">
-        <button className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all relative">
+      <div className="flex items-center gap-3 sm:gap-6">
+        <button className="hidden sm:flex w-10 h-10 rounded-xl border border-gray-200 items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all relative">
           <Bell size={18} />
           <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white"></span>
         </button>
 
         {/* User menu */}
-        <div className="relative pl-6 border-l border-gray-100" ref={dropdownRef}>
+        <div className="relative sm:pl-6 sm:border-l border-gray-100" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(o => !o)}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="text-right hidden sm:block">
+            <div className="text-right hidden md:block">
               <p className="text-sm font-bold text-gray-900 leading-tight">{user?.name || "User"}</p>
               <p className="text-[10px] font-bold text-[#3B00D9] uppercase tracking-wider">{user?.role || "Administrator"}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3B00D9] overflow-hidden shadow-sm shadow-indigo-500/5">
+            <div className="w-9 h-9 sm:w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3B00D9] overflow-hidden shadow-sm shadow-indigo-500/5">
               {user?.image
                 ? <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-                : <User size={20} />
+                : <User size={18} className="sm:size-5" />
               }
             </div>
             <ChevronDown size={14} className={`text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />

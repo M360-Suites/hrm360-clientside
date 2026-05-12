@@ -25,28 +25,28 @@ const Leave = () => {
         <p className="text-sm text-gray-500">Track and manage employee leave requests</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
           { label: "Annual Leave", count: 32, color: "text-indigo-500", bg: "bg-indigo-50" },
           { label: "Sick Leave", count: 12, color: "text-rose-500", bg: "bg-rose-50" },
-          { label: "Maternity Leave", count: 5, color: "text-emerald-500", bg: "bg-emerald-50" },
-          { label: "Compassionate Leave", count: 8, color: "text-orange-500", bg: "bg-orange-50" }
+          { label: "Maternity", count: 5, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "Compassionate", count: 8, color: "text-orange-500", bg: "bg-orange-50" }
         ].map((item, i) => (
-          <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
-            <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 rounded-lg ${item.bg} ${item.color}`}>
-                <Calendar size={18} />
+          <div key={i} className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <div className={`p-1.5 sm:p-2 rounded-lg ${item.bg} ${item.color}`}>
+                <Calendar size={16} />
               </div>
-              <span className="text-sm font-medium text-gray-600">{item.label}</span>
+              <span className="text-[10px] sm:text-sm font-medium text-gray-600 truncate">{item.label}</span>
             </div>
-            <h3 className="text-3xl font-semibold text-gray-900 mt-2">{item.count}</h3>
+            <h3 className="text-xl sm:text-3xl font-semibold text-gray-900 mt-1">{item.count}</h3>
           </div>
         ))}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
+        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
@@ -54,7 +54,7 @@ const Leave = () => {
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
             />
           </div>
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+          <button className="flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
             Sort by
           </button>
         </div>

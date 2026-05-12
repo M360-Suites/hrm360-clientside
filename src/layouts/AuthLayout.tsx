@@ -95,9 +95,9 @@ const AuthLayout = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative z-20">
+      <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
         {/* Mobile Carousel Header (Visible only on mobile/tablet) */}
-        <div className="lg:hidden h-[35vh] relative w-full overflow-hidden">
+        <div className="lg:hidden h-[30vh] sm:h-[35vh] relative w-full overflow-hidden shrink-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={`mobile-bg-${currentIndex}`}
@@ -112,15 +112,15 @@ const AuthLayout = () => {
                 alt="Mobile Slide"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#F8F9FF]"></div>
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-[#F8F9FF]"></div>
             </motion.div>
           </AnimatePresence>
           
-          <div className="absolute top-10 left-0 right-0 px-6 flex justify-between items-center">
-            <img src={logo} alt="Hrm360" className="w-24 h-8 object-contain brightness-0 invert" />
+          <div className="absolute top-8 left-0 right-0 px-6 flex justify-center items-center">
+            <span className="font-bold text-2xl text-white tracking-tight drop-shadow-md">Hrm360</span>
           </div>
 
-          <div className="absolute bottom-8 left-0 right-0 px-6 text-center">
+          <div className="absolute bottom-6 left-0 right-0 px-6 text-center">
              <AnimatePresence mode="wait">
               <motion.div
                 key={`mobile-text-${currentIndex}`}
@@ -129,14 +129,14 @@ const AuthLayout = () => {
                 exit={{ opacity: 0, scale: 1.1 }}
                 transition={{ duration: 0.5 }}
               >
-                <h3 className="text-xl font-bold text-white drop-shadow-lg">
+                <h3 className="text-xl font-bold text-white drop-shadow-lg mb-1">
                   {carouselItems[currentIndex].title}
                 </h3>
               </motion.div>
             </AnimatePresence>
             
             {/* Mobile Indicators */}
-            <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex items-center justify-center gap-2 mt-2">
               {carouselItems.map((_, idx) => (
                 <div 
                   key={idx}
@@ -150,16 +150,16 @@ const AuthLayout = () => {
         </div>
 
         {/* Form Container */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 py-10 lg:px-20 overflow-y-auto">
+        <div className="flex-1 flex flex-col items-center justify-start lg:justify-center px-4 sm:px-10 py-8 lg:px-20 overflow-y-auto custom-scrollbar">
           {/* Logo (Desktop only, already handled for mobile) */}
           <div className="hidden lg:flex absolute top-12 right-12">
-            <img src={logo} alt="Hrm360" className="w-32 h-10 object-contain" />
+             <span className="font-bold text-3xl text-[#3B00D9] tracking-tight">Hrm360</span>
           </div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-xl bg-white/70 backdrop-blur-xl border border-white/50 p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 lg:bg-transparent lg:backdrop-blur-none lg:border-none lg:shadow-none lg:p-0"
+            className="w-full max-w-xl bg-white/80 backdrop-blur-2xl border border-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 lg:bg-transparent lg:backdrop-blur-none lg:border-none lg:shadow-none lg:p-0"
           >
             <Outlet />
           </motion.div>

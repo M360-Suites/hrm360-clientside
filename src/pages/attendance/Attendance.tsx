@@ -59,7 +59,7 @@ const Attendance = () => {
 
 	return (
 		<div className='max-w-7xl mx-auto space-y-6 pb-12'>
-			<div className='flex items-end justify-between'>
+			<div className='flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4'>
 				<div>
 					<h2 className='text-xl font-semibold text-gray-800 mb-1'>
 						Attendance Tracking
@@ -68,7 +68,7 @@ const Attendance = () => {
 						Real-time presence management for your organization
 					</p>
 				</div>
-				<div className='text-right'>
+				<div className='text-left sm:text-right w-full sm:w-auto p-4 bg-white rounded-2xl border border-gray-100 sm:bg-transparent sm:border-0 sm:p-0'>
 					<p className='text-xs text-gray-400 font-medium uppercase tracking-wider mb-1'>
 						Current Time
 					</p>
@@ -78,36 +78,36 @@ const Attendance = () => {
 				</div>
 			</div>
 
-			<div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm shadow-indigo-500/5'>
-					<p className='text-xs font-bold text-indigo-500 uppercase tracking-wider mb-2'>
+			<div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-indigo-500/5'>
+					<p className='text-[10px] sm:text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Present Today
 					</p>
-					<h3 className='text-3xl font-bold text-gray-900'>
+					<h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
 						{todayStats?.present || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm shadow-amber-500/5'>
-					<p className='text-xs font-bold text-amber-500 uppercase tracking-wider mb-2'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-amber-500/5'>
+					<p className='text-[10px] sm:text-xs font-bold text-amber-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Late Arrivals
 					</p>
-					<h3 className='text-3xl font-bold text-gray-900'>
+					<h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
 						{todayStats?.late || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm shadow-rose-500/5'>
-					<p className='text-xs font-bold text-rose-500 uppercase tracking-wider mb-2'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-rose-500/5'>
+					<p className='text-[10px] sm:text-xs font-bold text-rose-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Absent Today
 					</p>
-					<h3 className='text-3xl font-bold text-gray-900'>
+					<h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
 						{todayStats?.absent || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm shadow-emerald-500/5'>
-					<p className='text-xs font-bold text-emerald-500 uppercase tracking-wider mb-2'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-emerald-500/5'>
+					<p className='text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Attendance Rate
 					</p>
-					<h3 className='text-3xl font-bold text-gray-900'>
+					<h3 className='text-2xl sm:text-3xl font-bold text-gray-900'>
 						{todayStats?.rate || "0%"}
 					</h3>
 				</div>
