@@ -100,7 +100,7 @@ const Register = () => {
 	};
 
 	const fieldCls = (field: string) =>
-		`w-full px-4 py-3 rounded-xl border transition-all text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
+		`w-full px-4 py-3 rounded-xl border transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 ${
 			errors[field]
 				? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
 				: "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"

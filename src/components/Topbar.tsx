@@ -63,7 +63,7 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
               <p className="text-sm font-bold text-gray-900 leading-tight">{user?.name || "User"}</p>
               <p className="text-[10px] font-bold text-[#3B00D9] uppercase tracking-wider">{user?.role || "Administrator"}</p>
             </div>
-            <div className="w-9 h-9 sm:w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3B00D9] overflow-hidden shadow-sm shadow-indigo-500/5">
+            <div className="w-9 h-9 sm:w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#3B00D9] overflow-hidden shadow-xs shadow-indigo-500/5">
               {user?.image
                 ? <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                 : <User size={18} className="sm:size-5" />

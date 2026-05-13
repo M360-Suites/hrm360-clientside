@@ -205,7 +205,7 @@ const Onboarding = () => {
 									onChange={(e) =>
 										updateField("address", e.target.value)
 									}
-									className='w-full h-12 px-4 rounded-md border border-gray-200 focus:outline-none focus:border-[#7B2FFF] focus:ring-2 focus:ring-[#7B2FFF]/10'
+									className='w-full h-12 px-4 rounded-md border border-gray-200 focus:outline-hidden focus:border-[#7B2FFF] focus:ring-2 focus:ring-[#7B2FFF]/10'
 								/>
 							</div>
 

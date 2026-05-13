@@ -25,34 +25,34 @@ const Loans = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Loan Management</h2>
           <p className="text-sm text-gray-500">Track and manage employee loans</p>
         </div>
-        <button className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors shadow-sm">
+        <button className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors shadow-xs">
           View loan policy
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex items-center gap-4">
           <div className="p-2 bg-indigo-50 text-indigo-500 rounded-full"><TrendingUp size={20} /></div>
           <div>
             <p className="text-xs font-medium text-gray-500">Active Loans</p>
             <h3 className="text-xl font-bold text-gray-900 mt-1">8</h3>
           </div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex items-center gap-4">
           <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full"><CheckCircle2 size={20} /></div>
           <div>
             <p className="text-xs font-medium text-gray-500">Total Disbursed</p>
             <h3 className="text-xl font-bold text-gray-900 mt-1">₦4.2M</h3>
           </div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex items-center gap-4">
           <div className="p-2 bg-emerald-50 text-emerald-500 rounded-full"><Award size={20} /></div>
           <div>
             <p className="text-xs font-medium text-gray-500">Pending Request</p>
             <h3 className="text-xl font-bold text-gray-900 mt-1">3</h3>
           </div>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex items-center gap-4">
           <div className="p-2 bg-rose-50 text-rose-500 rounded-full"><Clock size={20} /></div>
           <div>
             <p className="text-xs font-medium text-gray-500">Monthly repayments</p>
@@ -63,21 +63,21 @@ const Loans = () => {
 
       <div className="flex items-center justify-between mt-8 border-b border-gray-200 pb-4">
         <div className="flex gap-6 text-sm font-medium">
-          <button className="text-gray-800 border-b-2 border-gray-800 pb-4 -mb-[17px]">All</button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 -mb-[17px]">Approved</button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 -mb-[17px]">Pending</button>
+          <button className="text-gray-800 border-b-2 border-gray-800 pb-4 mb-[-17px]">All</button>
+          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 mb-[-17px]">Approved</button>
+          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 mb-[-17px]">Pending</button>
         </div>
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           <input 
             type="text" 
             placeholder="Search courses.." 
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-4">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden mt-4">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600 whitespace-nowrap">
             <thead className="bg-white text-gray-800 font-medium border-b border-gray-100">

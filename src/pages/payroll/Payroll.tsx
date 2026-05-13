@@ -31,12 +31,12 @@ const Payroll = () => {
           <p className="text-sm text-gray-500">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })} payroll cycle</p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors shadow-sm">
+          <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors shadow-xs">
             <Download size={16} /> Export payroll
           </button>
           <button 
             onClick={() => setShowPinModal(true)}
-            className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-purple-100 transition-colors shadow-sm"
+            className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
           >
             <RefreshCw size={16} /> Run payroll
           </button>
@@ -44,28 +44,28 @@ const Payroll = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-indigo-500">
             <div className="p-2 bg-indigo-50 rounded-lg"><Calendar size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Gross Salary</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(summary?.totalGrossSalary || 0)}</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-rose-500">
             <div className="p-2 bg-rose-50 rounded-lg"><FileText size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Total Deductions</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(summary?.totalDeductions || 0)}</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-emerald-500">
             <div className="p-2 bg-emerald-50 rounded-lg"><Calendar size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Net Salary</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(summary?.totalNetSalary || 0)}</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-orange-500">
             <div className="p-2 bg-orange-50 rounded-lg"><FileText size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Pending Payslips</span>
@@ -74,14 +74,14 @@ const Payroll = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
               placeholder="Search employee" 
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
             />
           </div>
         </div>
@@ -150,7 +150,7 @@ const Payroll = () => {
 
       {/* PIN Modal */}
       {showPinModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-2">Run Payroll</h3>
             <p className="text-sm text-gray-500 mb-6">Enter your payroll PIN to authorize this cycle.</p>
@@ -160,7 +160,7 @@ const Payroll = () => {
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               placeholder="Enter PIN"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] mb-6 text-center text-2xl tracking-[1em]"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] mb-6 text-center text-2xl tracking-[1em]"
               maxLength={4}
             />
 

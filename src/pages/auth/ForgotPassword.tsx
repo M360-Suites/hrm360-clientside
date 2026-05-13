@@ -7,14 +7,8 @@ import { getCookie } from "../../utils/cookies";
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
-  const {
-    sendCode,
-    verifyCode,
-    resetPassword,
-    resetToken,
-    isLoading,
-    error,
-  } = useAuthStore();
+  const { sendCode, verifyCode, resetPassword, resetToken, isLoading, error } =
+    useAuthStore();
 
   const [step, setStep] = useState<"email" | "code" | "reset">("email");
   const [email, setEmail] = useState("");
@@ -73,7 +67,8 @@ const ForgotPassword = () => {
         </h2>
 
         <p className="text-gray-500">
-          {step === "email" && "Enter your email to receive a verification code."}
+          {step === "email" &&
+            "Enter your email to receive a verification code."}
           {step === "code" && "Enter the code sent to your email."}
           {step === "reset" && "Create a new password for your account."}
         </p>
@@ -98,14 +93,14 @@ const ForgotPassword = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-sm shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Send Code
@@ -126,14 +121,14 @@ const ForgotPassword = () => {
               onChange={(e) => setCode(e.target.value)}
               placeholder="Enter verification code"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-sm shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Verify Code
@@ -156,7 +151,7 @@ const ForgotPassword = () => {
                 placeholder="Enter new password"
                 required
                 minLength={8}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
               />
 
               <button
@@ -172,7 +167,7 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-sm shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Reset Password

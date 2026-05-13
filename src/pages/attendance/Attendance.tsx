@@ -79,7 +79,7 @@ const Attendance = () => {
 			</div>
 
 			<div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4'>
-				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-indigo-500/5'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs shadow-indigo-500/5'>
 					<p className='text-[10px] sm:text-xs font-bold text-indigo-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Present Today
 					</p>
@@ -87,7 +87,7 @@ const Attendance = () => {
 						{todayStats?.present || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-amber-500/5'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs shadow-amber-500/5'>
 					<p className='text-[10px] sm:text-xs font-bold text-amber-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Late Arrivals
 					</p>
@@ -95,7 +95,7 @@ const Attendance = () => {
 						{todayStats?.late || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-rose-500/5'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs shadow-rose-500/5'>
 					<p className='text-[10px] sm:text-xs font-bold text-rose-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Absent Today
 					</p>
@@ -103,7 +103,7 @@ const Attendance = () => {
 						{todayStats?.absent || 0}
 					</h3>
 				</div>
-				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm shadow-emerald-500/5'>
+				<div className='bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs shadow-emerald-500/5'>
 					<p className='text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 sm:mb-2'>
 						Attendance Rate
 					</p>
@@ -116,7 +116,7 @@ const Attendance = () => {
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
 				{/* Employee List for Clocking In/Out */}
 				<div className='lg:col-span-2 space-y-4'>
-					<div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col'>
+					<div className='bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden flex flex-col'>
 						<div className='p-6 border-b border-gray-100'>
 							<div className='flex items-center justify-between mb-4'>
 								<h3 className='font-bold text-gray-900'>
@@ -136,7 +136,7 @@ const Attendance = () => {
 									placeholder='Search employee to clock in...'
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
-									className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
+									className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
 								/>
 							</div>
 						</div>
@@ -224,7 +224,7 @@ const Attendance = () => {
 
 				{/* Real-time Activity Feed */}
 				<div className='space-y-4'>
-					<div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'>
+					<div className='bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden'>
 						<div className='p-6 border-b border-gray-100'>
 							<h3 className='font-bold text-gray-900'>
 								Today's Logs

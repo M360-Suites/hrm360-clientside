@@ -23,34 +23,34 @@ const Training = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Training Management</h2>
           <p className="text-sm text-gray-500">Manage employee training and development programs</p>
         </div>
-        <button className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-purple-100 transition-colors shadow-sm">
+        <button className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-purple-100 transition-colors shadow-xs">
           <Plus size={16} /> Add course
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-indigo-500">
             <div className="p-2 bg-indigo-50 rounded-lg"><BookOpen size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Active courses</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">3</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-emerald-500">
             <div className="p-2 bg-emerald-50 rounded-lg"><Users size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Enrolled</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">18</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-emerald-500">
             <div className="p-2 bg-emerald-50 rounded-lg"><Award size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Completed</span>
           </div>
           <h3 className="text-2xl font-bold text-gray-900">7</h3>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-3 text-rose-500">
             <div className="p-2 bg-rose-50 rounded-lg"><Clock size={18} /></div>
             <span className="text-sm font-medium text-gray-600">Expiring soon</span>
@@ -66,14 +66,14 @@ const Training = () => {
           <input 
             type="text" 
             placeholder="Search courses.." 
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course, idx) => (
-          <div key={idx} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[11px] font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
                 {course.tag}

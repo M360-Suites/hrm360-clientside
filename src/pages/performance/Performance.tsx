@@ -8,13 +8,13 @@ const Performance = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Performance Management</h2>
           <p className="text-sm text-gray-500">Review cycles, goal tracking, and competency evaluation</p>
         </div>
-        <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors shadow-sm">
+        <button className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-gray-50 transition-colors shadow-xs">
           <CalendarIcon size={16} /> Q1 2026 <ChevronDown size={14} />
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-2 text-indigo-500">
             <div className="p-2 bg-indigo-50 rounded-full"><TrendingUp size={16} /></div>
             <span className="text-sm font-medium text-gray-600">Total reviews done</span>
@@ -24,7 +24,7 @@ const Performance = () => {
             <TrendingUp size={12} className="mr-1" /> +2.3% vs Q4
           </span>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-2 text-emerald-500">
             <div className="p-2 bg-emerald-50 rounded-full"><CheckCircle2 size={16} /></div>
             <span className="text-sm font-medium text-gray-600">Goals completion</span>
@@ -34,7 +34,7 @@ const Performance = () => {
             <TrendingUp size={12} className="mr-1" /> +2.3% vs Q4
           </span>
         </div>
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
           <div className="flex items-center gap-3 mb-2 text-rose-500">
             <div className="p-2 bg-rose-50 rounded-full"><Award size={16} /></div>
             <span className="text-sm font-medium text-gray-600">Top Performer</span>
@@ -45,7 +45,7 @@ const Performance = () => {
           </span>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-purple-200 border-dashed bg-purple-50/30 flex flex-col justify-center">
-          <div className="bg-[#3B00D9] text-white text-sm font-medium text-center py-2 rounded-lg mb-3 shadow-sm">
+          <div className="bg-[#3B00D9] text-white text-sm font-medium text-center py-2 rounded-lg mb-3 shadow-xs">
             Quick Actions
           </div>
           <div className="space-y-2">
@@ -61,23 +61,23 @@ const Performance = () => {
 
       <div className="flex items-center justify-between mt-8 border-b border-gray-200 pb-4">
         <div className="flex gap-6 text-sm font-medium">
-          <button className="text-gray-800 border-b-2 border-gray-800 pb-4 -mb-[17px]">Overview</button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 -mb-[17px]">Goals</button>
-          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 -mb-[17px]">Reviews & Feedback</button>
+          <button className="text-gray-800 border-b-2 border-gray-800 pb-4 mb-[-17px]">Overview</button>
+          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 mb-[-17px]">Goals</button>
+          <button className="text-gray-500 hover:text-gray-800 transition-colors pb-4 mb-[-17px]">Reviews & Feedback</button>
         </div>
         <div className="relative w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           <input 
             type="text" 
             placeholder="Search courses.." 
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-80 flex flex-col">
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs h-80 flex flex-col">
              <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-800">Performance Overview</h3>
               <button className="flex items-center gap-2 text-sm font-medium text-[#3B00D9] bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
@@ -112,7 +112,7 @@ const Performance = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-64">
+             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs h-64">
                 <h3 className="font-semibold text-gray-800 mb-2">Recent activities</h3>
                 <p className="text-xs text-gray-500 mb-6">Average score by team</p>
                 <div className="space-y-4">
@@ -136,7 +136,7 @@ const Performance = () => {
                   </div>
                 </div>
              </div>
-             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-64 flex flex-col">
+             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs h-64 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-800">Top performer</h3>
                   <button className="flex items-center gap-1 text-xs font-medium text-[#3B00D9] bg-indigo-50 px-2 py-1 rounded-lg">
@@ -158,7 +158,7 @@ const Performance = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 h-fit">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-xs p-6 h-fit">
           <h3 className="font-semibold text-gray-800 mb-1">Team Comparison</h3>
           <p className="text-xs text-gray-500 mb-6">Average score by team</p>
           <div className="space-y-6">

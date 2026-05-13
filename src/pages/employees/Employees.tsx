@@ -94,7 +94,7 @@ const Employees = () => {
 	};
 
 	const fieldCls = (field: string) =>
-		`w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all ${
+		`w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-hidden focus:ring-2 transition-all ${
 			formErrors[field]
 				? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
 				: "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
@@ -220,7 +220,7 @@ const Employees = () => {
 		<div className='max-w-7xl mx-auto space-y-6'>
 			{toast && (
 				<div
-					className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
+					className={`fixed top-6 right-6 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
 						toast.type === "success"
 							? "bg-emerald-600 text-white"
 							: "bg-rose-600 text-white"
@@ -250,13 +250,13 @@ const Employees = () => {
 						resetForm();
 						setIsModalOpen(true);
 					}}
-					className='w-full sm:w-auto bg-[#3B00D9] text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#3500c0] transition-all shadow-sm'
+					className='w-full sm:w-auto bg-[#3B00D9] text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#3500c0] transition-all shadow-xs'
 				>
 					<Plus size={16} /> Add new employee
 				</button>
 			</div>
 
-			<div className='bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden'>
+			<div className='bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden'>
 				<div className='p-4 border-b border-gray-100 overflow-x-auto'>
 					<div className='flex gap-4 min-w-max text-sm'>
 						<button className='font-medium text-[#3B00D9] border-b-2 border-[#3B00D9] pb-4 px-2'>
@@ -277,7 +277,7 @@ const Employees = () => {
 						<input
 							type='text'
 							placeholder='Search employee'
-							className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
+							className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
 						/>
 					</div>
 
@@ -530,7 +530,7 @@ const Employees = () => {
 			</div>
 
 			{isModalOpen && (
-				<div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4'>
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
 					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden'>
 						<div className='p-8'>
 							<div className='flex items-center justify-between mb-8'>
@@ -649,7 +649,7 @@ const Employees = () => {
 			)}
 
 			{isEditModalOpen && (
-				<div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4'>
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
 					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden'>
 						<div className='p-8'>
 							<div className='flex items-center justify-between mb-8'>

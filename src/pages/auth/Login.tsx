@@ -57,7 +57,7 @@ const Login = () => {
   };
 
   const fieldCls = (field: string) =>
-    `w-full px-4 py-3 rounded-xl border transition-all text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
+    `w-full px-4 py-3 rounded-xl border transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 ${
       errors[field]
         ? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
         : "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
@@ -150,7 +150,7 @@ const Login = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-sm shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+          className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
         >
           {isLoading && <Loader2 className="animate-spin" size={18} />}
           Login

@@ -32,7 +32,7 @@ const AuthLayout = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#F8F9FF] via-white to-[#E9EDFF] relative overflow-hidden">
+    <div className="flex min-h-screen bg-linear-to-br from-[#F8F9FF] via-white to-[#E9EDFF] relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/20 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/20 blur-[120px] rounded-full" />
@@ -54,7 +54,7 @@ const AuthLayout = () => {
                 alt={`Slide ${currentIndex + 1}`}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-indigo-900/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-indigo-950/90 via-indigo-900/20 to-transparent"></div>
             </motion.div>
           </AnimatePresence>
 
@@ -112,7 +112,7 @@ const AuthLayout = () => {
                 alt="Mobile Slide"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-[#F8F9FF]"></div>
+              <div className="absolute inset-0 bg-linear-to-b from-black/50 via-transparent to-[#F8F9FF]"></div>
             </motion.div>
           </AnimatePresence>
           

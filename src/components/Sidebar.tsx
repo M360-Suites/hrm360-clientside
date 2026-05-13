@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 }}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${
                   isActive 
-                    ? "text-[#3B00D9] bg-indigo-50 font-medium border border-indigo-100 shadow-sm" 
+                    ? "text-[#3B00D9] bg-indigo-50 font-medium border border-indigo-100 shadow-xs" 
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
@@ -111,7 +111,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   className="flex items-center gap-3 w-full p-2 hover:bg-white rounded-lg transition-colors text-left group"
                 >
                   <div className={`w-6 h-6 rounded-md ${colorClass} flex items-center justify-center shrink-0`}>
-                    <div className="w-2.5 h-2.5 bg-white/30 rounded-sm"></div>
+                    <div className="w-2.5 h-2.5 bg-white/30 rounded-xs"></div>
                   </div>
                   <span className="text-sm text-gray-600 truncate group-hover:text-gray-900">
                     {org.name}

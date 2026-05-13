@@ -171,7 +171,7 @@ const Dashboard = () => {
 			</div>
 
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'>
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative'>
+				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-xs relative'>
 					<p className='text-sm font-medium text-gray-600 mb-2'>
 						Total Employee
 					</p>
@@ -195,7 +195,7 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm'>
+				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-xs'>
 					<p className='text-sm font-medium text-gray-600 mb-2'>
 						Attendance Today
 					</p>
@@ -210,7 +210,7 @@ const Dashboard = () => {
 					</div>
 				</div>
 
-				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm sm:col-span-2 lg:col-span-1'>
+				<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1'>
 					<p className='text-sm font-medium text-gray-600 mb-2'>
 						On leave Today
 					</p>
@@ -228,7 +228,7 @@ const Dashboard = () => {
 
 			<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
 				<div className='lg:col-span-2 space-y-6'>
-					<div className='bg-white p-6 rounded-2xl border border-gray-100 shadow-sm'>
+					<div className='bg-white p-6 rounded-2xl border border-gray-100 shadow-xs'>
 						<div className='flex items-center justify-between mb-6'>
 							<h3 className='font-semibold text-gray-800'>
 								Employee Overview
@@ -271,7 +271,7 @@ const Dashboard = () => {
 						</button>
 					</div>
 
-					<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-sm'>
+					<div className='bg-white p-5 rounded-2xl border border-gray-100 shadow-xs'>
 						<h3 className='font-semibold text-gray-800 mb-4'>
 							Calendar
 						</h3>

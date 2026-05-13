@@ -32,7 +32,7 @@ const Leave = () => {
           { label: "Maternity", count: 5, color: "text-emerald-500", bg: "bg-emerald-50" },
           { label: "Compassionate", count: 8, color: "text-orange-500", bg: "bg-orange-50" }
         ].map((item, i) => (
-          <div key={i} className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center">
+          <div key={i} className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-col justify-center">
             <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
               <div className={`p-1.5 sm:p-2 rounded-lg ${item.bg} ${item.color}`}>
                 <Calendar size={16} />
@@ -44,14 +44,14 @@ const Leave = () => {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
               placeholder="Search employee" 
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
             />
           </div>
           <button className="flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
