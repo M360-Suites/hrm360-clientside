@@ -16,6 +16,7 @@ type EmployeeFormData = {
 	name: string;
 	email: string;
 	role: string;
+	workMode: string;
 };
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +25,7 @@ const emptyForm: EmployeeFormData = {
 	name: "",
 	email: "",
 	role: "",
+	workMode: "Remote",
 };
 
 const validateEmployee = (data: EmployeeFormData) => {
@@ -41,6 +43,9 @@ const validateEmployee = (data: EmployeeFormData) => {
 
 	if (!data.role.trim())
 		errors.role = "Role / Job title is required.";
+
+	if (!data.workMode || !data.workMode.trim())
+		errors.workMode = "Work mode is required.";
 
 	return errors;
 };
@@ -115,6 +120,7 @@ const Employees = () => {
 			name: formData.name.trim(),
 			email: formData.email.trim(),
 			role: formData.role.trim(),
+			workMode: formData.workMode,
 			status: "Active",
 			basicSalary: 0,
 			allowances: 0,
@@ -156,6 +162,7 @@ const Employees = () => {
 			name: formData.name.trim(),
 			email: formData.email.trim(),
 			role: formData.role.trim(),
+			workMode: formData.workMode,
 			status: selectedEmployee.status || "Active",
 			basicSalary: selectedEmployee.basicSalary || 0,
 			allowances: selectedEmployee.allowances || 0,
@@ -209,6 +216,7 @@ const Employees = () => {
 			name: employee.name || "",
 			email: employee.email || "",
 			role: employee.role || "",
+			workMode: employee.workMode || "Remote",
 		});
 
 		setFormErrors({});
@@ -262,9 +270,9 @@ const Employees = () => {
 						<button className='font-medium text-[#3B00D9] border-b-2 border-[#3B00D9] pb-4 px-2'>
 							All Employees
 						</button>
-						<button className='font-medium text-gray-500 pb-4 px-2 hover:text-gray-700'>
+						{/* <button className='font-medium text-gray-500 pb-4 px-2 hover:text-gray-700'>
 							Teams
-						</button>
+						</button> */}
 					</div>
 				</div>
 
@@ -306,6 +314,7 @@ const Employees = () => {
 							<tr>
 								<th className='px-6 py-4'>Employee</th>
 								<th className='px-6 py-4'>Role</th>
+								<th className='px-6 py-4'>Work Mode</th>
 								<th className='px-6 py-4'>Organization</th>
 								<th className='px-6 py-4'>Status</th>
 								<th className='px-6 py-4'>Date joined</th>
@@ -341,6 +350,10 @@ const Employees = () => {
 
 										<td className='px-6 py-4 text-gray-600 font-medium'>
 											{emp.role}
+										</td>
+
+										<td className='px-6 py-4 text-gray-600 font-medium'>
+											{emp.workMode || "Remote"}
 										</td>
 
 										<td className='px-6 py-4'>
@@ -484,6 +497,10 @@ const Employees = () => {
 											<p className='text-gray-700 font-medium'>{emp.role}</p>
 										</div>
 										<div>
+											<p className='text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1'>Work Mode</p>
+											<p className='text-gray-700 font-medium'>{emp.workMode || "Remote"}</p>
+										</div>
+										<div>
 											<p className='text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1'>Status</p>
 											<span
 												className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
@@ -619,6 +636,28 @@ const Employees = () => {
 										</p>
 									)}
 								</div>
+
+								<div>
+									<label className='block text-sm font-medium text-gray-700 mb-1.5'>
+										Work Mode
+									</label>
+									<select
+										value={formData.workMode}
+										onChange={(e) =>
+											updateField("workMode", e.target.value)
+										}
+										className={fieldCls("workMode")}
+									>
+										<option value='Remote'>Remote</option>
+										<option value='On site'>On-site</option>
+										<option value='Hybrid'>Hybrid</option>
+									</select>
+									{formErrors.workMode && (
+										<p className='mt-1.5 text-xs text-rose-500 font-medium'>
+											{formErrors.workMode}
+										</p>
+									)}
+								</div>
 								<div className='pt-4 flex gap-3'>
 									<button
 										type='button'
@@ -735,6 +774,28 @@ const Employees = () => {
 									{formErrors.role && (
 										<p className='mt-1.5 text-xs text-rose-500 font-medium'>
 											{formErrors.role}
+										</p>
+									)}
+								</div>
+
+								<div>
+									<label className='block text-sm font-medium text-gray-700 mb-1.5'>
+										Work Mode
+									</label>
+									<select
+										value={formData.workMode}
+										onChange={(e) =>
+											updateField("workMode", e.target.value)
+										}
+										className={fieldCls("workMode")}
+									>
+										<option value='Remote'>Remote</option>
+										<option value='On site'>On-site</option>
+										<option value='Hybrid'>Hybrid</option>
+									</select>
+									{formErrors.workMode && (
+										<p className='mt-1.5 text-xs text-rose-500 font-medium'>
+											{formErrors.workMode}
 										</p>
 									)}
 								</div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Clock, UserPlus, UserMinus, Search } from "lucide-react";
+import { Clock, UserPlus, UserMinus, Search, X, Loader2, QrCode, ScanLine } from "lucide-react";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 
@@ -11,6 +11,10 @@ const Attendance = () => {
 		fetchTodayStats,
 		clockIn,
 		clockOut,
+		qrCode,
+		isLoading,
+		fetchQrCode,
+		clockWithQr
 	} = useAttendanceStore();
 
 	const fetchedOnce = useRef(false);
@@ -31,6 +35,9 @@ const Attendance = () => {
 
 	const [time, setTime] = useState(new Date());
 	const [searchQuery, setSearchQuery] = useState("");
+	const [showQrModal, setShowQrModal] = useState(false);
+	const [showScanModal, setShowScanModal] = useState(false);
+	const [qrInput, setQrInput] = useState("");
 
 	useEffect(() => {
 		fetchDayAttendance();
@@ -122,9 +129,17 @@ const Attendance = () => {
 								<h3 className='font-bold text-gray-900'>
 									Manage Attendance
 								</h3>
-								<span className='text-xs text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full font-semibold'>
-									{employees.length} Employees
-								</span>
+								<div className="flex items-center gap-2">
+									<span className='hidden sm:inline-block text-xs text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full font-semibold'>
+										{employees.length} Employees
+									</span>
+									<button onClick={() => { fetchQrCode(); setShowQrModal(true); }} className="flex items-center gap-1.5 text-xs bg-[#3B00D9] text-white px-3 py-1.5 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-xs">
+										<QrCode size={14} /> Today's QR
+									</button>
+									<button onClick={() => setShowScanModal(true)} className="flex items-center gap-1.5 text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full font-medium hover:bg-emerald-700 transition-colors shadow-xs">
+										<ScanLine size={14} /> Scan QR
+									</button>
+								</div>
 							</div>
 							<div className='relative'>
 								<Search
@@ -278,6 +293,70 @@ const Attendance = () => {
 					</div>
 				</div>
 			</div>
+
+			{/* QR Modals */}
+			{showQrModal && (
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
+					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative'>
+						<button onClick={() => setShowQrModal(false)} className='absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors'><X size={20}/></button>
+						<h3 className='text-xl font-bold text-gray-900 mb-2'>Today's QR Code</h3>
+						<p className='text-sm text-gray-500 mb-6'>Employees can scan this to clock in/out.</p>
+						<div className='flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 min-h-[250px]'>
+							{isLoading && !qrCode ? (
+								<Loader2 className='animate-spin text-[#3B00D9]' size={32} />
+							) : qrCode ? (
+								<div className="text-center w-full">
+									<div className="w-48 h-48 bg-white p-2 border border-gray-200 rounded-xl shadow-sm mb-4 mx-auto flex items-center justify-center overflow-hidden">
+										{typeof qrCode === 'string' && (qrCode.startsWith('http') || qrCode.startsWith('data:image')) ? (
+											<img src={qrCode} alt="Today's QR" className="max-w-full max-h-full" />
+										) : (
+											<div className="text-[10px] break-all text-gray-600 p-2 font-mono bg-gray-50 rounded w-full h-full overflow-auto">
+												{typeof qrCode === 'object' ? JSON.stringify(qrCode) : qrCode}
+											</div>
+										)}
+									</div>
+									<p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Unique Daily Code</p>
+								</div>
+							) : (
+								<p className="text-sm text-rose-500 font-medium">Failed to load QR code</p>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+
+			{showScanModal && (
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
+					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative'>
+						<button onClick={() => setShowScanModal(false)} className='absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors'><X size={20}/></button>
+						<h3 className='text-xl font-bold text-gray-900 mb-2'>Scan QR Code</h3>
+						<p className='text-sm text-gray-500 mb-6'>Enter or scan QR data to clock in/out.</p>
+						<div className='space-y-4'>
+							<input 
+								type="text" 
+								value={qrInput}
+								onChange={(e) => setQrInput(e.target.value)}
+								placeholder="Paste or scan QR data..." 
+								className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+							/>
+							<button 
+								onClick={async () => {
+									if(!qrInput) return;
+									const success = await clockWithQr(qrInput);
+									if(success) {
+										setShowScanModal(false);
+										setQrInput("");
+									}
+								}}
+								disabled={isLoading || !qrInput}
+								className="w-full py-3 bg-[#3B00D9] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#3500c0] disabled:opacity-70 transition-all shadow-xs"
+							>
+								{isLoading ? <Loader2 className="animate-spin" size={16} /> : "Submit QR Data"}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

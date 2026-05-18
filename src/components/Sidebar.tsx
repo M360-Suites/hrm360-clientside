@@ -8,12 +8,12 @@ import {
   Banknote, 
   UserPlus, 
   GraduationCap, 
-  TrendingUp, 
-  LineChart, 
-  Wallet, 
-  CheckCircle2, 
+  // TrendingUp, 
+  // LineChart, 
+  // Wallet, 
+  // CheckCircle2, 
   Megaphone, 
-  FileText,
+  // FileText,
   X
 } from "lucide-react";
 import { useOrgStore } from "../store/useOrgStore";
@@ -26,12 +26,12 @@ const navItems = [
   { icon: Banknote, label: "Payroll", path: "/payroll" },
   { icon: UserPlus, label: "Recruitment", path: "/recruitment" },
   { icon: GraduationCap, label: "Training", path: "/training" },
-  { icon: TrendingUp, label: "Promotion", path: "/promotion" },
-  { icon: LineChart, label: "Performance", path: "/performance" },
-  { icon: Wallet, label: "Loans", path: "/loans" },
-  { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
+  // { icon: TrendingUp, label: "Promotion", path: "/promotion" },
+  // { icon: LineChart, label: "Performance", path: "/performance" },
+  // { icon: Wallet, label: "Loans", path: "/loans" },
+  // { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
   { icon: Megaphone, label: "Announcement", path: "/announcement" },
-  { icon: FileText, label: "Documents", path: "/documents" },
+  // { icon: FileText, label: "Documents", path: "/documents" },
 ];
 
 const ORG_COLORS = [
