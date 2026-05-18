@@ -43,14 +43,14 @@ const Recruitment = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Recruitment</h2>
           <p className="text-sm text-gray-500">Track job openings and applicant pipeline</p>
         </div>
         <button 
           onClick={() => setShowPostModal(true)}
-          className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
+          className="w-full sm:w-auto bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
         >
           <Plus size={16} /> Post jobs
         </button>
@@ -70,17 +70,17 @@ const Recruitment = () => {
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Open positions</h3>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden divide-y divide-gray-100">
           {jobs.length > 0 ? jobs.map((job, idx) => (
-            <div key={job._id || idx} className="p-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+            <div key={job._id || idx} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
               <div>
                 <h4 className="font-semibold text-gray-900 mb-1">{job.title}</h4>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
                   <span className="font-medium text-[#3B00D9] bg-indigo-50 px-2 py-0.5 rounded">{job.department}</span>
                   • {job.location} • {job.type}
                   {job.createdAt && ` • Posted ${new Date(job.createdAt).toLocaleDateString()}`}
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="text-center">
+              <div className="flex items-center gap-6 self-start sm:self-auto">
+                <div className="text-left sm:text-center">
                   <p className="text-sm font-medium text-gray-800">{job.applicants || 0} applicants</p>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-pink-600 mt-1">
                     {job.interviewing || 0} interviewing

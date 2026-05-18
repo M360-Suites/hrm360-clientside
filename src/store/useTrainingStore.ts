@@ -83,7 +83,8 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
   addCourse: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post('/training/course', data, getOrgConfig());
+      const orgId = getCookie("orgId");
+      await api.post('/training/course', { ...data, orgId }, getOrgConfig());
       await get().fetchCourses();
       await get().fetchStats();
       set({ isLoading: false });

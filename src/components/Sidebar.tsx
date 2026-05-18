@@ -34,6 +34,8 @@ const navItems = [
   // { icon: FileText, label: "Documents", path: "/documents" },
 ];
 
+import { getCookie } from "../utils/cookies";
+
 const ORG_COLORS = [
   "bg-orange-500",
   "bg-pink-500",
@@ -55,6 +57,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   useEffect(() => {
     fetchOrganizations();
   }, [fetchOrganizations]);
+
+  const activeOrgId = getCookie("orgId");
+  const userOrganizations = organizations.filter(org => {
+    const orgId = org._id || org.id;
+    return orgId === activeOrgId;
+  });
 
   return (
     <aside className={`
@@ -101,7 +109,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         <div className="bg-gray-50 rounded-2xl p-4">
           <p className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Organizations</p>
           <div className="space-y-2">
-            {organizations.map((org, index) => {
+            {userOrganizations.map((org, index) => {
               const colorClass = ORG_COLORS[index % ORG_COLORS.length];
               const orgId = org._id || org.id;
               
