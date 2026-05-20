@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import QrScanner from "qr-scanner";
 import {
 	Clock,
 	UserPlus,
@@ -8,8 +9,6 @@ import {
 	Loader2,
 	QrCode,
 	ScanLine,
-	ChevronLeft,
-	ChevronRight,
 	CalendarDays,
 	CheckCircle2,
 	AlertCircle,
@@ -51,7 +50,7 @@ const Attendance = () => {
 	} = useAttendanceStore();
 
 	const { employees, fetchEmployees } = useEmployeeStore();
-	const { user, isAdmin } = useAuthStore();
+	const { isAdmin } = useAuthStore();
 
 	const [time, setTime] = useState(new Date());
 	const [searchQuery, setSearchQuery] = useState("");
@@ -87,6 +86,7 @@ const Attendance = () => {
 	}, []);
 
 	const employeeToday = employeeDashboard?.today || todayStats;
+
 	const hasClockedIn = Boolean(
 		employeeToday?.clockIn ||
 			employeeToday?.clockedIn ||
@@ -107,7 +107,9 @@ const Attendance = () => {
 		"00:00:00";
 
 	const remainingTime =
-		employeeToday?.remainingTime || employeeToday?.timeLeft || "7h 55m left today";
+		employeeToday?.remainingTime ||
+		employeeToday?.timeLeft ||
+		"7h 55m left today";
 
 	const checkedInTime =
 		employeeToday?.clockIn ||
@@ -134,26 +136,31 @@ const Attendance = () => {
 		await fetchTodayStats();
 	};
 
-	const handleQrSubmit = async (value?: string) => {
-		const qrData = value || qrInput;
+	const handleQrSubmit = useCallback(
+		async (value?: string) => {
+			const qrData = value || qrInput;
 
-		if (!qrData.trim()) {
-			setScanMessage("Please scan or paste a valid QR code.");
-			return;
-		}
+			if (!qrData.trim()) {
+				setScanMessage("Please scan or paste a valid QR code.");
+				return;
+			}
 
-		const success = await clockWithQr(qrData.trim());
+			const success = await clockWithQr(qrData.trim());
 
-		if (success) {
-			setShowScanModal(false);
-			setQrInput("");
-			setScanMessage("");
-			await fetchEmployeeDashboard();
-			await fetchTodayStats();
-		} else {
-			setScanMessage("QR verification failed. Please scan the active admin QR code.");
-		}
-	};
+			if (success) {
+				setShowScanModal(false);
+				setQrInput("");
+				setScanMessage("");
+				await fetchEmployeeDashboard();
+				await fetchTodayStats();
+			} else {
+				setScanMessage(
+					"QR verification failed. Please scan the active admin QR code.",
+				);
+			}
+		},
+		[qrInput, clockWithQr, fetchEmployeeDashboard, fetchTodayStats],
+	);
 
 	const days = [
 		{ date: 1, day: "Sun", status: "neutral" },
@@ -172,7 +179,8 @@ const Attendance = () => {
 		late: "border-orange-300 text-orange-600 bg-orange-50",
 		holiday: "border-pink-300 text-pink-600 bg-pink-50",
 		weekend: "border-slate-200 text-slate-500 bg-slate-50",
-		active: "border-violet-500 text-violet-700 bg-violet-50 ring-2 ring-violet-100",
+		active:
+			"border-violet-500 text-violet-700 bg-violet-50 ring-2 ring-violet-100",
 		neutral: "border-slate-200 text-slate-500 bg-white",
 	};
 
@@ -181,7 +189,9 @@ const Attendance = () => {
 			<div className="max-w-5xl mx-auto pb-12">
 				<div className="flex items-start justify-between gap-4 mb-6">
 					<div>
-						<h2 className="text-lg font-semibold text-slate-900">Attendance</h2>
+						<h2 className="text-lg font-semibold text-slate-900">
+							Attendance
+						</h2>
 						<p className="text-sm text-slate-500">
 							Scan your workplace QR code to check in or out.
 						</p>
@@ -218,7 +228,9 @@ const Attendance = () => {
 							<div className="relative z-10 text-center px-6">
 								{hasClockedIn && !hasClockedOut ? (
 									<>
-										<p className="text-xs text-slate-500 mb-2">Work duration</p>
+										<p className="text-xs text-slate-500 mb-2">
+											Work duration
+										</p>
 										<h1 className="text-3xl font-bold text-slate-900 tabular-nums">
 											{workDuration}
 										</h1>
@@ -339,10 +351,26 @@ const Attendance = () => {
 			</div>
 
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-				<StatCard label="Present Today" value={todayStats?.present || 0} tone="indigo" />
-				<StatCard label="Late Arrivals" value={todayStats?.late || 0} tone="amber" />
-				<StatCard label="Absent Today" value={todayStats?.absent || 0} tone="rose" />
-				<StatCard label="Attendance Rate" value={todayStats?.rate || "0%"} tone="emerald" />
+				<StatCard
+					label="Present Today"
+					value={todayStats?.present || 0}
+					tone="indigo"
+				/>
+				<StatCard
+					label="Late Arrivals"
+					value={todayStats?.late || 0}
+					tone="amber"
+				/>
+				<StatCard
+					label="Absent Today"
+					value={todayStats?.absent || 0}
+					tone="rose"
+				/>
+				<StatCard
+					label="Attendance Rate"
+					value={todayStats?.rate || "0%"}
+					tone="emerald"
+				/>
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -351,7 +379,9 @@ const Attendance = () => {
 						<div className="p-6 border-b border-gray-100">
 							<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
 								<div>
-									<h3 className="font-bold text-gray-900">Manage Attendance</h3>
+									<h3 className="font-bold text-gray-900">
+										Manage Attendance
+									</h3>
 									<p className="mt-1 text-xs text-gray-500">
 										Admins can manually correct attendance when needed.
 									</p>
@@ -411,15 +441,22 @@ const Attendance = () => {
 										);
 
 										return (
-											<tr key={employeeId} className="hover:bg-gray-50/40 transition-colors">
+											<tr
+												key={employeeId}
+												className="hover:bg-gray-50/40 transition-colors"
+											>
 												<td className="px-6 py-4">
 													<div className="flex items-center gap-3">
 														<div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-xs">
 															{emp.name?.charAt(0) || "E"}
 														</div>
 														<div>
-															<p className="font-semibold text-gray-900">{emp.name}</p>
-															<p className="text-[10px] text-gray-400">{emp.email}</p>
+															<p className="font-semibold text-gray-900">
+																{emp.name}
+															</p>
+															<p className="text-[10px] text-gray-400">
+																{emp.email}
+															</p>
 														</div>
 													</div>
 												</td>
@@ -453,7 +490,10 @@ const Attendance = () => {
 
 									{filteredEmployees.length === 0 && (
 										<tr>
-											<td colSpan={3} className="px-6 py-10 text-center text-gray-400 text-xs italic">
+											<td
+												colSpan={3}
+												className="px-6 py-10 text-center text-gray-400 text-xs italic"
+											>
 												No employees found.
 											</td>
 										</tr>
@@ -468,10 +508,12 @@ const Attendance = () => {
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 						<div className="p-6 border-b border-gray-100">
 							<h3 className="font-bold text-gray-900">Today’s Logs</h3>
-							<p className="mt-1 text-xs text-gray-500">{formatDate(time)}</p>
+							<p className="mt-1 text-xs text-gray-500">
+								{formatDate(time)}
+							</p>
 						</div>
 
-						<div className="p-4 space-y-4 max-h-[500px] overflow-y-auto">
+						<div className="p-4 space-y-4 max-h-125 overflow-y-auto">
 							{dayAttendance.length > 0 ? (
 								dayAttendance.map((record: any, idx: number) => (
 									<div
@@ -552,11 +594,15 @@ const StatCard = ({
 	};
 
 	return (
-		<div className={`bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm ${tones[tone]}`}>
+		<div
+			className={`bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm ${tones[tone]}`}
+		>
 			<p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">
 				{label}
 			</p>
-			<h3 className="text-2xl sm:text-3xl font-bold text-gray-900">{value}</h3>
+			<h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+				{value}
+			</h3>
 		</div>
 	);
 };
@@ -580,9 +626,12 @@ const AdminQrModal = ({
 					<X size={20} />
 				</button>
 
-				<h3 className="text-xl font-bold text-gray-900 mb-2">Today’s QR Code</h3>
+				<h3 className="text-xl font-bold text-gray-900 mb-2">
+					Today’s QR Code
+				</h3>
 				<p className="text-sm text-gray-500 mb-6">
-					Display this for employees to scan. Do not share it outside your workplace.
+					Display this for employees to scan. Do not share it outside your
+					workplace.
 				</p>
 
 				<div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 min-h-[250px]">
@@ -592,11 +641,18 @@ const AdminQrModal = ({
 						<div className="text-center w-full">
 							<div className="w-48 h-48 bg-white p-2 border border-gray-200 rounded-xl shadow-sm mb-4 mx-auto flex items-center justify-center overflow-hidden">
 								{typeof qrCode === "string" &&
-								(qrCode.startsWith("http") || qrCode.startsWith("data:image")) ? (
-									<img src={qrCode} alt="Today's QR" className="max-w-full max-h-full" />
+								(qrCode.startsWith("http") ||
+									qrCode.startsWith("data:image")) ? (
+									<img
+										src={qrCode}
+										alt="Today's QR"
+										className="max-w-full max-h-full"
+									/>
 								) : (
 									<div className="text-[10px] break-all text-gray-600 p-2 font-mono bg-gray-50 rounded w-full h-full overflow-auto">
-										{typeof qrCode === "object" ? JSON.stringify(qrCode) : qrCode}
+										{typeof qrCode === "object"
+											? JSON.stringify(qrCode)
+											: qrCode}
 									</div>
 								)}
 							</div>
@@ -631,17 +687,71 @@ const ScanQrModal = ({
 	onClose: () => void;
 	onSubmit: (value?: string) => void;
 }) => {
+	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const scannerRef = useRef<QrScanner | null>(null);
+
+	const [cameraError, setCameraError] = useState("");
+	const [isCameraReady, setIsCameraReady] = useState(false);
+	const [hasScanned, setHasScanned] = useState(false);
+
+	useEffect(() => {
+		if (!videoRef.current) return;
+
+		const scanner = new QrScanner(
+			videoRef.current,
+			async (result) => {
+				const scannedValue =
+					typeof result === "string" ? result : result.data;
+
+				if (!scannedValue || hasScanned) return;
+
+				setHasScanned(true);
+				setQrInput(scannedValue);
+
+				scanner.stop();
+				await onSubmit(scannedValue);
+			},
+			{
+				preferredCamera: "environment",
+				highlightScanRegion: false,
+				highlightCodeOutline: false,
+				maxScansPerSecond: 5,
+			},
+		);
+
+		scannerRef.current = scanner;
+
+		scanner
+			.start()
+			.then(() => {
+				setIsCameraReady(true);
+				setCameraError("");
+			})
+			.catch(() => {
+				setCameraError(
+					"Camera access failed. Allow camera permission or paste the QR data manually.",
+				);
+			});
+
+		return () => {
+			scanner.stop();
+			scanner.destroy();
+			scannerRef.current = null;
+		};
+	}, [hasScanned, onSubmit, setQrInput]);
+
 	return (
 		<div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
 			<div className="relative h-full w-full max-w-md overflow-hidden bg-black text-white sm:h-[760px] sm:rounded-[2rem]">
 				<button
-					onClick={onClose}
-					className="absolute right-4 top-4 z-20 rounded-full border border-white/30 p-1 text-white"
+					onClick={() => {
+						scannerRef.current?.stop();
+						onClose();
+					}}
+					className="absolute right-4 top-4 z-30 rounded-full border border-white/30 p-1 text-white"
 				>
 					<X size={18} />
 				</button>
-
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.16),rgba(0,0,0,0.9))]" />
 
 				<div className="relative z-10 p-6">
 					<h3 className="text-lg font-semibold">Scan QR Code</h3>
@@ -650,27 +760,51 @@ const ScanQrModal = ({
 					</p>
 				</div>
 
-				<div className="relative z-10 mt-16 flex justify-center">
-					<div className="relative h-72 w-72 rounded-3xl border-2 border-white/80">
-						<div className="absolute left-0 top-0 h-10 w-10 rounded-tl-3xl border-l-4 border-t-4 border-white" />
-						<div className="absolute right-0 top-0 h-10 w-10 rounded-tr-3xl border-r-4 border-t-4 border-white" />
-						<div className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-3xl border-b-4 border-l-4 border-white" />
-						<div className="absolute bottom-0 right-0 h-10 w-10 rounded-br-3xl border-b-4 border-r-4 border-white" />
-						<div className="absolute left-6 right-6 top-1/2 h-0.5 bg-violet-400 shadow-[0_0_20px_rgba(167,139,250,0.9)]" />
+				<div className="relative z-10 mt-10 flex justify-center px-6">
+					<div className="relative h-80 w-full overflow-hidden rounded-3xl border border-white/20 bg-slate-900">
+						<video
+							ref={videoRef}
+							className="h-full w-full object-cover"
+							muted
+							playsInline
+						/>
+
+						<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+							<div className="relative h-64 w-64 rounded-3xl border-2 border-white/90">
+								<div className="absolute left-0 top-0 h-10 w-10 rounded-tl-3xl border-l-4 border-t-4 border-white" />
+								<div className="absolute right-0 top-0 h-10 w-10 rounded-tr-3xl border-r-4 border-t-4 border-white" />
+								<div className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-3xl border-b-4 border-l-4 border-white" />
+								<div className="absolute bottom-0 right-0 h-10 w-10 rounded-br-3xl border-b-4 border-r-4 border-white" />
+								<div className="absolute left-6 right-6 top-1/2 h-0.5 bg-violet-400 shadow-[0_0_20px_rgba(167,139,250,0.9)]" />
+							</div>
+						</div>
+
+						{!isCameraReady && !cameraError && (
+							<div className="absolute inset-0 flex items-center justify-center bg-black/60">
+								<Loader2 className="animate-spin text-white" size={28} />
+							</div>
+						)}
 					</div>
 				</div>
 
-				<div className="absolute bottom-0 left-0 right-0 z-10 rounded-t-3xl bg-white p-5 text-slate-900">
-					<div className="mb-3 flex items-center gap-2 rounded-2xl bg-violet-50 px-4 py-3 text-xs text-violet-700">
-						<ScanLine size={16} />
-						Camera scanner UI ready. Paste QR data below if camera decoding is not connected yet.
-					</div>
+				<div className="absolute bottom-0 left-0 right-0 z-20 rounded-t-3xl bg-white p-5 text-slate-900">
+					{cameraError ? (
+						<div className="mb-3 flex items-start gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-xs text-rose-600">
+							<AlertCircle size={16} className="mt-0.5 shrink-0" />
+							<span>{cameraError}</span>
+						</div>
+					) : (
+						<div className="mb-3 flex items-center gap-2 rounded-2xl bg-violet-50 px-4 py-3 text-xs text-violet-700">
+							<ScanLine size={16} />
+							Camera scanner active. Hold the QR code inside the frame.
+						</div>
+					)}
 
 					<input
 						type="text"
 						value={qrInput}
 						onChange={(e) => setQrInput(e.target.value)}
-						placeholder="Paste scanned QR data..."
+						placeholder="Paste QR data manually..."
 						className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
 					/>
 
@@ -683,7 +817,7 @@ const ScanQrModal = ({
 
 					<button
 						onClick={() => onSubmit()}
-						disabled={isLoading}
+						disabled={isLoading || !qrInput.trim()}
 						className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-70"
 					>
 						{isLoading ? (
