@@ -68,7 +68,7 @@ export const Verification = () => {
 
   return (
     <div className={`flex flex-col ${onboardingSteps === 1 ? "gap-21 max-md:gap-6": "gap-10 max-md:gap-6"} w-full justify-center items-center max-md:pt-10 max-md:relative`}>
-      <div className="flex flex-col gap-3 max-md:gap-2 px-5 max-md:px-0 self-start max-w-[532px] max-md:w-full max-md:self-start">
+      <div className="flex flex-col gap-3 max-md:gap-2 px-5 max-md:px-0 self-start max-w-133 max-md:w-full max-md:self-start">
         <h1 className="text-4xl/[100%] max-md:text-2xl/[120%] font-semibold">{currentStep?.title}</h1>
         <div className="flex items-center gap-1">
           <p className="text-[#4A4A4A] text-lg max-md:text-sm/[100%] font-normal">{currentStep?.description} </p>
@@ -83,7 +83,7 @@ export const Verification = () => {
 
       <div>
         {currentStep?.step === 1 ? (
-          <div className="flex flex-col gap-6 max-md:gap-4 px-5 justify-center items-center w-[532px] max-md:w-full">
+          <div className="flex flex-col gap-6 max-md:gap-4 px-5 justify-center items-center w-133 max-md:w-full">
             <CustomInputOtp />
             {/* <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export const Verification = () => {
             </div> */}
       </div>
         ): (
-          <div className="flex flex-col gap-5 justify-center items-start w-[532px]">
+          <div className="flex flex-col gap-5 justify-center items-start w-133">
             {teamData.map((data,index)=> (
               <button key={index} className={`flex items-center cursor-pointer gap-2 p-6 border rounded-lg w-md ${selectedTeam.name === data.name && "border-[#4C0BFD]"}`} onClick={()=>{
                 handleTeamSelect(data)
@@ -112,7 +112,7 @@ export const Verification = () => {
       </div>
       
       <div className="flex items-center justify-between w-full px-16 max-md:fixed max-md:bottom-5 max-md:left-0 max-md:right-0 max-md:px-4 max-md:py-3  z-50">
-        <div className="border border-gray-200 max-md:hidden bg-transparent h-3.5 w-[250px] rounded-full">
+        <div className="border border-gray-200 max-md:hidden bg-transparent h-3.5 w-62.5 rounded-full">
           <div style={{
             width: `${(onboardingSteps / StepData.length) * 100}%`,                 
             backgroundColor: '#7948FD',
