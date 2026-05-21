@@ -102,7 +102,7 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const { isAdmin, user } = useAuthStore.getState();
+      const { isAdmin } = useAuthStore.getState();
 
       if (isAdmin) {
         const response = await api.get("/leave/", getOrgConfig());
