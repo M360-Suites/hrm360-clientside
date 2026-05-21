@@ -40,6 +40,25 @@ interface TrainingState {
   fetchEmployeeStats: () => Promise<void>;
 }
 
+const getErrorMessage = (error: any, fallback: string) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  error?.message ||
+  fallback;
+
+const normalizeCourses = (responseData: any): Course[] => {
+  const data = responseData?.data || responseData?.courses || responseData;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.courses)) return data.courses;
+  if (Array.isArray(data?.data)) return data.data;
+
+  return [];
+};
+
+const normalizeStats = (responseData: any) =>
+  responseData?.data || responseData?.stats || responseData || null;
+
 const getOrgConfig = () => {
   const orgId = getCookie("orgId");
   if (!orgId) {
@@ -64,9 +83,9 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get('/training/courses', getOrgConfig());
-      set({ courses: response.data?.data || response.data || [], isLoading: false });
+      set({ courses: normalizeCourses(response.data), isLoading: false, error: null });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch courses', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to fetch courses'), isLoading: false });
     }
   },
 
@@ -74,23 +93,22 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get(`/training/course/${id}`, getOrgConfig());
-      set({ courseDetails: response.data?.data || response.data, isLoading: false });
+      set({ courseDetails: response.data?.data || response.data, isLoading: false, error: null });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch course details', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to fetch course details'), isLoading: false });
     }
   },
 
   addCourse: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      const orgId = getCookie("orgId");
-      await api.post('/training/course', { ...data, orgId }, getOrgConfig());
+      await api.post('/training/course', data, getOrgConfig());
       await get().fetchCourses();
       await get().fetchStats();
-      set({ isLoading: false });
+      set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to add course', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to add course'), isLoading: false });
       return false;
     }
   },
@@ -100,10 +118,11 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     try {
       await api.post(`/training/course/${id}/enroll`, {}, getOrgConfig());
       await get().fetchCourses();
-      set({ isLoading: false });
+      await get().fetchEmployeeStats();
+      set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to enroll in course', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to enroll in course'), isLoading: false });
       return false;
     }
   },
@@ -112,9 +131,9 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get('/training/stats', getOrgConfig());
-      set({ stats: response.data?.data || response.data, isLoading: false });
+      set({ stats: normalizeStats(response.data), isLoading: false, error: null });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch stats', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to fetch stats'), isLoading: false });
     }
   },
 
@@ -122,9 +141,9 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await api.get('/training/employee-stats', getOrgConfig());
-      set({ employeeStats: response.data?.data || response.data, isLoading: false });
+      set({ employeeStats: normalizeStats(response.data), isLoading: false, error: null });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch employee stats', isLoading: false });
+      set({ error: getErrorMessage(error, 'Failed to fetch employee stats'), isLoading: false });
     }
   }
 }));
