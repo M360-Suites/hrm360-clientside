@@ -112,14 +112,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								}}
 								className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${
 									isActive
-										? "text-[#3B00D9] bg-indigo-50 font-medium border border-indigo-100 shadow-xs"
+										? "text-white bg-[#3B00D9] font-medium border border-indigo-100 shadow-xs"
 										: "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
 								}`}
 							>
 								<Icon
 									size={18}
 									className={
-										isActive ? "text-[#3B00D9]" : "text-gray-400"
+										isActive ? "text-white" : "text-gray-400"
 									}
 								/>
 								{item.label}
@@ -128,8 +128,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 					})}
 			</nav>
 
-				<div className='bg-gray-50 rounded-2xl p-4'>
-					<p className='text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider'>
+				<div className='bg-[#3B00D9] rounded-2xl p-4'>
+					<p className='text-xs font-semibold text-white mb-3 uppercase tracking-wider'>
 						Organizations
 					</p>
 					<div className='space-y-2'>
@@ -148,7 +148,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 									>
 										<div className='w-2.5 h-2.5 bg-white/30 rounded-xs'></div>
 									</div>
-									<span className='text-sm text-gray-600 truncate group-hover:text-gray-900'>
+									<span className='text-sm text-white truncate group-hover:text-gray-900'>
 										{org.name}
 									</span>
 								</button>
