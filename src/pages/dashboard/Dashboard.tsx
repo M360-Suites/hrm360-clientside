@@ -67,6 +67,7 @@ const Dashboard = () => {
   const [calendarMonth, setCalendarMonth] = useState(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
+  const [now, setNow] = useState(new Date());
 
   const { employees, isLoading, error, fetchEmployees, createEmployee } = useEmployeeStore();
   const { todayStats, fetchTodayStats } = useAttendanceStore();
@@ -83,11 +84,23 @@ const Dashboard = () => {
     fetchLeaves();
   }, [fetchEmployees, fetchTodayStats, fetchLeaves]);
 
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   const calendarCells = useMemo(() => getCalendarCells(calendarMonth), [calendarMonth]);
   const monthLabel = calendarMonth.toLocaleString("default", { month: "long", year: "numeric" });
   const isCurrentMonth =
     calendarMonth.getFullYear() === new Date().getFullYear() &&
     calendarMonth.getMonth() === new Date().getMonth();
+  const currentHour = now.getHours();
+  const greeting =
+    currentHour < 12
+      ? "Good morning"
+      : currentHour < 17
+      ? "Good afternoon"
+      : "Good evening";
 
   const showToast = (type: Toast["type"], message: string) => {
     setToast({ type, message });
@@ -158,7 +171,7 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">
-            {isAdmin ? "Welcome back" : `Good morning, ${employeeName}`}
+            {isAdmin ? "Welcome back" : `${greeting}, ${employeeName}`}
           </h2>
           <p className="text-sm text-gray-500">
             Here is an overview of what is happening across your organization today
