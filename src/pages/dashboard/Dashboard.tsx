@@ -164,7 +164,7 @@ const Dashboard = () => {
             Here is an overview of what is happening across your organization today
           </p>
         </div>
-        {isAdmin && (
+        {/* {isAdmin && (
           <button
             type="button"
             onClick={() => {
@@ -175,7 +175,7 @@ const Dashboard = () => {
           >
             Add new employee
           </button>
-        )}
+        )} */}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
