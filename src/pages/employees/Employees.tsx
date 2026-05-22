@@ -63,6 +63,10 @@ const Employees = () => {
 	>({});
 	const [formData, setFormData] =
 		useState<EmployeeFormData>(emptyForm);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState("all");
+	const [modeFilter, setModeFilter] = useState("all");
+	const [roleFilter, setRoleFilter] = useState("all");
 
 	const {
 		employees,
@@ -224,6 +228,97 @@ const Employees = () => {
 		setActiveMenu(null);
 	};
 
+	const uniqueRoles = Array.from(
+		new Set(
+			employees
+				.map((emp: any) => String(emp.role || "").trim())
+				.filter(Boolean),
+		),
+	).sort((a, b) => a.localeCompare(b));
+
+	const filteredEmployees = employees.filter((emp: any) => {
+		const query = searchQuery.trim().toLowerCase();
+		const employeeName = String(emp.name || "").toLowerCase();
+		const employeeEmail = String(emp.email || "").toLowerCase();
+		const employeeRole = String(emp.role || "").toLowerCase();
+		const employeeMode = String(emp.workMode || "Remote").toLowerCase();
+		const employeeStatus = String(emp.status || "Active").toLowerCase();
+
+		const searchMatches =
+			!query ||
+			employeeName.includes(query) ||
+			employeeEmail.includes(query) ||
+			employeeRole.includes(query) ||
+			employeeMode.includes(query);
+
+		const statusMatches =
+			statusFilter === "all" ||
+			employeeStatus === statusFilter.toLowerCase();
+		const modeMatches =
+			modeFilter === "all" ||
+			employeeMode === modeFilter.toLowerCase();
+		const roleMatches =
+			roleFilter === "all" ||
+			employeeRole === roleFilter.toLowerCase();
+
+		return searchMatches && statusMatches && modeMatches && roleMatches;
+	});
+
+	const handleExport = () => {
+		const csvHeaders = [
+			"Name",
+			"Email",
+			"Role",
+			"Work Mode",
+			"Organization",
+			"Status",
+			"Date Joined",
+		];
+
+		const rows = filteredEmployees.map((emp: any) => {
+			const organization =
+				typeof emp.orgId === "object"
+					? emp.orgId?.name || ""
+					: emp.orgId || "";
+			const dateJoined = emp.joinedAt
+				? new Date(emp.joinedAt).toLocaleDateString()
+				: "";
+
+			return [
+				emp.name || "",
+				emp.email || "",
+				emp.role || "",
+				emp.workMode || "Remote",
+				organization,
+				emp.status || "Active",
+				dateJoined,
+			];
+		});
+
+		const toCsvCell = (value: string) => {
+			const safe = String(value).replace(/"/g, '""');
+			return `"${safe}"`;
+		};
+
+		const csvContent = [
+			csvHeaders.map(toCsvCell).join(","),
+			...rows.map((row) => row.map(toCsvCell).join(",")),
+		].join("\n");
+
+		const blob = new Blob([csvContent], {
+			type: "text/csv;charset=utf-8;",
+		});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		const date = new Date().toISOString().split("T")[0];
+		link.href = url;
+		link.setAttribute("download", `employees-${date}.csv`);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	};
+
 	return (
 		<div className='max-w-7xl mx-auto space-y-6'>
 			{toast && (
@@ -285,21 +380,54 @@ const Employees = () => {
 						<input
 							type='text'
 							placeholder='Search employee'
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
 							className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
 						/>
 					</div>
 
 					<div className='flex gap-2'>
-						<button className='flex-1 sm:flex-none flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors'>
-							Filter
-						</button>
-						<button className='flex-1 sm:flex-none flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors'>
+						<select
+							value={statusFilter}
+							onChange={(e) => setStatusFilter(e.target.value)}
+							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+						>
+							<option value='all'>All Status</option>
+							<option value='active'>Active</option>
+							<option value='inactive'>Inactive</option>
+						</select>
+						<select
+							value={modeFilter}
+							onChange={(e) => setModeFilter(e.target.value)}
+							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+						>
+							<option value='all'>All Modes</option>
+							<option value='remote'>Remote</option>
+							<option value='on site'>On-site</option>
+							<option value='hybrid'>Hybrid</option>
+						</select>
+						<select
+							value={roleFilter}
+							onChange={(e) => setRoleFilter(e.target.value)}
+							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+						>
+							<option value='all'>All Roles</option>
+							{uniqueRoles.map((role) => (
+								<option key={role} value={role.toLowerCase()}>
+									{role}
+								</option>
+							))}
+						</select>
+						<button
+							onClick={handleExport}
+							className='flex-1 sm:flex-none flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors'
+						>
 							Export
 						</button>
 					</div>
 				</div>
 
-				<div className='overflow-x-auto min-h-[400px] relative'>
+				<div className='overflow-x-auto min-h-100 relative'>
 					{isLoading && (
 						<div className='absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10'>
 							<Loader2
@@ -323,7 +451,7 @@ const Employees = () => {
 						</thead>
 
 						<tbody className='divide-y divide-gray-50'>
-							{employees?.map((emp: any, index: number) => {
+							{filteredEmployees?.map((emp: any, index: number) => {
 								const employeeId = emp._id || emp.id || String(index);
 
 								return (
@@ -436,7 +564,7 @@ const Employees = () => {
 
 					{/* Mobile Card Layout */}
 					<div className='md:hidden divide-y divide-gray-100'>
-						{employees?.map((emp: any, index: number) => {
+						{filteredEmployees?.map((emp: any, index: number) => {
 							const employeeId = emp._id || emp.id || String(index);
 
 							return (
@@ -530,7 +658,7 @@ const Employees = () => {
 						})}
 					</div>
 
-					{employees?.length === 0 && !isLoading && (
+					{filteredEmployees?.length === 0 && !isLoading && (
 						<div className='px-6 py-20 text-center'>
 							<div className='flex flex-col items-center justify-center'>
 								<div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4'>
@@ -538,7 +666,7 @@ const Employees = () => {
 								</div>
 								<p className='text-gray-900 font-medium'>No employees found</p>
 								<p className='text-gray-500 text-sm mt-1'>
-									Start by adding your first employee to the organization
+									Try adjusting your search or filters
 								</p>
 							</div>
 						</div>

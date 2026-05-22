@@ -130,7 +130,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
 				<div className='bg-[#3B00D9] rounded-2xl p-4'>
 					<p className='text-xs font-semibold text-white mb-3 uppercase tracking-wider'>
-						Organizations
+						Organization
 					</p>
 					<div className='space-y-2'>
 						{userOrganizations.map((org, index) => {
