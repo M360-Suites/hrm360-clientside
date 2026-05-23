@@ -64,9 +64,8 @@ const Attendance = () => {
 		if (fetchedOnce.current) return;
 		fetchedOnce.current = true;
 
-		fetchTodayStats();
-
 		if (isAdmin) {
+			fetchTodayStats();
 			fetchEmployees();
 			fetchDayAttendance();
 		} else {
@@ -152,14 +151,13 @@ const Attendance = () => {
 				setQrInput("");
 				setScanMessage("");
 				await fetchEmployeeDashboard();
-				await fetchTodayStats();
 			} else {
 				setScanMessage(
 					"QR verification failed. Please scan the active admin QR code.",
 				);
 			}
 		},
-		[qrInput, clockWithQr, fetchEmployeeDashboard, fetchTodayStats],
+		[qrInput, clockWithQr, fetchEmployeeDashboard],
 	);
 
 	const days = [
@@ -616,6 +614,41 @@ const AdminQrModal = ({
 	isLoading: boolean;
 	onClose: () => void;
 }) => {
+	const handleDownloadQr = async () => {
+		try {
+			if (typeof qrCode !== "string") return;
+
+			const filename = `attendance-qr-${new Date()
+				.toISOString()
+				.slice(0, 10)}.png`;
+
+			if (qrCode.startsWith("data:image")) {
+				const link = document.createElement("a");
+				link.href = qrCode;
+				link.download = filename;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				return;
+			}
+
+			if (qrCode.startsWith("http")) {
+				const response = await fetch(qrCode);
+				const blob = await response.blob();
+				const objectUrl = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.href = objectUrl;
+				link.download = filename;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				URL.revokeObjectURL(objectUrl);
+			}
+		} catch (error) {
+			console.error("Failed to download QR code:", error);
+		}
+	};
+
 	return (
 		<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 			<div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative">
@@ -660,6 +693,13 @@ const AdminQrModal = ({
 							<p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
 								Unique Daily Code
 							</p>
+							<button
+								type="button"
+								onClick={handleDownloadQr}
+								className="mt-4 inline-flex items-center justify-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+							>
+								Download QR
+							</button>
 						</div>
 					) : (
 						<p className="text-sm text-rose-500 font-medium">

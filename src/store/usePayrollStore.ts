@@ -1,5 +1,6 @@
-import { create } from 'zustand';
-import api from '../api/axios';
+import { create } from "zustand";
+import api from "../api/axios";
+import { getCookie } from "../utils/cookies";
 
 interface PayrollSummary {
   totalEmployees: number;
@@ -16,9 +17,38 @@ interface PayrollState {
   error: string | null;
   fetchSummary: () => Promise<void>;
   fetchEmployeesSalary: () => Promise<void>;
-  runPayroll: (payPeriod: string, pin: string) => Promise<void>;
-  payPayroll: (payPeriod: string, employeeId: string, pin: string) => Promise<void>;
+  runPayroll: (payPeriod: string, pin: string) => Promise<boolean>;
+  payPayroll: (payPeriod: string, employeeId: string, pin: string) => Promise<boolean>;
 }
+
+const getOrgConfig = () => {
+  const orgId = getCookie("orgId");
+  if (!orgId) {
+    throw new Error("Organization ID missing.");
+  }
+  return {
+    headers: {
+      "x-org-id": orgId,
+    },
+  };
+};
+
+const getErrorMessage = (error: any, fallback: string) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  error?.message ||
+  fallback;
+
+const normalizeSummary = (responseData: any) =>
+  responseData?.data || responseData?.summary || responseData || null;
+
+const normalizeEmployeesSalary = (responseData: any) => {
+  const data = responseData?.data || responseData?.employees || responseData;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.employees)) return data.employees;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
+};
 
 export const usePayrollStore = create<PayrollState>((set, get) => ({
   summary: null,
@@ -29,50 +59,88 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
   fetchSummary: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.get('/payroll/summary');
-      set({ summary: response.data.data || response.data, isLoading: false });
+      const response = await api.get("/payroll/summary", getOrgConfig());
+      set({
+        summary: normalizeSummary(response.data),
+        isLoading: false,
+        error: null,
+      });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch payroll summary', isLoading: false });
+      set({
+        error: getErrorMessage(error, "Failed to fetch payroll summary"),
+        isLoading: false,
+      });
     }
   },
 
   fetchEmployeesSalary: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.get('/payroll/employees');
-      let data = response.data.data || response.data;
-      if (!Array.isArray(data) && typeof data === 'object') {
-        data = data.employees || Object.values(data).find(val => Array.isArray(val)) || [];
-      }
-      set({ employeesSalary: Array.isArray(data) ? data : [], isLoading: false });
+      const response = await api.get("/payroll/employees", getOrgConfig());
+      set({
+        employeesSalary: normalizeEmployeesSalary(response.data),
+        isLoading: false,
+        error: null,
+      });
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to fetch employee salary data', isLoading: false });
+      set({
+        error: getErrorMessage(error, "Failed to fetch employee salary data"),
+        isLoading: false,
+      });
     }
   },
 
   runPayroll: async (payPeriod, pin) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post('/payroll/run', { payPeriod }, {
-        headers: { 'x-payroll-pin': pin }
-      });
+      await api.post(
+        "/payroll/run",
+        { payPeriod },
+        {
+          ...getOrgConfig(),
+          headers: {
+            ...getOrgConfig().headers,
+            "x-payroll-pin": pin,
+          },
+        },
+      );
       await get().fetchSummary();
       await get().fetchEmployeesSalary();
+      set({ isLoading: false, error: null });
+      return true;
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to run payroll', isLoading: false });
+      set({
+        error: getErrorMessage(error, "Failed to run payroll"),
+        isLoading: false,
+      });
+      return false;
     }
   },
 
   payPayroll: async (payPeriod, employeeId, pin) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post('/payroll/pay', { payPeriod, employeeId }, {
-        headers: { 'x-payroll-pin': pin }
-      });
+      await api.post(
+        "/payroll/pay",
+        { payPeriod, employeeId },
+        {
+          ...getOrgConfig(),
+          headers: {
+            ...getOrgConfig().headers,
+            "x-payroll-pin": pin,
+          },
+        },
+      );
       await get().fetchSummary();
       await get().fetchEmployeesSalary();
+      set({ isLoading: false, error: null });
+      return true;
     } catch (error: any) {
-      set({ error: error.response?.data?.message || 'Failed to pay payroll', isLoading: false });
+      set({
+        error: getErrorMessage(error, "Failed to pay payroll"),
+        isLoading: false,
+      });
+      return false;
     }
   },
 }));

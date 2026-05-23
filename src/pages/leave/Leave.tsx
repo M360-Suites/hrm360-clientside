@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Calendar, Loader2, X, MoreVertical, Download } from "lucide-react";
+import { Search, Calendar, Loader2, X, MoreVertical, Download, CheckCircle, AlertCircle } from "lucide-react";
 import { useLeaveStore } from "../../store/useLeaveStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
@@ -30,6 +30,46 @@ const getLeaveDays = (startDate?: string, endDate?: string) => {
 
 const formatDate = (value?: string) =>
   value ? new Date(value).toLocaleDateString() : "-";
+const isValidObjectId = (value?: string) =>
+  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
+
+const parseDurationRange = (duration?: string) => {
+  if (!duration || typeof duration !== "string") {
+    return { start: "", end: "" };
+  }
+
+  const parts = duration.split(" - ").map((p) => p.trim());
+  if (parts.length !== 2) return { start: "", end: "" };
+
+  return { start: parts[0], end: parts[1] };
+};
+
+const getLeaveDateRange = (leave: any) => {
+  if (leave?.startDate || leave?.endDate) {
+    return {
+      start: formatDate(leave?.startDate),
+      end: formatDate(leave?.endDate),
+    };
+  }
+
+  const { start, end } = parseDurationRange(leave?.duration);
+  return {
+    start: start ? formatDate(start) : "-",
+    end: end ? formatDate(end) : "-",
+  };
+};
+
+const getLeaveDaysValue = (leave: any) => {
+  if (leave?.days !== undefined && leave?.days !== null && leave?.days !== "") {
+    const parsed = Number(leave.days);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+
+  const { start, end } = parseDurationRange(leave?.duration);
+  if (start && end) return getLeaveDays(start, end);
+
+  return getLeaveDays(leave?.startDate, leave?.endDate);
+};
 
 const getLeaveEmployee = (leave: any) => {
   const employeeObj =
@@ -91,6 +131,8 @@ const Leave = () => {
     document: "",
   });
   const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (fetchedOnce.current) return;
@@ -105,6 +147,11 @@ const Leave = () => {
       fetchUserLeaveStats();
     }
   }, [isAdmin, fetchEmployees, fetchLeaves, fetchOrgLeaveStats, fetchUserLeaveStats]);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4500);
+  };
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -160,8 +207,13 @@ const Leave = () => {
     const leaveId = leave?._id || leave?.id;
     if (!leaveId) return;
     const success = await approveLeave(leaveId);
-    if (!success) return;
+    if (!success) {
+      const errorMessage = useLeaveStore.getState().error || "Failed to approve leave request.";
+      showToast("error", errorMessage);
+      return;
+    }
     await fetchOrgLeaveStats();
+    showToast("success", "Leave request approved successfully.");
     setSelectedLeave(null);
   };
 
@@ -169,23 +221,59 @@ const Leave = () => {
     const leaveId = leave?._id || leave?.id;
     if (!leaveId) return;
     const success = await rejectLeave(leaveId);
-    if (!success) return;
+    if (!success) {
+      const errorMessage = useLeaveStore.getState().error || "Failed to reject leave request.";
+      showToast("error", errorMessage);
+      return;
+    }
     await fetchOrgLeaveStats();
+    showToast("success", "Leave request rejected successfully.");
     setSelectedLeave(null);
   };
 
   const handleSubmitLeaveRequest = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const normalizedDocument = formData.document?.trim();
+    const documentValue = isValidObjectId(normalizedDocument)
+      ? normalizedDocument
+      : "";
+
+    const errors: Record<string, string> = {};
+    if (!formData.type.trim()) errors.type = "Leave type is required.";
+    if (!formData.startDate) errors.startDate = "Start date is required.";
+    if (!formData.endDate) errors.endDate = "End date is required.";
+    if (!formData.reason.trim()) errors.reason = "Reason is required.";
+    if (
+      formData.startDate &&
+      formData.endDate &&
+      new Date(formData.endDate) < new Date(formData.startDate)
+    ) {
+      errors.endDate = "End date cannot be before start date.";
+    }
+    if (normalizedDocument && !documentValue && !documentFile) {
+      errors.document = "Document ID must be a valid 24-character ObjectId.";
+    }
+
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      showToast("error", "Please fix the highlighted form errors.");
+      return;
+    }
+
     const success = await requestLeave({
       type: formData.type,
       startDate: formData.startDate,
       endDate: formData.endDate,
       reason: formData.reason,
-      document: documentFile || formData.document,
+      document: documentFile || documentValue,
     });
 
-    if (!success) return;
+    if (!success) {
+      const errorMessage = useLeaveStore.getState().error || "Failed to submit leave request.";
+      showToast("error", errorMessage);
+      return;
+    }
 
     setShowRequestModal(false);
     setFormData({
@@ -196,11 +284,24 @@ const Leave = () => {
       document: "",
     });
     setDocumentFile(null);
+    setFormErrors({});
     await fetchUserLeaveStats();
+    showToast("success", "Leave request submitted successfully.");
   };
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
+            toast.type === "success" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
+          }`}
+        >
+          {toast.type === "success" ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          {toast.message}
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Leave Management</h2>
@@ -299,7 +400,8 @@ const Leave = () => {
                     const employeeName = employee.name;
                     const employeeEmail = employee.email;
                     const status = leave.status || "Pending";
-                    const days = getLeaveDays(leave.startDate, leave.endDate);
+                    const days = getLeaveDaysValue(leave);
+                    const dateRange = getLeaveDateRange(leave);
 
                     return (
                       <tr key={leaveId} className="hover:bg-gray-50/50 transition-colors">
@@ -316,7 +418,7 @@ const Leave = () => {
                         </td>
                         <td className="px-6 py-4">{leave.type || "Annual Leave"}</td>
                         <td className="px-6 py-4">
-                          {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
+                          {dateRange.start} - {dateRange.end}
                         </td>
                         <td className="px-6 py-4">{days || "-"}</td>
                         <td className="px-6 py-4 max-w-xs truncate">{leave.reason || "-"}</td>
@@ -352,7 +454,8 @@ const Leave = () => {
               {filteredLeaves.map((leave: any, idx: number) => {
                 const leaveId = leave._id || leave.id || idx;
                 const status = leave.status || "Pending";
-                const days = getLeaveDays(leave.startDate, leave.endDate);
+                const days = getLeaveDaysValue(leave);
+                const dateRange = getLeaveDateRange(leave);
                 const docLabel =
                   typeof leave.document === "string"
                     ? leave.document.split("/").pop()
@@ -363,10 +466,10 @@ const Leave = () => {
                     <div className="flex items-start justify-between gap-4 mb-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2 text-sm">
                         <p><span className="text-gray-500">Leave Type:</span> {leave.type || "Annual Leave"}</p>
-                        <p><span className="text-gray-500">End Date:</span> {formatDate(leave.endDate)}</p>
+                        <p><span className="text-gray-500">End Date:</span> {dateRange.end}</p>
                         <p><span className="text-gray-500">Duration:</span> {days} day{days === 1 ? "" : "s"}</p>
                         <p><span className="text-gray-500">Applied On:</span> {formatDate(leave.createdAt)}</p>
-                        <p><span className="text-gray-500">Start Date:</span> {formatDate(leave.startDate)}</p>
+                        <p><span className="text-gray-500">Start Date:</span> {dateRange.start}</p>
                       </div>
                       <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${getStatusColor(status)}`}>
                         {status}
@@ -424,10 +527,10 @@ const Leave = () => {
                 <h4 className="text-sm font-semibold text-gray-800 mb-3">Leave Request Details</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
                   <p><span className="text-gray-500">Leave Type:</span> {selectedLeave.type || "Annual Leave"}</p>
-                  <p><span className="text-gray-500">End Date:</span> {formatDate(selectedLeave.endDate)}</p>
-                  <p><span className="text-gray-500">Duration:</span> {getLeaveDays(selectedLeave.startDate, selectedLeave.endDate)} day(s)</p>
+                  <p><span className="text-gray-500">End Date:</span> {getLeaveDateRange(selectedLeave).end}</p>
+                  <p><span className="text-gray-500">Duration:</span> {getLeaveDaysValue(selectedLeave)} day(s)</p>
                   <p><span className="text-gray-500">Applied On:</span> {formatDate(selectedLeave.createdAt)}</p>
-                  <p><span className="text-gray-500">Start Date:</span> {formatDate(selectedLeave.startDate)}</p>
+                  <p><span className="text-gray-500">Start Date:</span> {getLeaveDateRange(selectedLeave).start}</p>
                 </div>
               </div>
 
@@ -485,7 +588,10 @@ const Leave = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Leave Type</label>
                   <select
                     value={formData.type}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, type: e.target.value }));
+                      setFormErrors((prev) => ({ ...prev, type: "" }));
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
                   >
                     <option value="Annual Leave">Annual Leave</option>
@@ -493,6 +599,7 @@ const Leave = () => {
                     <option value="Maternity Leave">Maternity Leave</option>
                     <option value="Compassionate Leave">Compassionate Leave</option>
                   </select>
+                  {formErrors.type && <p className="mt-1.5 text-xs text-rose-500">{formErrors.type}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -501,20 +608,28 @@ const Leave = () => {
                     <input
                       type="date"
                       value={formData.startDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, startDate: e.target.value }));
+                        setFormErrors((prev) => ({ ...prev, startDate: "", endDate: "" }));
+                      }}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
                     />
+                    {formErrors.startDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.startDate}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">End Date</label>
                     <input
                       type="date"
                       value={formData.endDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
+                      onChange={(e) => {
+                        setFormData((prev) => ({ ...prev, endDate: e.target.value }));
+                        setFormErrors((prev) => ({ ...prev, endDate: "" }));
+                      }}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
                     />
+                    {formErrors.endDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.endDate}</p>}
                   </div>
                 </div>
 
@@ -523,10 +638,14 @@ const Leave = () => {
                   <textarea
                     rows={4}
                     value={formData.reason}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, reason: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, reason: e.target.value }));
+                      setFormErrors((prev) => ({ ...prev, reason: "" }));
+                    }}
                     required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
                   />
+                  {formErrors.reason && <p className="mt-1.5 text-xs text-rose-500">{formErrors.reason}</p>}
                 </div>
 
                 <div>
@@ -534,7 +653,10 @@ const Leave = () => {
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-                    onChange={(e) => setDocumentFile(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      setDocumentFile(e.target.files?.[0] || null);
+                      setFormErrors((prev) => ({ ...prev, document: "" }));
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"
                   />
                   {documentFile && <p className="mt-1.5 text-xs text-gray-500">Selected: {documentFile.name}</p>}
@@ -545,10 +667,14 @@ const Leave = () => {
                   <input
                     type="text"
                     value={formData.document}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, document: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData((prev) => ({ ...prev, document: e.target.value }));
+                      setFormErrors((prev) => ({ ...prev, document: "" }));
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"
                     placeholder="Paste existing document ObjectId if required"
                   />
+                  {formErrors.document && <p className="mt-1.5 text-xs text-rose-500">{formErrors.document}</p>}
                 </div>
 
                 <div className="pt-2 flex gap-3">

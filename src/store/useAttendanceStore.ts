@@ -186,8 +186,6 @@ export const useAttendanceStore = create<AttendanceState>(
 					},
 					getOrgConfig(),
 				);
-				await get().fetchDayAttendance();
-				await get().fetchTodayStats();
 				set({ isLoading: false, error: null });
 				return true;
 			} catch (error: any) {

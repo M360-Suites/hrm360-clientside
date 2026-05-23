@@ -91,6 +91,9 @@ const cleanPayload = (payload: any) => {
   return cleaned;
 };
 
+const isValidObjectId = (value: any) =>
+  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
+
 export const useLeaveStore = create<LeaveState>((set, get) => ({
   leaves: [],
   orgStats: null,
@@ -163,35 +166,25 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const hasFile =
+      const isFileSelected =
         typeof File !== "undefined" && data?.document instanceof File;
+      const rawDocumentValue =
+        typeof data?.document === "string" ? data.document.trim() : "";
+      const documentObjectId = isValidObjectId(rawDocumentValue)
+        ? rawDocumentValue
+        : undefined;
 
-      if (hasFile) {
-        const formPayload = new FormData();
-        formPayload.append("type", data.type);
-        formPayload.append("startDate", data.startDate);
-        formPayload.append("endDate", data.endDate);
-        formPayload.append("reason", data.reason);
-        formPayload.append("document", data.document);
+      const payload = cleanPayload({
+        type: data.type,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        reason: data.reason,
+        // Send document only when it is a valid ObjectId expected by backend.
+        // If a file is selected, it must be uploaded first via a dedicated endpoint.
+        document: isFileSelected ? undefined : documentObjectId,
+      });
 
-        await api.post("/leave/", formPayload, {
-          ...getOrgConfig(),
-          headers: {
-            ...getOrgConfig().headers,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } else {
-        const payload = cleanPayload({
-          type: data.type,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          reason: data.reason,
-          document: data.document,
-        });
-
-        await api.post("/leave/", payload, getOrgConfig());
-      }
+      await api.post("/leave/", payload, getOrgConfig());
 
       await get().fetchLeaves();
       set({ isLoading: false, error: null });

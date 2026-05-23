@@ -69,19 +69,19 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 	return (
 		<aside
 			className={`
-      fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col h-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
+      fixed inset-y-0 left-0 z-50 w-64 bg-[#3B00D9] border-r border-[#4a1ae0] flex flex-col h-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
     `}
 		>
 			<div className='p-6 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
-					<span className='font-bold text-xl text-[#3B00D9]'>
+					<span className='font-bold text-xl text-white'>
 						Hrm360
 					</span>
 				</div>
 				<button
 					onClick={onClose}
-					className='lg:hidden p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors'
+					className='lg:hidden p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors'
 				>
 					<X size={20} />
 				</button>
@@ -112,14 +112,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								}}
 								className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${
 									isActive
-										? "text-white bg-[#3B00D9] font-medium border border-indigo-100 shadow-xs"
-										: "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+										? "text-white bg-white/15 font-medium border border-white/20 shadow-xs"
+										: "text-white/80 hover:bg-white/10 hover:text-white"
 								}`}
 							>
 								<Icon
 									size={18}
 									className={
-										isActive ? "text-white" : "text-gray-400"
+										isActive ? "text-white" : "text-white/70"
 									}
 								/>
 								{item.label}
@@ -128,8 +128,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 					})}
 			</nav>
 
-				<div className='bg-[#3B00D9] rounded-2xl p-4'>
-					<p className='text-xs font-semibold text-white mb-3 uppercase tracking-wider'>
+				<div className='bg-white/10 rounded-2xl p-4 border border-white/10'>
+					<p className='text-xs font-semibold text-white/70 mb-3 uppercase tracking-wider'>
 						Organization
 					</p>
 					<div className='space-y-2'>
@@ -141,14 +141,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 							return (
 								<button
 									key={orgId}
-									className='flex items-center gap-3 w-full p-2 hover:bg-white rounded-lg transition-colors text-left group'
+									className='flex items-center gap-3 w-full p-2 hover:bg-white/10 rounded-lg transition-colors text-left group'
 								>
 									<div
 										className={`w-6 h-6 rounded-md ${colorClass} flex items-center justify-center shrink-0`}
 									>
 										<div className='w-2.5 h-2.5 bg-white/30 rounded-xs'></div>
 									</div>
-									<span className='text-sm text-white truncate group-hover:text-gray-900'>
+									<span className='text-sm text-white/90 truncate group-hover:text-white'>
 										{org.name}
 									</span>
 								</button>
