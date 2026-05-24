@@ -7,6 +7,7 @@ interface AttendanceState {
 	weekOverview: any | null;
 	todayStats: any | null;
 	employeeDashboard: any | null;
+	lastQrAction: "clock-in" | "clock-out" | null;
 	isLoading: boolean;
 	error: string | null;
 	fetchDayAttendance: () => Promise<void>;
@@ -17,7 +18,9 @@ interface AttendanceState {
 	clockOut: (employeeId: string) => Promise<void>;
 	qrCode: any | null;
 	fetchQrCode: () => Promise<void>;
-	clockWithQr: (qrData: string) => Promise<boolean>;
+	clockWithQr: (
+		qrData: string,
+	) => Promise<{ success: boolean; action?: "clock-in" | "clock-out" }>;
 }
 
 const getErrorMessage = (error: any, fallback: string) =>
@@ -26,6 +29,76 @@ const getErrorMessage = (error: any, fallback: string) =>
 	error?.response?.data?.error ||
 	error?.message ||
 	fallback;
+
+const normalizeAttendanceRecord = (record: any) => {
+	const employeeObj =
+		typeof record?.employee === "object"
+			? record.employee
+			: typeof record?.employeeId === "object"
+				? record.employeeId
+				: null;
+
+	return {
+		...record,
+		employee: employeeObj || null,
+		employeeId:
+			record?.employeeId ||
+			employeeObj?._id ||
+			employeeObj?.id ||
+			record?.employee ||
+			null,
+		employeeName:
+			record?.employeeName || employeeObj?.name || "Employee",
+		clockIn: record?.clockIn || record?.clockInTime || "",
+		clockOut: record?.clockOut || record?.clockOutTime || "",
+		clockInTime: record?.clockInTime || record?.clockIn || "",
+		clockOutTime: record?.clockOutTime || record?.clockOut || "",
+		timeSpent: record?.timeSpent || record?.workDuration || record?.duration || "",
+		status: record?.status || "Present",
+	};
+};
+
+const normalizeEmployeeDashboard = (data: any) => {
+	if (!data || typeof data !== "object") return {};
+
+	const todayRaw =
+		data?.today || data?.attendanceToday || data?.attendance || data?.data || data;
+
+	const today =
+		todayRaw && typeof todayRaw === "object"
+			? {
+					...todayRaw,
+					clockIn:
+						todayRaw?.clockIn ||
+						todayRaw?.clockInTime ||
+						todayRaw?.checkedInAt ||
+						"",
+					clockOut:
+						todayRaw?.clockOut ||
+						todayRaw?.clockOutTime ||
+						todayRaw?.checkedOutAt ||
+						"",
+					clockInTime:
+						todayRaw?.clockInTime ||
+						todayRaw?.clockIn ||
+						todayRaw?.checkedInAt ||
+						"",
+					clockOutTime:
+						todayRaw?.clockOutTime ||
+						todayRaw?.clockOut ||
+						todayRaw?.checkedOutAt ||
+						"",
+					timeSpent:
+						todayRaw?.timeSpent ||
+						todayRaw?.workDuration ||
+						todayRaw?.duration ||
+						todayRaw?.hoursWorked ||
+						"",
+				}
+			: {};
+
+	return { ...data, today };
+};
 
 const getOrgConfig = () => {
 	const orgId = getCookie("orgId");
@@ -47,6 +120,7 @@ export const useAttendanceStore = create<AttendanceState>(
 		weekOverview: null,
 		todayStats: null,
 		employeeDashboard: null,
+		lastQrAction: null,
 		qrCode: null,
 		isLoading: false,
 		error: null,
@@ -63,7 +137,9 @@ export const useAttendanceStore = create<AttendanceState>(
 						[];
 				}
 				set({
-					dayAttendance: Array.isArray(data) ? data : [],
+					dayAttendance: Array.isArray(data)
+						? data.map(normalizeAttendanceRecord)
+						: [],
 					isLoading: false,
 				});
 			} catch (error: any) {
@@ -114,7 +190,10 @@ export const useAttendanceStore = create<AttendanceState>(
 					getOrgConfig(),
 				);
 				const data = response.data?.data || response.data;
-				set({ employeeDashboard: data, isLoading: false });
+				set({
+					employeeDashboard: normalizeEmployeeDashboard(data),
+					isLoading: false,
+				});
 			} catch (error: any) {
 				set({
 					error: getErrorMessage(error, "Failed to fetch employee dashboard"),
@@ -174,7 +253,7 @@ export const useAttendanceStore = create<AttendanceState>(
 		clockWithQr: async (qrData) => {
 			set({ isLoading: true, error: null });
 			try {
-				await api.post(
+				const response = await api.post(
 					"/attendance/qr",
 					{
 						qrData,
@@ -183,15 +262,17 @@ export const useAttendanceStore = create<AttendanceState>(
 					},
 					getOrgConfig(),
 				);
-				set({ isLoading: false, error: null });
-				return true;
+				const data = response.data?.data || response.data;
+				const action = data?.action as "clock-in" | "clock-out" | undefined;
+				set({ isLoading: false, error: null, lastQrAction: action || null });
+				return { success: true, action };
 			} catch (error: any) {
 				console.error("Clock with QR Error:", error.response?.data);
 				set({
 					error: getErrorMessage(error, "Clock in/out with QR failed"),
 					isLoading: false,
 				});
-				return false;
+				return { success: false };
 			}
 		},
 	}),

@@ -84,6 +84,7 @@ const Attendance = () => {
 		clockIn,
 		clockOut,
 		qrCode,
+		lastQrAction,
 		isLoading,
 		error,
 		fetchQrCode,
@@ -100,7 +101,16 @@ const Attendance = () => {
 	const [qrInput, setQrInput] = useState("");
 	const [scanMessage, setScanMessage] = useState("");
 	const [successMessage, setSuccessMessage] = useState("");
+	const [attendancePhase, setAttendancePhase] = useState<
+		"idle" | "clocked_in" | "clocked_out"
+	>("idle");
+	const [localClockInAt, setLocalClockInAt] = useState<Date | null>(null);
 	const fetchedOnce = useRef(false);
+	const dateKey = new Date();
+	const localDateKey = `${dateKey.getFullYear()}-${String(
+		dateKey.getMonth() + 1,
+	).padStart(2, "0")}-${String(dateKey.getDate()).padStart(2, "0")}`;
+	const todayKey = `attendance:${localDateKey}`;
 
 	useEffect(() => {
 		if (fetchedOnce.current) return;
@@ -146,6 +156,9 @@ const Attendance = () => {
 	const hasClockedOut = Boolean(
 		clockOutTimeValue || employeeToday?.checkedOut,
 	);
+	const effectiveHasClockedIn =
+		attendancePhase === "clocked_in" || attendancePhase === "clocked_out";
+	const effectiveHasClockedOut = attendancePhase === "clocked_out";
 
 	const baseWorkDuration =
 		employeeToday?.workDuration ||
@@ -155,7 +168,9 @@ const Attendance = () => {
 		"00:00:00";
 	const liveClockInDate = parseClockTimeToDate(clockInTimeValue);
 	const liveWorkDuration =
-		hasClockedIn && !hasClockedOut && liveClockInDate
+		attendancePhase === "clocked_in" && localClockInAt
+			? formatDuration(time.getTime() - localClockInAt.getTime())
+			: effectiveHasClockedIn && !effectiveHasClockedOut && liveClockInDate
 			? formatDuration(time.getTime() - liveClockInDate.getTime())
 			: baseWorkDuration;
 
@@ -165,9 +180,56 @@ const Attendance = () => {
 		"7h 55m left today";
 
 	const checkedInTime =
+		(localClockInAt
+			? localClockInAt.toLocaleTimeString("en-GB", {
+					hour: "2-digit",
+					minute: "2-digit",
+					second: "2-digit",
+			  })
+			: "") ||
 		clockInTimeValue ||
 		employeeToday?.checkedInAt ||
 		"09:09:23";
+
+	useEffect(() => {
+		const persistedRaw = localStorage.getItem(todayKey);
+		if (persistedRaw) {
+			try {
+				const persisted = JSON.parse(persistedRaw);
+				if (persisted?.phase === "clocked_in") {
+					setAttendancePhase("clocked_in");
+					const parsed = parseClockTimeToDate(persisted?.clockInTime);
+					if (parsed) setLocalClockInAt(parsed);
+					return;
+				}
+				if (persisted?.phase === "clocked_out") {
+					setAttendancePhase("clocked_out");
+					const parsed = parseClockTimeToDate(persisted?.clockInTime);
+					if (parsed) setLocalClockInAt(parsed);
+					return;
+				}
+			} catch {
+				// ignore malformed local state
+			}
+		}
+	}, [todayKey]);
+
+	useEffect(() => {
+		// Backup behavior: if backend dashboard eventually includes today info,
+		// sync phase only when local phase is still idle.
+		if (attendancePhase !== "idle") return;
+		if (hasClockedOut) {
+			setAttendancePhase("clocked_out");
+			const parsed = parseClockTimeToDate(clockInTimeValue);
+			if (parsed) setLocalClockInAt(parsed);
+			return;
+		}
+		if (hasClockedIn) {
+			setAttendancePhase("clocked_in");
+			const parsed = parseClockTimeToDate(clockInTimeValue);
+			if (parsed) setLocalClockInAt(parsed);
+		}
+	}, [attendancePhase, hasClockedIn, hasClockedOut, clockInTimeValue]);
 
 	const filteredEmployees = useMemo(() => {
 		return employees.filter(
@@ -197,14 +259,53 @@ const Attendance = () => {
 				return;
 			}
 
-			const success = await clockWithQr(qrData.trim());
+			const result = await clockWithQr(qrData.trim());
 
-			if (success) {
+			if (result.success) {
+				const action = result.action || lastQrAction;
+
 				setShowScanModal(false);
 				setQrInput("");
 				setScanMessage("");
 				await fetchEmployeeDashboard();
-				setSuccessMessage("Attendance recorded successfully.");
+
+				// Use backend action source of truth from POST /attendance/qr response.
+				if (action === "clock-in") {
+					const nowTime = new Date();
+					setAttendancePhase("clocked_in");
+					setLocalClockInAt(nowTime);
+					localStorage.setItem(
+						todayKey,
+						JSON.stringify({
+							phase: "clocked_in",
+							clockInTime: nowTime.toTimeString().slice(0, 8),
+						}),
+					);
+					setSuccessMessage("Clock-in recorded successfully.");
+				} else if (action === "clock-out") {
+					setAttendancePhase("clocked_out");
+					localStorage.setItem(
+						todayKey,
+						JSON.stringify({
+							phase: "clocked_out",
+							clockInTime: localClockInAt
+								? localClockInAt.toTimeString().slice(0, 8)
+								: "",
+						}),
+					);
+					setSuccessMessage("Clock-out recorded successfully.");
+				} else {
+					// Fallback toggle if action is unexpectedly missing.
+					if (attendancePhase === "clocked_in") {
+						setAttendancePhase("clocked_out");
+						setSuccessMessage("Clock-out recorded successfully.");
+					} else {
+						const nowTime = new Date();
+						setAttendancePhase("clocked_in");
+						setLocalClockInAt(nowTime);
+						setSuccessMessage("Clock-in recorded successfully.");
+					}
+				}
 				setTimeout(() => setSuccessMessage(""), 3500);
 			} else {
 				setScanMessage(
@@ -212,7 +313,15 @@ const Attendance = () => {
 				);
 			}
 		},
-		[qrInput, clockWithQr, fetchEmployeeDashboard],
+		[
+			qrInput,
+			clockWithQr,
+			fetchEmployeeDashboard,
+			attendancePhase,
+			lastQrAction,
+			localClockInAt,
+			todayKey,
+		],
 	);
 
 	const days = [
@@ -279,7 +388,7 @@ const Attendance = () => {
 							<div className="absolute inset-[-10px] rounded-full border-[10px] border-violet-500 border-r-violet-200" />
 
 							<div className="relative z-10 text-center px-6">
-								{hasClockedIn && !hasClockedOut ? (
+								{attendancePhase === "clocked_in" ? (
 									<>
 										<p className="text-xs text-slate-500 mb-2">
 											Work duration
@@ -293,21 +402,20 @@ const Attendance = () => {
 										</div>
 									</>
 								) : (
-									<button
-										onClick={() => setShowScanModal(true)}
-										className="text-xl font-semibold text-slate-900"
-									>
-										Check - in
-									</button>
+									<span className="text-xl font-semibold text-slate-900">
+										{attendancePhase === "clocked_out"
+											? "Checked-out"
+											: "Check-in"}
+									</span>
 								)}
 							</div>
 						</div>
 
 						<button
 							onClick={() => setShowScanModal(true)}
-							disabled={isLoading}
+							disabled={isLoading || attendancePhase === "clocked_out"}
 							className={`mt-8 inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold text-white transition disabled:opacity-70 ${
-								hasClockedIn && !hasClockedOut
+								effectiveHasClockedIn && !effectiveHasClockedOut
 									? "bg-rose-500 hover:bg-rose-600"
 									: "bg-violet-600 hover:bg-violet-700"
 							}`}
@@ -317,14 +425,21 @@ const Attendance = () => {
 							) : (
 								<ScanLine size={18} />
 							)}
-							{hasClockedIn && !hasClockedOut
+							{attendancePhase === "clocked_in"
 								? "Scan QR to check out"
+								: attendancePhase === "clocked_out"
+								? "Attendance complete"
 								: "Scan QR to check in"}
 						</button>
 
-						{hasClockedIn && (
+						{effectiveHasClockedIn && (
 							<div className="mt-6 w-full rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
 								Checked in: {checkedInTime}
+							</div>
+						)}
+						{attendancePhase === "clocked_out" && (
+							<div className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-medium text-slate-700">
+								Checked-out
 							</div>
 						)}
 						{successMessage && (
