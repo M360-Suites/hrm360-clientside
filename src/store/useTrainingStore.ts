@@ -59,6 +59,14 @@ const normalizeCourses = (responseData: any): Course[] => {
 const normalizeStats = (responseData: any) =>
   responseData?.data || responseData?.stats || responseData || null;
 
+const getOrgId = () => {
+  const orgId = getCookie("orgId");
+  if (!orgId) {
+    throw new Error("Organization ID missing.");
+  }
+  return orgId;
+};
+
 const getOrgConfig = () => {
   const orgId = getCookie("orgId");
   if (!orgId) {
@@ -102,7 +110,51 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
   addCourse: async (data) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post('/training/course', data, getOrgConfig());
+      const orgId = getOrgId();
+      const payload = {
+        title: data.title,
+        category: data.category,
+        instructor: data.instructor,
+        duration: data.duration,
+        endDate: data.endDate,
+        maxCapacity: Number(data.maxCapacity || 0),
+        description: data.description,
+        courseType: data.courseType || "internal",
+        modules: Array.isArray(data.modules) ? data.modules : [],
+      };
+
+      try {
+        await api.post('/training/course', payload, getOrgConfig());
+      } catch (firstError: any) {
+        const firstMessage =
+          firstError?.response?.data?.message || firstError?.message || "";
+
+        if (String(firstMessage).includes("Path `org` is required")) {
+          try {
+            await api.post(
+              '/training/course',
+              { ...payload, orgId },
+              getOrgConfig(),
+            );
+          } catch (secondError: any) {
+            const secondMessage =
+              secondError?.response?.data?.message || secondError?.message || "";
+
+            if (String(secondMessage).includes('"orgId" is not allowed')) {
+              await api.post(
+                '/training/course',
+                { ...payload, organizationId: orgId },
+                getOrgConfig(),
+              );
+            } else {
+              throw secondError;
+            }
+          }
+        } else {
+          throw firstError;
+        }
+      }
+
       await get().fetchCourses();
       await get().fetchStats();
       set({ isLoading: false, error: null });

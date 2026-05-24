@@ -20,6 +20,13 @@ interface AttendanceState {
 	clockWithQr: (qrData: string) => Promise<boolean>;
 }
 
+const getErrorMessage = (error: any, fallback: string) =>
+	error?.response?.data?.message?.message ||
+	error?.response?.data?.message ||
+	error?.response?.data?.error ||
+	error?.message ||
+	fallback;
+
 const getOrgConfig = () => {
 	const orgId = getCookie("orgId");
 	if (!orgId) {
@@ -47,8 +54,8 @@ export const useAttendanceStore = create<AttendanceState>(
 		fetchDayAttendance: async () => {
 			set({ isLoading: true, error: null });
 			try {
-				const response = await api.get("/attendance");
-				let data = response.data.data || response.data;
+				const response = await api.get("/attendance", getOrgConfig());
+				let data = response.data?.data || response.data;
 				if (!Array.isArray(data) && typeof data === "object") {
 					data =
 						data.attendance ||
@@ -61,9 +68,7 @@ export const useAttendanceStore = create<AttendanceState>(
 				});
 			} catch (error: any) {
 				set({
-					error:
-						error.response?.data?.message ||
-						"Failed to fetch day attendance",
+					error: getErrorMessage(error, "Failed to fetch day attendance"),
 					isLoading: false,
 				});
 			}
@@ -72,16 +77,14 @@ export const useAttendanceStore = create<AttendanceState>(
 		fetchWeekOverview: async () => {
 			set({ isLoading: true, error: null });
 			try {
-				const response = await api.get("/attendance/overview");
+				const response = await api.get("/attendance/overview", getOrgConfig());
 				set({
 					weekOverview: response.data.data || response.data,
 					isLoading: false,
 				});
 			} catch (error: any) {
 				set({
-					error:
-						error.response?.data?.message ||
-						"Failed to fetch week overview",
+					error: getErrorMessage(error, "Failed to fetch week overview"),
 					isLoading: false,
 				});
 			}
@@ -90,16 +93,14 @@ export const useAttendanceStore = create<AttendanceState>(
 		fetchTodayStats: async () => {
 			set({ isLoading: true, error: null });
 			try {
-				const response = await api.get("/attendance/stats");
+				const response = await api.get("/attendance/stats", getOrgConfig());
 				set({
 					todayStats: response.data.data || response.data,
 					isLoading: false,
 				});
 			} catch (error: any) {
 				set({
-					error:
-						error.response?.data?.message ||
-						"Failed to fetch today stats",
+					error: getErrorMessage(error, "Failed to fetch today stats"),
 					isLoading: false,
 				});
 			}
@@ -116,9 +117,7 @@ export const useAttendanceStore = create<AttendanceState>(
 				set({ employeeDashboard: data, isLoading: false });
 			} catch (error: any) {
 				set({
-					error:
-						error.response?.data?.message ||
-						"Failed to fetch employee dashboard",
+					error: getErrorMessage(error, "Failed to fetch employee dashboard"),
 					isLoading: false,
 				});
 			}
@@ -132,7 +131,7 @@ export const useAttendanceStore = create<AttendanceState>(
 			} catch (error: any) {
 				console.error("Clock In Error:", error.response?.data);
 				set({
-					error: error.response?.data?.message || "Clock in failed",
+					error: getErrorMessage(error, "Clock in failed"),
 					isLoading: false,
 				});
 			}
@@ -146,7 +145,7 @@ export const useAttendanceStore = create<AttendanceState>(
 			} catch (error: any) {
 				console.error("Clock Out Error:", error.response?.data);
 				set({
-					error: error.response?.data?.message || "Clock out failed",
+					error: getErrorMessage(error, "Clock out failed"),
 					isLoading: false,
 				});
 			}
@@ -166,9 +165,7 @@ export const useAttendanceStore = create<AttendanceState>(
 				});
 			} catch (error: any) {
 				set({
-					error:
-						error.response?.data?.message ||
-						"Failed to fetch QR code",
+					error: getErrorMessage(error, "Failed to fetch QR code"),
 					isLoading: false,
 				});
 			}
@@ -191,9 +188,7 @@ export const useAttendanceStore = create<AttendanceState>(
 			} catch (error: any) {
 				console.error("Clock with QR Error:", error.response?.data);
 				set({
-					error:
-						error.response?.data?.message ||
-						"Clock in/out with QR failed",
+					error: getErrorMessage(error, "Clock in/out with QR failed"),
 					isLoading: false,
 				});
 				return false;

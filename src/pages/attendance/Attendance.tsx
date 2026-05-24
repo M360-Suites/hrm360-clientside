@@ -32,6 +32,47 @@ const formatDate = (date: Date) =>
 		year: "numeric",
 	});
 
+const formatDuration = (ms: number) => {
+	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+	const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+	const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+		2,
+		"0",
+	);
+	const seconds = String(totalSeconds % 60).padStart(2, "0");
+	return `${hours}:${minutes}:${seconds}`;
+};
+
+const normalizeTimeValue = (value?: string) => {
+	if (!value) return "";
+	const trimmed = String(value).trim();
+	if (!trimmed) return "";
+	return trimmed;
+};
+
+const parseClockTimeToDate = (timeValue?: string) => {
+	const normalized = normalizeTimeValue(timeValue);
+	if (!normalized) return null;
+
+	if (normalized.includes("T")) {
+		const parsed = new Date(normalized);
+		return Number.isNaN(parsed.getTime()) ? null : parsed;
+	}
+
+	const [h, m, s] = normalized.split(":").map(Number);
+	if ([h, m, s].some((n) => Number.isNaN(n))) return null;
+
+	const now = new Date();
+	return new Date(
+		now.getFullYear(),
+		now.getMonth(),
+		now.getDate(),
+		h,
+		m,
+		s || 0,
+	);
+};
+
 const Attendance = () => {
 	const {
 		dayAttendance,
@@ -58,6 +99,7 @@ const Attendance = () => {
 	const [showScanModal, setShowScanModal] = useState(false);
 	const [qrInput, setQrInput] = useState("");
 	const [scanMessage, setScanMessage] = useState("");
+	const [successMessage, setSuccessMessage] = useState("");
 	const fetchedOnce = useRef(false);
 
 	useEffect(() => {
@@ -85,25 +127,37 @@ const Attendance = () => {
 	}, []);
 
 	const employeeToday = employeeDashboard?.today || todayStats;
+	const clockInTimeValue =
+		employeeToday?.clockIn ||
+		employeeToday?.clockInTime ||
+		employeeToday?.checkedInAt ||
+		employeeToday?.clockedIn;
+	const clockOutTimeValue =
+		employeeToday?.clockOut ||
+		employeeToday?.clockOutTime ||
+		employeeToday?.checkedOutAt ||
+		employeeToday?.clockedOut;
 
 	const hasClockedIn = Boolean(
-		employeeToday?.clockIn ||
-			employeeToday?.clockedIn ||
-			employeeToday?.checkedIn ||
+		clockInTimeValue ||
 			employeeToday?.status === "Present",
 	);
 
 	const hasClockedOut = Boolean(
-		employeeToday?.clockOut ||
-			employeeToday?.clockedOut ||
-			employeeToday?.checkedOut,
+		clockOutTimeValue || employeeToday?.checkedOut,
 	);
 
-	const workDuration =
+	const baseWorkDuration =
 		employeeToday?.workDuration ||
+		employeeToday?.timeSpent ||
 		employeeToday?.duration ||
 		employeeToday?.hoursWorked ||
 		"00:00:00";
+	const liveClockInDate = parseClockTimeToDate(clockInTimeValue);
+	const liveWorkDuration =
+		hasClockedIn && !hasClockedOut && liveClockInDate
+			? formatDuration(time.getTime() - liveClockInDate.getTime())
+			: baseWorkDuration;
 
 	const remainingTime =
 		employeeToday?.remainingTime ||
@@ -111,9 +165,8 @@ const Attendance = () => {
 		"7h 55m left today";
 
 	const checkedInTime =
-		employeeToday?.clockIn ||
+		clockInTimeValue ||
 		employeeToday?.checkedInAt ||
-		employeeToday?.clockInTime ||
 		"09:09:23";
 
 	const filteredEmployees = useMemo(() => {
@@ -151,6 +204,8 @@ const Attendance = () => {
 				setQrInput("");
 				setScanMessage("");
 				await fetchEmployeeDashboard();
+				setSuccessMessage("Attendance recorded successfully.");
+				setTimeout(() => setSuccessMessage(""), 3500);
 			} else {
 				setScanMessage(
 					"QR verification failed. Please scan the active admin QR code.",
@@ -230,7 +285,7 @@ const Attendance = () => {
 											Work duration
 										</p>
 										<h1 className="text-3xl font-bold text-slate-900 tabular-nums">
-											{workDuration}
+											{liveWorkDuration}
 										</h1>
 										<div className="mt-3 inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-slate-700">
 											<Clock size={12} />
@@ -270,6 +325,12 @@ const Attendance = () => {
 						{hasClockedIn && (
 							<div className="mt-6 w-full rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
 								Checked in: {checkedInTime}
+							</div>
+						)}
+						{successMessage && (
+							<div className="mt-4 flex w-full items-start gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+								<CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+								<span>{successMessage}</span>
 							</div>
 						)}
 
@@ -434,8 +495,10 @@ const Attendance = () => {
 										const isClockedIn = dayAttendance.some(
 											(record: any) =>
 												(record.employeeId === employeeId ||
-													record.employeeId?._id === employeeId) &&
-												!record.clockOut,
+													record.employeeId?._id === employeeId ||
+													record.employee?._id === employeeId) &&
+												!record.clockOut &&
+												!record.clockOutTime,
 										);
 
 										return (
@@ -531,13 +594,14 @@ const Attendance = () => {
 										<div className="min-w-0">
 											<p className="text-xs font-bold text-gray-900 truncate">
 												{record.employeeName ||
+													record.employee?.name ||
 													record.employeeId?.name ||
 													"Employee"}
 											</p>
 											<p className="text-[10px] text-gray-500">
-												{record.clockOut
-													? `Out: ${record.clockOut}`
-													: `In: ${record.clockIn}`}
+												{record.clockOut || record.clockOutTime
+													? `Out: ${record.clockOut || record.clockOutTime}`
+													: `In: ${record.clockIn || record.clockInTime || "-"}`}
 											</p>
 										</div>
 
