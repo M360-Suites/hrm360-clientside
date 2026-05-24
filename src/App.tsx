@@ -32,6 +32,7 @@ import Promotion from "./pages/promotion/Promotion";
 import Loans from "./pages/loans/Loans";
 import Performance from "./pages/performance/Performance";
 import Announcement from "./pages/announcement/Announcement";
+import TaskManager from "./pages/task-manager/TaskManager";
 
 const RequireAuth = () => {
 	const token = getCookie("token");
@@ -119,6 +120,7 @@ const App = () => {
 						<Route path='/payroll' element={<Payroll />} />
 						<Route path='/recruitment' element={<Recruitment />} />
 						<Route path='/training' element={<Training />} />
+						<Route path='/task-manager' element={<TaskManager />} />
 						<Route path='/promotion' element={<Promotion />} />
 						<Route path='/loans' element={<Loans />} />
 						<Route path='/performance' element={<Performance />} />

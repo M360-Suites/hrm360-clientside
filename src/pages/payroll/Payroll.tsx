@@ -10,6 +10,7 @@ import {
   CheckCircle,
   AlertCircle,
   Wallet,
+  ShieldCheck,
 } from "lucide-react";
 import { usePayrollStore } from "../../store/usePayrollStore";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -22,15 +23,20 @@ const Payroll = () => {
     error,
     fetchSummary,
     fetchEmployeesSalary,
+    configurePayrollPin,
     runPayroll,
     payPayroll,
+    isPayrollPinConfigured,
   } = usePayrollStore();
   const { isAdmin } = useAuthStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showRunPinModal, setShowRunPinModal] = useState(false);
   const [showPayPinModal, setShowPayPinModal] = useState(false);
+  const [showSetupPinModal, setShowSetupPinModal] = useState(false);
   const [pin, setPin] = useState("");
+  const [setupPin, setSetupPin] = useState("");
+  const [confirmSetupPin, setConfirmSetupPin] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -77,6 +83,10 @@ const Payroll = () => {
   };
 
   const handleRunPayroll = async () => {
+    if (!isPayrollPinConfigured) {
+      setShowSetupPinModal(true);
+      return;
+    }
     const success = await runPayroll(payPeriod, pin);
     if (!success) return;
     showToast("success", "Payroll run completed successfully.");
@@ -91,6 +101,10 @@ const Payroll = () => {
   };
 
   const handlePayPayroll = async () => {
+    if (!isPayrollPinConfigured) {
+      setShowSetupPinModal(true);
+      return;
+    }
     if (!selectedEmployee) return;
     const employeeId = selectedEmployee.id || selectedEmployee._id;
     if (!employeeId) {
@@ -103,6 +117,25 @@ const Payroll = () => {
     setShowPayPinModal(false);
     setSelectedEmployee(null);
     setPin("");
+  };
+
+  const handleConfigurePin = async () => {
+    if (setupPin.trim().length < 4) {
+      showToast("error", "PIN must be at least 4 digits.");
+      return;
+    }
+    if (setupPin !== confirmSetupPin) {
+      showToast("error", "PIN confirmation does not match.");
+      return;
+    }
+    const success = await configurePayrollPin(setupPin.trim());
+    if (!success) return;
+    showToast("success", "Payroll PIN configured successfully.");
+    setShowSetupPinModal(false);
+    setSetupPin("");
+    setConfirmSetupPin("");
+    setPin("");
+    fetchSummary();
   };
 
   const handleExportPayroll = () => {
@@ -176,6 +209,14 @@ const Payroll = () => {
           </button>
           {isAdmin && (
             <button
+              onClick={() => setShowSetupPinModal(true)}
+              className="flex-1 sm:flex-none bg-white border border-purple-200 text-[#3B00D9] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-50 transition-colors shadow-xs"
+            >
+              <ShieldCheck size={16} /> {isPayrollPinConfigured ? "Update PIN" : "Set Payroll PIN"}
+            </button>
+          )}
+          {isAdmin && (
+            <button
               onClick={() => setShowRunPinModal(true)}
               className="flex-1 sm:flex-none bg-purple-50 text-[#3B00D9] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
             >
@@ -184,6 +225,24 @@ const Payroll = () => {
           )}
         </div>
       </div>
+
+      {isAdmin && !isPayrollPinConfigured && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-amber-800">Payroll PIN setup required</p>
+            <p className="text-sm text-amber-700 mt-1">
+              Configure your organization payroll PIN before running payroll or paying employees.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowSetupPinModal(true)}
+            className="shrink-0 px-4 py-2 rounded-lg bg-[#3B00D9] text-white text-sm font-semibold hover:bg-[#3500c0]"
+          >
+            Configure PIN
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <SummaryCard
@@ -345,6 +404,22 @@ const Payroll = () => {
           confirmLabel="Pay Now"
         />
       )}
+
+      {showSetupPinModal && (
+        <SetupPinModal
+          setupPin={setupPin}
+          confirmSetupPin={confirmSetupPin}
+          setSetupPin={setSetupPin}
+          setConfirmSetupPin={setConfirmSetupPin}
+          isLoading={isLoading}
+          onCancel={() => {
+            setShowSetupPinModal(false);
+            setSetupPin("");
+            setConfirmSetupPin("");
+          }}
+          onConfirm={handleConfigurePin}
+        />
+      )}
     </div>
   );
 };
@@ -432,6 +507,71 @@ const PinModal = ({
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SetupPinModal = ({
+  setupPin,
+  confirmSetupPin,
+  setSetupPin,
+  setConfirmSetupPin,
+  isLoading,
+  onCancel,
+  onConfirm,
+}: {
+  setupPin: string;
+  confirmSetupPin: string;
+  setSetupPin: (value: string) => void;
+  setConfirmSetupPin: (value: string) => void;
+  isLoading: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) => {
+  return (
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Configure Payroll PIN</h3>
+        <p className="text-sm text-gray-500 mb-6">
+          Set a secure PIN for payroll actions like running payroll and paying employees.
+        </p>
+
+        <div className="space-y-3 mb-6">
+          <input
+            type="password"
+            value={setupPin}
+            onChange={(e) => setSetupPin(e.target.value)}
+            placeholder="New PIN"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-2xl tracking-[1em]"
+            maxLength={6}
+          />
+          <input
+            type="password"
+            value={confirmSetupPin}
+            onChange={(e) => setConfirmSetupPin(e.target.value)}
+            placeholder="Confirm PIN"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-2xl tracking-[1em]"
+            maxLength={6}
+          />
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={setupPin.length < 4 || confirmSetupPin.length < 4 || isLoading}
+            className="flex-1 py-3 bg-[#3B00D9] text-white rounded-xl font-medium hover:bg-[#3500c0] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isLoading && <Loader2 className="animate-spin" size={18} />}
+            Save PIN
           </button>
         </div>
       </div>

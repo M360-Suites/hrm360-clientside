@@ -9,7 +9,7 @@ import {
 	UserPlus,
 	GraduationCap,
 	// TrendingUp,
-	// LineChart,
+	LineChart,
 	// Wallet,
 	// CheckCircle2,
 	Megaphone,
@@ -28,7 +28,7 @@ const navItems = [
 	{ icon: UserPlus, label: "Recruitment", path: "/recruitment" },
 	{ icon: GraduationCap, label: "Training", path: "/training" },
 	// { icon: TrendingUp, label: "Promotion", path: "/promotion" },
-	// { icon: LineChart, label: "Performance", path: "/performance" },
+	{ icon: LineChart, label: "Task Manager", path: "/task-manager" },
 	// { icon: Wallet, label: "Loans", path: "/loans" },
 	// { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
 	{ icon: Megaphone, label: "Announcement", path: "/announcement" },
@@ -98,6 +98,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 							"/leave",
 							"/announcement",
 							"/training",
+							"/task-manager",
 						].includes(item.path);
 					})
 					.map((item) => {

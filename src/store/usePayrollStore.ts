@@ -15,8 +15,10 @@ interface PayrollState {
   employeesSalary: any[];
   isLoading: boolean;
   error: string | null;
+  isPayrollPinConfigured: boolean;
   fetchSummary: () => Promise<void>;
   fetchEmployeesSalary: () => Promise<void>;
+  configurePayrollPin: (pin: string) => Promise<boolean>;
   runPayroll: (payPeriod: string, pin: string) => Promise<boolean>;
   payPayroll: (payPeriod: string, employeeId: string, pin: string) => Promise<boolean>;
 }
@@ -55,6 +57,7 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
   employeesSalary: [],
   isLoading: false,
   error: null,
+  isPayrollPinConfigured: true,
 
   fetchSummary: async () => {
     set({ isLoading: true, error: null });
@@ -64,11 +67,18 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
         summary: normalizeSummary(response.data),
         isLoading: false,
         error: null,
+        isPayrollPinConfigured: true,
       });
     } catch (error: any) {
+      const resolvedError = getErrorMessage(error, "Failed to fetch payroll summary");
+      const lowered = String(resolvedError).toLowerCase();
       set({
-        error: getErrorMessage(error, "Failed to fetch payroll summary"),
+        error: resolvedError,
         isLoading: false,
+        isPayrollPinConfigured: !(
+          lowered.includes("payroll not configured") ||
+          lowered.includes("configure payroll pin")
+        ),
       });
     }
   },
@@ -87,6 +97,25 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
         error: getErrorMessage(error, "Failed to fetch employee salary data"),
         isLoading: false,
       });
+    }
+  },
+
+  configurePayrollPin: async (pin) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.put("/org", { pin }, getOrgConfig());
+      set({
+        isLoading: false,
+        error: null,
+        isPayrollPinConfigured: true,
+      });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to configure payroll PIN"),
+        isLoading: false,
+      });
+      return false;
     }
   },
 
@@ -109,9 +138,15 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
       set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
+      const resolvedError = getErrorMessage(error, "Failed to run payroll");
+      const lowered = String(resolvedError).toLowerCase();
       set({
-        error: getErrorMessage(error, "Failed to run payroll"),
+        error: resolvedError,
         isLoading: false,
+        isPayrollPinConfigured: !(
+          lowered.includes("payroll not configured") ||
+          lowered.includes("configure payroll pin")
+        ),
       });
       return false;
     }
@@ -136,9 +171,15 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
       set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
+      const resolvedError = getErrorMessage(error, "Failed to pay payroll");
+      const lowered = String(resolvedError).toLowerCase();
       set({
-        error: getErrorMessage(error, "Failed to pay payroll"),
+        error: resolvedError,
         isLoading: false,
+        isPayrollPinConfigured: !(
+          lowered.includes("payroll not configured") ||
+          lowered.includes("configure payroll pin")
+        ),
       });
       return false;
     }

@@ -94,6 +94,13 @@ const cleanPayload = (payload: any) => {
 const isValidObjectId = (value: any) =>
   typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
 
+const getLeaveId = (leave: any): string => {
+  const raw = leave?._id || leave?.id || leave?.leaveId;
+  return typeof raw === "string" ? raw : "";
+};
+
+const normalizeStatus = (status: any) => String(status || "").trim().toLowerCase();
+
 export const useLeaveStore = create<LeaveState>((set, get) => ({
   leaves: [],
   orgStats: null,
@@ -207,8 +214,22 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
 
     try {
       const encodedLeaveId = encodeURIComponent(String(leaveId));
-      await api.put(`/leave/${encodedLeaveId}/approve`, {}, getOrgConfig());
+      await api.put(
+        `/leave/${encodedLeaveId}/approve`,
+        { status: "Approved", decision: "approve" },
+        getOrgConfig(),
+      );
       await get().fetchLeaves();
+
+      const updated = get().leaves.find((leave: any) => getLeaveId(leave) === String(leaveId));
+      if (updated && normalizeStatus(updated.status) !== "approved") {
+        set({
+          isLoading: false,
+          error: "Leave action did not apply correctly. Please refresh and try again.",
+        });
+        return false;
+      }
+
       set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
@@ -229,8 +250,23 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
 
     try {
       const encodedLeaveId = encodeURIComponent(String(leaveId));
-      await api.put(`/leave/${encodedLeaveId}/reject`, {}, getOrgConfig());
+      await api.put(
+        `/leave/${encodedLeaveId}/reject`,
+        { status: "Rejected", decision: "reject" },
+        getOrgConfig(),
+      );
       await get().fetchLeaves();
+
+      const updated = get().leaves.find((leave: any) => getLeaveId(leave) === String(leaveId));
+      if (updated && normalizeStatus(updated.status) !== "rejected") {
+        set({
+          isLoading: false,
+          error:
+            "Reject endpoint responded but leave status is not rejected. Please verify backend route mapping.",
+        });
+        return false;
+      }
+
       set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {

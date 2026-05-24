@@ -204,8 +204,11 @@ const Leave = () => {
   ];
 
   const handleApprove = async (leave: any) => {
-    const leaveId = leave?._id || leave?.id;
-    if (!leaveId) return;
+    const leaveId = leave?._id || leave?.id || leave?.leaveId;
+    if (!leaveId) {
+      showToast("error", "Leave ID is missing. Please refresh and try again.");
+      return;
+    }
     const success = await approveLeave(leaveId);
     if (!success) {
       const errorMessage = useLeaveStore.getState().error || "Failed to approve leave request.";
@@ -218,8 +221,11 @@ const Leave = () => {
   };
 
   const handleReject = async (leave: any) => {
-    const leaveId = leave?._id || leave?.id;
-    if (!leaveId) return;
+    const leaveId = leave?._id || leave?.id || leave?.leaveId;
+    if (!leaveId) {
+      showToast("error", "Leave ID is missing. Please refresh and try again.");
+      return;
+    }
     const success = await rejectLeave(leaveId);
     if (!success) {
       const errorMessage = useLeaveStore.getState().error || "Failed to reject leave request.";
