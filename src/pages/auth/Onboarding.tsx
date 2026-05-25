@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, UploadCloud } from "lucide-react";
 import { useOrgStore } from "../../store/useOrgStore";
@@ -18,8 +18,7 @@ const Onboarding = () => {
 	const navigate = useNavigate();
 
 	const { user, setUser } = useAuthStore();
-	const { createOrg, completeOnboarding, isLoading, error } =
-		useOrgStore();
+	const { completeOnboarding, isLoading, error } = useOrgStore();
 
 	const [step, setStep] = useState(1);
 
@@ -40,6 +39,15 @@ const Onboarding = () => {
 		}));
 	};
 
+	useEffect(() => {
+		const isOnboarded = getCookie("isOnboarded") === "true";
+		const orgId = getCookie("orgId");
+
+		if (isOnboarded && orgId) {
+			navigate("/dashboard", { replace: true });
+		}
+	}, [navigate]);
+
 	const handleNext = () => {
 		if (step < 3) {
 			setStep((prev) => prev + 1);
@@ -53,30 +61,22 @@ const Onboarding = () => {
 	};
 
 	const handleSubmit = async () => {
-		const createdBy = user?._id || user?.id || user?.userId;
+		const resolvedOrgId =
+			user?.orgId ||
+			user?.organizationId ||
+			user?.organization?._id ||
+			user?.organization?.id ||
+			user?.org?._id ||
+			user?.org?.id ||
+			getCookie("orgId");
 
-		if (!createdBy) {
+		if (!resolvedOrgId) {
 			navigate("/login", { replace: true });
 			return;
 		}
 
-		const orgCreated = await createOrg({
-			name: user?.companyName || "Untitled Organization",
-			subtext: "",
-			tagline: "",
-			image: formData.logo,
-			stats: [],
-			createdBy,
-		});
-
-		if (!orgCreated) return;
-
-		const orgId = getCookie("orgId");
-
-		if (!orgId) return;
-
 		const onboarded = await completeOnboarding({
-			orgId,
+			orgId: resolvedOrgId,
 			companySize: formData.companySize,
 			structure: formData.structure,
 			address: formData.address,
@@ -85,13 +85,15 @@ const Onboarding = () => {
 
 		if (!onboarded) return;
 
+		const finalOrgId = getCookie("orgId") || resolvedOrgId;
+
 		const updatedUser = {
 			...user,
-			orgId,
+			orgId: finalOrgId,
 			isOnboarded: true,
 		};
 
-		setCookie("orgId", orgId);
+		setCookie("orgId", finalOrgId);
 		setCookie("isOnboarded", "true");
 		setCookie("user", JSON.stringify(updatedUser));
 

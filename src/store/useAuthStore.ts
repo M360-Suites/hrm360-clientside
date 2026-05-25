@@ -77,10 +77,22 @@ const extractOrgId = (user: any) => {
 	return (
 		user?.orgId ||
 		user?.organizationId ||
+		user?.defaultOrg?._id ||
+		user?.defaultOrg?.id ||
 		user?.organization?._id ||
 		user?.organization?.id ||
 		user?.org?._id ||
 		user?.org?.id ||
+		null
+	);
+};
+
+const extractDefaultOrgId = (responseData: any) => {
+	return (
+		responseData?.defaultOrg?._id ||
+		responseData?.defaultOrg?.id ||
+		responseData?.data?.defaultOrg?._id ||
+		responseData?.data?.defaultOrg?.id ||
 		null
 	);
 };
@@ -195,8 +207,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 				setCookie("refreshToken", refreshToken);
 			}
 
-			let orgId = extractOrgId(user);
+			let orgId = extractOrgId(user) || extractDefaultOrgId(response.data);
 			let isOnboarded = extractOnboardingState(user);
+
+			if (orgId) {
+				isOnboarded = true;
+			}
 
 			if (!orgId) {
 				try {

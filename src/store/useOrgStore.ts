@@ -88,7 +88,21 @@ export const useOrgStore = create<OrgState>((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      await api.post("/auth/onboarding", data);
+      const response = await api.post("/auth/onboarding", data);
+      const responseData = response.data?.data || response.data || {};
+      const resolvedOrgId =
+        responseData?.orgId ||
+        responseData?.organizationId ||
+        responseData?.organization?._id ||
+        responseData?.organization?.id ||
+        responseData?.org?._id ||
+        responseData?.org?.id ||
+        data?.orgId;
+
+      if (resolvedOrgId) {
+        setCookie("orgId", String(resolvedOrgId));
+      }
+      setCookie("isOnboarded", "true");
 
       set({
         isLoading: false,
