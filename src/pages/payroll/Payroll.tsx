@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Download,
@@ -16,6 +16,7 @@ import { usePayrollStore } from "../../store/usePayrollStore";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const Payroll = () => {
+  const didFetch = useRef(false);
   const {
     summary,
     employeesSalary,
@@ -34,6 +35,9 @@ const Payroll = () => {
   const [showRunPinModal, setShowRunPinModal] = useState(false);
   const [showPayPinModal, setShowPayPinModal] = useState(false);
   const [showSetupPinModal, setShowSetupPinModal] = useState(false);
+  const [showAccessPinModal, setShowAccessPinModal] = useState(false);
+  const [isPayrollUnlocked, setIsPayrollUnlocked] = useState(false);
+  const [accessPin, setAccessPin] = useState("");
   const [pin, setPin] = useState("");
   const [setupPin, setSetupPin] = useState("");
   const [confirmSetupPin, setConfirmSetupPin] = useState("");
@@ -46,9 +50,21 @@ const Payroll = () => {
   });
 
   useEffect(() => {
+    if (didFetch.current) return;
+    didFetch.current = true;
+    if (isAdmin) {
+      setShowAccessPinModal(true);
+      return;
+    }
     fetchSummary();
     fetchEmployeesSalary();
-  }, [fetchSummary, fetchEmployeesSalary]);
+  }, [isAdmin, fetchSummary, fetchEmployeesSalary]);
+
+  useEffect(() => {
+    if (!isAdmin || !isPayrollUnlocked) return;
+    fetchSummary();
+    fetchEmployeesSalary();
+  }, [isAdmin, isPayrollUnlocked, fetchSummary, fetchEmployeesSalary]);
 
   useEffect(() => {
     if (!error) return;
@@ -120,22 +136,40 @@ const Payroll = () => {
   };
 
   const handleConfigurePin = async () => {
-    if (setupPin.trim().length < 4) {
+    const normalizedSetup = setupPin.replace(/\D/g, "");
+    const normalizedConfirm = confirmSetupPin.replace(/\D/g, "");
+    if (normalizedSetup.length < 4) {
       showToast("error", "PIN must be at least 4 digits.");
       return;
     }
-    if (setupPin !== confirmSetupPin) {
+    if (normalizedSetup !== normalizedConfirm) {
       showToast("error", "PIN confirmation does not match.");
       return;
     }
-    const success = await configurePayrollPin(setupPin.trim());
+    const success = await configurePayrollPin(normalizedSetup);
     if (!success) return;
     showToast("success", "Payroll PIN configured successfully.");
     setShowSetupPinModal(false);
     setSetupPin("");
     setConfirmSetupPin("");
     setPin("");
-    fetchSummary();
+    if (isAdmin) setShowAccessPinModal(true);
+  };
+
+  const handleUnlockPayroll = () => {
+    if (!isPayrollPinConfigured) {
+      setShowAccessPinModal(false);
+      setShowSetupPinModal(true);
+      return;
+    }
+    const normalized = accessPin.replace(/\D/g, "");
+    if (normalized.length < 4) {
+      showToast("error", "Enter your payroll PIN to continue.");
+      return;
+    }
+    setAccessPin(normalized);
+    setShowAccessPinModal(false);
+    setIsPayrollUnlocked(true);
   };
 
   const handleExportPayroll = () => {
@@ -182,6 +216,8 @@ const Payroll = () => {
     URL.revokeObjectURL(url);
   };
 
+  const isPayrollLocked = isAdmin && !isPayrollUnlocked;
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {toast && (
@@ -195,6 +231,7 @@ const Payroll = () => {
         </div>
       )}
 
+      {!isPayrollLocked && (
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Payroll Management</h2>
@@ -225,8 +262,9 @@ const Payroll = () => {
           )}
         </div>
       </div>
+      )}
 
-      {isAdmin && !isPayrollPinConfigured && (
+      {!isPayrollLocked && isAdmin && !isPayrollPinConfigured && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-amber-800">Payroll PIN setup required</p>
@@ -244,6 +282,7 @@ const Payroll = () => {
         </div>
       )}
 
+      {!isPayrollLocked && (
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <SummaryCard
           label="Employees"
@@ -281,7 +320,9 @@ const Payroll = () => {
           format={false}
         />
       </div>
+      )}
 
+      {!isPayrollLocked && (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
@@ -371,6 +412,22 @@ const Payroll = () => {
           </table>
         </div>
       </div>
+      )}
+
+      {isPayrollLocked && (
+        <div className="bg-white border border-gray-100 rounded-2xl p-10 text-center">
+          <ShieldCheck className="mx-auto text-[#3B00D9]" size={42} />
+          <h3 className="mt-4 text-lg font-semibold text-gray-900">Payroll is locked</h3>
+          <p className="text-sm text-gray-500 mt-1">Enter payroll PIN to access payroll dashboard.</p>
+          <button
+            type="button"
+            onClick={() => setShowAccessPinModal(true)}
+            className="mt-5 px-5 py-2.5 rounded-xl bg-[#3B00D9] text-white text-sm font-medium hover:bg-[#3500c0]"
+          >
+            Unlock Payroll
+          </button>
+        </div>
+      )}
 
       {showRunPinModal && (
         <PinModal
@@ -418,6 +475,19 @@ const Payroll = () => {
             setConfirmSetupPin("");
           }}
           onConfirm={handleConfigurePin}
+        />
+      )}
+
+      {showAccessPinModal && isAdmin && (
+        <PinModal
+          title="Unlock Payroll"
+          description="Enter your payroll PIN to continue."
+          pin={accessPin}
+          setPin={setAccessPin}
+          isLoading={isLoading}
+          onCancel={() => setShowAccessPinModal(false)}
+          onConfirm={handleUnlockPayroll}
+          confirmLabel="Unlock"
         />
       )}
     </div>
@@ -486,10 +556,11 @@ const PinModal = ({
 
         <input
           type="password"
+          inputMode="numeric"
           value={pin}
-          onChange={(e) => setPin(e.target.value)}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
           placeholder="Enter PIN"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] mb-6 text-center text-2xl tracking-[1em]"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] mb-6 text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
           maxLength={6}
         />
 
@@ -542,18 +613,20 @@ const SetupPinModal = ({
         <div className="space-y-3 mb-6">
           <input
             type="password"
+            inputMode="numeric"
             value={setupPin}
-            onChange={(e) => setSetupPin(e.target.value)}
+            onChange={(e) => setSetupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="New PIN"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-2xl tracking-[1em]"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
             maxLength={6}
           />
           <input
             type="password"
+            inputMode="numeric"
             value={confirmSetupPin}
-            onChange={(e) => setConfirmSetupPin(e.target.value)}
+            onChange={(e) => setConfirmSetupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="Confirm PIN"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-2xl tracking-[1em]"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
             maxLength={6}
           />
         </div>
