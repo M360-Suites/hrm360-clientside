@@ -7,6 +7,8 @@ import {
 	Loader2,
 	CheckCircle,
 	AlertCircle,
+	ChevronLeft,
+	ChevronRight,
 } from "lucide-react";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 
@@ -70,9 +72,15 @@ const Employees = () => {
 
 	const {
 		employees,
+		page,
+		limit,
+		total,
+		totalPages,
 		isLoading,
 		error,
 		fetchEmployees,
+		setEmployeePage,
+		setEmployeeLimit,
 		createEmployee,
 		updateEmployee,
 		deleteEmployee,
@@ -661,7 +669,7 @@ const Employees = () => {
 					{filteredEmployees?.length === 0 && !isLoading && (
 						<div className='px-6 py-20 text-center'>
 							<div className='flex flex-col items-center justify-center'>
-								<div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4'>
+							<div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-4'>
 									<Plus size={32} />
 								</div>
 								<p className='text-gray-900 font-medium'>No employees found</p>
@@ -671,6 +679,63 @@ const Employees = () => {
 							</div>
 						</div>
 					)}
+				</div>
+
+				<div className='px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/40'>
+					<div className='text-xs sm:text-sm text-gray-600'>
+						Showing{" "}
+						<span className='font-semibold text-gray-800'>
+							{total === 0 ? 0 : (page - 1) * limit + 1}
+						</span>{" "}
+						to{" "}
+						<span className='font-semibold text-gray-800'>
+							{Math.min(page * limit, total)}
+						</span>{" "}
+						of{" "}
+						<span className='font-semibold text-gray-800'>
+							{total}
+						</span>{" "}
+						employees
+					</div>
+
+					<div className='flex items-center gap-2'>
+						<select
+							value={limit}
+							onChange={(e) =>
+								setEmployeeLimit(Number(e.target.value))
+							}
+							className='text-xs sm:text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-600'
+						>
+							<option value={10}>10 / page</option>
+							<option value={20}>20 / page</option>
+							<option value={50}>50 / page</option>
+							<option value={100}>100 / page</option>
+						</select>
+
+						<button
+							type='button'
+							onClick={() => setEmployeePage(page - 1)}
+							disabled={page <= 1 || isLoading}
+							className='inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50'
+						>
+							<ChevronLeft size={14} /> Prev
+						</button>
+
+						<span className='text-xs sm:text-sm font-medium text-gray-700 px-2'>
+							Page {page} of {Math.max(1, totalPages)}
+						</span>
+
+						<button
+							type='button'
+							onClick={() => setEmployeePage(page + 1)}
+							disabled={
+								page >= Math.max(1, totalPages) || isLoading
+							}
+							className='inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50'
+						>
+							Next <ChevronRight size={14} />
+						</button>
+					</div>
 				</div>
 			</div>
 

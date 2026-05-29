@@ -5,10 +5,16 @@ import { getCookie } from "../utils/cookies";
 interface EmployeeState {
   employees: any[];
   currentEmployee: any | null;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   isLoading: boolean;
   error: string | null;
 
-  fetchEmployees: () => Promise<void>;
+  fetchEmployees: (params?: { page?: number; limit?: number }) => Promise<void>;
+  setEmployeePage: (page: number) => Promise<void>;
+  setEmployeeLimit: (limit: number) => Promise<void>;
   fetchEmployeeById: (id: string) => Promise<void>;
   createEmployee: (data: any) => Promise<boolean>;
   updateEmployee: (id: string, data: any) => Promise<boolean>;
@@ -61,20 +67,46 @@ const normalizeEmployees = (responseData: any) => {
   return [];
 };
 
+const normalizeEmployeesMeta = (responseData: any) => {
+  const root = responseData?.data || responseData || {};
+  return {
+    page: Number(root?.page || 1),
+    total: Number(root?.total || 0),
+    totalPages: Number(root?.totalPages || 1),
+  };
+};
+
 export const useEmployeeStore = create<EmployeeState>((set, get) => ({
   employees: [],
   currentEmployee: null,
+  page: 1,
+  limit: 20,
+  total: 0,
+  totalPages: 1,
   isLoading: false,
   error: null,
 
-  fetchEmployees: async () => {
+  fetchEmployees: async (params) => {
     set({ isLoading: true, error: null });
 
     try {
-      const response = await api.get("/employees", getOrgConfig());
+      const nextPage = params?.page ?? get().page ?? 1;
+      const nextLimit = params?.limit ?? get().limit ?? 20;
+      const response = await api.get("/employees", {
+        ...getOrgConfig(),
+        params: {
+          page: nextPage,
+          limit: nextLimit,
+        },
+      });
+      const meta = normalizeEmployeesMeta(response.data);
 
       set({
         employees: normalizeEmployees(response.data),
+        page: meta.page || nextPage,
+        limit: nextLimit,
+        total: meta.total,
+        totalPages: meta.totalPages || 1,
         isLoading: false,
         error: null,
       });
@@ -88,6 +120,16 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
         isLoading: false,
       });
     }
+  },
+
+  setEmployeePage: async (page) => {
+    const safePage = Math.max(1, Number(page || 1));
+    await get().fetchEmployees({ page: safePage });
+  },
+
+  setEmployeeLimit: async (limit) => {
+    const safeLimit = Math.max(1, Number(limit || 20));
+    await get().fetchEmployees({ page: 1, limit: safeLimit });
   },
 
   fetchEmployeeById: async (id) => {
@@ -142,7 +184,7 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
 
       await api.post("/employee", payload, getOrgConfig());
 
-      await get().fetchEmployees();
+      await get().fetchEmployees({ page: get().page, limit: get().limit });
 
       set({ isLoading: false, error: null });
       return true;
@@ -186,7 +228,7 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
 
       await api.put(`/employee/${id}`, payload, getOrgConfig());
 
-      await get().fetchEmployees();
+      await get().fetchEmployees({ page: get().page, limit: get().limit });
 
       set({ isLoading: false, error: null });
       return true;
@@ -209,8 +251,11 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
 
     try {
       await api.delete(`/employee/${id}`, getOrgConfig());
-
-      await get().fetchEmployees();
+      const currentPage = get().page;
+      const nextTotal = Math.max(0, get().total - 1);
+      const lastPageAfterDelete = Math.max(1, Math.ceil(nextTotal / get().limit));
+      const targetPage = Math.min(currentPage, lastPageAfterDelete);
+      await get().fetchEmployees({ page: targetPage, limit: get().limit });
 
       set({ isLoading: false, error: null });
       return true;
