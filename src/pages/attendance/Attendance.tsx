@@ -79,6 +79,7 @@ const Attendance = () => {
 		todayStats,
 		employeeDashboard,
 		fetchDayAttendance,
+		fetchWeekAttendance,
 		fetchTodayStats,
 		fetchEmployeeDashboard,
 		clockIn,
@@ -120,6 +121,7 @@ const Attendance = () => {
 			fetchTodayStats();
 			fetchEmployees();
 			fetchDayAttendance();
+			fetchWeekAttendance();
 		} else {
 			fetchEmployeeDashboard();
 		}
@@ -128,6 +130,7 @@ const Attendance = () => {
 		fetchEmployees,
 		fetchTodayStats,
 		fetchDayAttendance,
+		fetchWeekAttendance,
 		fetchEmployeeDashboard,
 	]);
 

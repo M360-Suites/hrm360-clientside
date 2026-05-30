@@ -24,6 +24,7 @@ const Payroll = () => {
     error,
     fetchSummary,
     fetchEmployeesSalary,
+    verifyPayrollPin,
     configurePayrollPin,
     runPayroll,
     payPayroll,
@@ -167,9 +168,16 @@ const Payroll = () => {
       showToast("error", "Enter your payroll PIN to continue.");
       return;
     }
-    setAccessPin(normalized);
-    setShowAccessPinModal(false);
-    setIsPayrollUnlocked(true);
+    verifyPayrollPin(normalized).then((ok) => {
+      if (!ok) {
+        showToast("error", usePayrollStore.getState().error || "Invalid payroll PIN.");
+        return;
+      }
+      setAccessPin(normalized);
+      setShowAccessPinModal(false);
+      setIsPayrollUnlocked(true);
+      showToast("success", "Payroll unlocked.");
+    });
   };
 
   const handleExportPayroll = () => {

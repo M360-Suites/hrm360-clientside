@@ -18,6 +18,7 @@ interface PayrollState {
   isPayrollPinConfigured: boolean;
   fetchSummary: () => Promise<void>;
   fetchEmployeesSalary: () => Promise<void>;
+  verifyPayrollPin: (pin: string) => Promise<boolean>;
   configurePayrollPin: (pin: string) => Promise<boolean>;
   runPayroll: (payPeriod: string, pin: string) => Promise<boolean>;
   payPayroll: (payPeriod: string, employeeId: string, pin: string) => Promise<boolean>;
@@ -97,6 +98,27 @@ export const usePayrollStore = create<PayrollState>((set, get) => ({
         error: getErrorMessage(error, "Failed to fetch employee salary data"),
         isLoading: false,
       });
+    }
+  },
+
+  verifyPayrollPin: async (pin) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.get("/payroll/summary", {
+        ...getOrgConfig(),
+        headers: {
+          ...getOrgConfig().headers,
+          "x-payroll-pin": pin,
+        },
+      });
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Invalid payroll PIN"),
+        isLoading: false,
+      });
+      return false;
     }
   },
 

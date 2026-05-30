@@ -19,6 +19,8 @@ interface TaskState {
   fetchUserProjects: () => Promise<void>;
   createProject: (payload: any) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
+  updateTask: (payload: any) => Promise<boolean>;
+  deleteTask: (taskId: string) => Promise<boolean>;
   fetchProjectTasks: (args: {
     projectId: string;
     query?: string;
@@ -190,6 +192,48 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } catch (error: any) {
       set({
         error: getErrorMessage(error, "Failed to create task"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  updateTask: async (payload) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.put("/task", payload, getOrgConfig());
+      const projectId = payload?.projectId || get().selectedProject?._id || get().selectedProject?.id;
+      if (projectId) {
+        await get().fetchProjectTasks({ projectId, status: "All", page: get().pagination.page, limit: get().pagination.limit });
+      }
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to update task"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  deleteTask: async (taskId) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/task/${taskId}`, getOrgConfig());
+      const selectedProjectId = get().selectedProject?._id || get().selectedProject?.id;
+      if (selectedProjectId) {
+        await get().fetchProjectTasks({ projectId: selectedProjectId, status: "All", page: get().pagination.page, limit: get().pagination.limit });
+      } else {
+        set({
+          tasks: get().tasks.filter((t: any) => (t?._id || t?.id) !== taskId),
+        });
+      }
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to delete task"),
         isLoading: false,
       });
       return false;

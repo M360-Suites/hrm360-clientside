@@ -4,6 +4,7 @@ import { getCookie } from "../utils/cookies";
 
 interface AttendanceState {
 	dayAttendance: any[];
+	weekAttendance: any[];
 	weekOverview: any | null;
 	todayStats: any | null;
 	employeeDashboard: any | null;
@@ -12,6 +13,7 @@ interface AttendanceState {
 	error: string | null;
 	fetchDayAttendance: () => Promise<void>;
 	fetchWeekOverview: () => Promise<void>;
+	fetchWeekAttendance: () => Promise<void>;
 	fetchTodayStats: () => Promise<void>;
 	fetchEmployeeDashboard: () => Promise<void>;
 	clockIn: (employeeId: string) => Promise<void>;
@@ -117,6 +119,7 @@ const getOrgConfig = () => {
 export const useAttendanceStore = create<AttendanceState>(
 	(set, get) => ({
 		dayAttendance: [],
+		weekAttendance: [],
 		weekOverview: null,
 		todayStats: null,
 		employeeDashboard: null,
@@ -161,6 +164,30 @@ export const useAttendanceStore = create<AttendanceState>(
 			} catch (error: any) {
 				set({
 					error: getErrorMessage(error, "Failed to fetch week overview"),
+					isLoading: false,
+				});
+			}
+		},
+
+		fetchWeekAttendance: async () => {
+			set({ isLoading: true, error: null });
+			try {
+				const response = await api.get("/attendance/week", getOrgConfig());
+				const data = response.data?.data || response.data;
+				const logs = Array.isArray(data)
+					? data
+					: Array.isArray(data?.attendance)
+						? data.attendance
+						: Array.isArray(data?.logs)
+							? data.logs
+							: [];
+				set({
+					weekAttendance: logs.map(normalizeAttendanceRecord),
+					isLoading: false,
+				});
+			} catch (error: any) {
+				set({
+					error: getErrorMessage(error, "Failed to fetch week attendance"),
 					isLoading: false,
 				});
 			}
