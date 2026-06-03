@@ -18,6 +18,7 @@ interface TaskState {
   fetchProjects: () => Promise<void>;
   fetchUserProjects: () => Promise<void>;
   createProject: (payload: any) => Promise<boolean>;
+  deleteProject: (projectId: string) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
   deleteTask: (taskId: string) => Promise<boolean>;
@@ -192,6 +193,36 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } catch (error: any) {
       set({
         error: getErrorMessage(error, "Failed to create task"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  deleteProject: async (projectId) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/task/project/${projectId}`, getOrgConfig());
+      const nextProjects = get().projects.filter(
+        (project: any) => (project?._id || project?.id) !== projectId,
+      );
+      const currentSelectedId = get().selectedProject?._id || get().selectedProject?.id;
+      const nextSelectedProject =
+        currentSelectedId === projectId
+          ? nextProjects[0] || null
+          : get().selectedProject;
+
+      set({
+        projects: nextProjects,
+        selectedProject: nextSelectedProject,
+        tasks: currentSelectedId === projectId ? [] : get().tasks,
+        isLoading: false,
+        error: null,
+      });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to delete project"),
         isLoading: false,
       });
       return false;

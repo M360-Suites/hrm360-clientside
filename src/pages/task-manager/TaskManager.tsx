@@ -6,8 +6,10 @@ import {
   Loader2,
   Calendar,
   CheckCircle2,
-  AlertTriangle,
   CircleDot,
+  Clock3,
+  Pencil,
+  Trash2,
   X,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -35,6 +37,7 @@ const TaskManager = () => {
     fetchProjects,
     fetchUserProjects,
     createProject,
+    deleteProject,
     createTask,
     updateTask,
     deleteTask,
@@ -47,7 +50,7 @@ const TaskManager = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<any | null>(null);
-  const [dragOverColumn, setDragOverColumn] = useState<"completed" | "inProgress" | "due" | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<"completed" | "inProgress" | "pending" | null>(null);
   const [activeTaskMenuId, setActiveTaskMenuId] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<any | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -118,11 +121,11 @@ const TaskManager = () => {
       const status = normalizeStatus(task.status);
       return status === "in progress" || status === "in-progress" || status === "progress";
     });
-    const due = tasks.filter((task: any) => {
+    const pending = tasks.filter((task: any) => {
       const status = normalizeStatus(task.status);
       return status === "due" || status === "pending" || status === "todo";
     });
-    return { completed, inProgress, due };
+    return { completed, inProgress, pending };
   }, [tasks]);
 
   const handleCreateProject = async (e: React.FormEvent) => {
@@ -187,13 +190,22 @@ const TaskManager = () => {
     }));
   };
 
-  const mapColumnToStatus = (column: "completed" | "inProgress" | "due") => {
+  const handleDeleteProject = async (project: any) => {
+    const projectId = project?._id || project?.id;
+    if (!projectId) return;
+    const confirmed = window.confirm("Delete this project and its task board?");
+    if (!confirmed) return;
+    const ok = await deleteProject(projectId);
+    if (ok) showToast("success", "Project deleted successfully.");
+  };
+
+  const mapColumnToStatus = (column: "completed" | "inProgress" | "pending") => {
     if (column === "completed") return "Completed";
     if (column === "inProgress") return "In progress";
     return "Pending";
   };
 
-  const handleDropTask = async (column: "completed" | "inProgress" | "due") => {
+  const handleDropTask = async (column: "completed" | "inProgress" | "pending") => {
     if (!draggedTask) return;
     const nextStatus = mapColumnToStatus(column);
     if (normalizeStatus(draggedTask?.status) === normalizeStatus(nextStatus)) {
@@ -290,8 +302,8 @@ const TaskManager = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Task Board</h2>
-          <p className="text-sm text-gray-500">Review cycles, goal tracking, and project execution</p>
+          <h2 className="text-xl font-semibold text-gray-900">Task Manager</h2>
+          <p className="text-sm text-gray-500">Projects, owners, dates, and task status in one place</p>
         </div>
         {isAdmin && (
           <button
@@ -304,27 +316,42 @@ const TaskManager = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-4">
-        <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-3 h-fit">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-4">
+        <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit">
           <h3 className="font-semibold text-gray-800">Projects</h3>
           <div className="space-y-2">
             {projects.map((project: any, idx: number) => {
               const projectId = project?._id || project?.id || String(idx);
               const isActive = (selectedProject?._id || selectedProject?.id) === projectId;
               return (
-                <button
+                <div
                   key={projectId}
-                  type="button"
-                  onClick={() => onSwitchProject(project)}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl border text-sm flex items-center justify-between ${
+                  className={`w-full rounded-lg border text-sm flex items-center ${
                     isActive
                       ? "bg-[#3B00D9] text-white border-[#3B00D9]"
                       : "bg-white border-gray-200 text-gray-700 hover:border-[#3B00D9]/40"
                   }`}
                 >
-                  <span className="truncate">{project?.title || project?.name || "Untitled Project"}</span>
-                  <MoreVertical size={15} className={isActive ? "text-white/80" : "text-gray-400"} />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => onSwitchProject(project)}
+                    className="min-w-0 flex-1 text-left px-3 py-2.5"
+                  >
+                    <span className="block truncate">{project?.title || project?.name || "Untitled Project"}</span>
+                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteProject(project)}
+                      className={`mr-2 rounded p-1 ${
+                        isActive ? "text-white/80 hover:bg-white/10" : "text-rose-500 hover:bg-rose-50"
+                      }`}
+                      title="Delete project"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -332,7 +359,7 @@ const TaskManager = () => {
             <button
               type="button"
               onClick={() => setShowProjectModal(true)}
-              className="w-full border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-xl py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5"
+              className="w-full border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5"
             >
               + Add new project
             </button>
@@ -391,11 +418,11 @@ const TaskManager = () => {
               isAdmin={isAdmin}
             />
             <BoardColumn
-              columnKey="due"
-              title="Due task"
-              tone="red"
-              icon={<AlertTriangle size={14} />}
-              tasks={boardData.due}
+              columnKey="pending"
+              title="Pending"
+              tone="slate"
+              icon={<Clock3 size={14} />}
+              tasks={boardData.pending}
               onDropTask={handleDropTask}
               onDragTask={setDraggedTask}
               onDeleteTask={handleDeleteTask}
@@ -574,41 +601,47 @@ const BoardColumn = ({
   setDragOverColumn,
   isAdmin,
 }: {
-  columnKey: "completed" | "inProgress" | "due";
+  columnKey: "completed" | "inProgress" | "pending";
   title: string;
-  tone: "green" | "orange" | "red";
+  tone: "green" | "orange" | "slate";
   icon: React.ReactNode;
   tasks: any[];
-  onDropTask: (column: "completed" | "inProgress" | "due") => void;
+  onDropTask: (column: "completed" | "inProgress" | "pending") => void;
   onDragTask: (task: any | null) => void;
   onDeleteTask: (task: any) => void;
   onEditTask: (task: any) => void;
   onManualStatusChange: (task: any, status: "Pending" | "In progress" | "Completed") => void;
   activeTaskMenuId: string | null;
   setActiveTaskMenuId: (taskId: string | null) => void;
-  dragOverColumn: "completed" | "inProgress" | "due" | null;
-  setDragOverColumn: (column: "completed" | "inProgress" | "due" | null) => void;
+  dragOverColumn: "completed" | "inProgress" | "pending" | null;
+  setDragOverColumn: (column: "completed" | "inProgress" | "pending" | null) => void;
   isAdmin: boolean;
 }) => {
   const headerTone = {
-    green: "bg-[#65C237] text-white",
-    orange: "bg-[#FF6D1B] text-white",
-    red: "bg-[#D90429] text-white",
+    green: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    orange: "bg-amber-50 text-amber-700 border-amber-100",
+    slate: "bg-slate-50 text-slate-700 border-slate-200",
   };
 
   return (
     <div
-      className={`bg-white border rounded-2xl overflow-hidden transition-all ${
+      className={`bg-white border rounded-lg overflow-hidden transition-all ${
         dragOverColumn === columnKey
           ? "border-[#3B00D9] ring-2 ring-[#3B00D9]/20 shadow-md"
           : "border-gray-100"
       }`}
     >
-      <div className={`px-4 py-3 text-sm font-semibold flex items-center gap-2 ${headerTone[tone]}`}>
+      <div className={`px-4 py-3 text-sm font-semibold flex items-center gap-2 border-b ${headerTone[tone]}`}>
         {icon} {title} <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
+      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+        <span>Task</span>
+        <span>Due Date</span>
+        <span>Team</span>
+        <span />
+      </div>
       <div
-        className="p-3 space-y-3 min-h-[420px] max-h-[68vh] overflow-y-auto"
+        className="min-h-[420px] max-h-[68vh] overflow-y-auto"
         onDragOver={(e) => {
           e.preventDefault();
           setDragOverColumn(columnKey);
@@ -640,7 +673,7 @@ const BoardColumn = ({
             isAdmin={isAdmin}
           />
         ))}
-        {tasks.length === 0 && <div className="text-xs text-gray-500 text-center py-8">No tasks here</div>}
+        {tasks.length === 0 && <div className="text-xs text-gray-500 text-center py-10">No tasks here</div>}
       </div>
     </div>
   );
@@ -670,53 +703,56 @@ const TaskCard = ({
   const teamCount = Array.isArray(task?.team) ? task.team.length : 0;
   return (
     <div
-      className="border border-gray-100 rounded-xl p-3 cursor-grab active:cursor-grabbing"
+      className="group grid gap-2 border-b border-gray-100 bg-white px-3 py-3 text-sm transition hover:bg-gray-50 md:grid-cols-[minmax(0,1fr)_96px_76px_32px] md:items-center cursor-grab active:cursor-grabbing"
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <h4 className="text-sm font-semibold text-gray-800 line-clamp-1">{task?.title || "Untitled task"}</h4>
-      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task?.description || "No description provided."}</p>
-      <div className="mt-3 h-1.5 rounded-full bg-gray-100">
-        <div className="h-full w-[70%] bg-[#3B00D9] rounded-full" />
+      <div className="min-w-0">
+        <h4 className="truncate text-sm font-semibold text-gray-800">{task?.title || "Untitled task"}</h4>
+        <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">{task?.description || "No description provided."}</p>
       </div>
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-        <span className="inline-flex items-center gap-1">
-          <Calendar size={12} /> Due: {formatDate(getTaskDate(task))}
-        </span>
-        <div className="flex items-center gap-2 relative">
-          <span>{teamCount} assignee{teamCount === 1 ? "" : "s"}</span>
-          {isAdmin && (
-            <>
-              <button
-                type="button"
-                onClick={onToggleMenu}
-                className="p-1 rounded hover:bg-gray-100 text-gray-500"
-              >
-                <MoreVertical size={14} />
-              </button>
-              {isMenuOpen && (
-                <div className="absolute right-0 top-6 z-20 w-40 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
-                  <button type="button" onClick={onEdit} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50">
-                    Edit task
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("Pending")} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50">
-                    Move to Pending
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("In progress")} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50">
-                    Move to In progress
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("Completed")} className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50">
-                    Move to Completed
-                  </button>
-                  <button type="button" onClick={onDelete} className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50">
-                    Delete task
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+
+      <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+        <Calendar size={12} /> {formatDate(getTaskDate(task))}
+      </span>
+
+      <span className="text-xs text-gray-500">
+        {teamCount} member{teamCount === 1 ? "" : "s"}
+      </span>
+
+      <div className="relative flex justify-end">
+        {isAdmin && (
+          <>
+            <button
+              type="button"
+              onClick={onToggleMenu}
+              className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
+              title="Task options"
+            >
+              <MoreVertical size={15} />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+                <button type="button" onClick={onEdit} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-50">
+                  <Pencil size={13} /> Edit task
+                </button>
+                <button type="button" onClick={() => onManualStatusChange("Pending")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                  Move to Pending
+                </button>
+                <button type="button" onClick={() => onManualStatusChange("In progress")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                  Move to In progress
+                </button>
+                <button type="button" onClick={() => onManualStatusChange("Completed")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                  Move to Completed
+                </button>
+                <button type="button" onClick={onDelete} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50">
+                  <Trash2 size={13} /> Delete task
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -849,4 +885,3 @@ const TeamCheckboxList = ({
 );
 
 export default TaskManager;
-
