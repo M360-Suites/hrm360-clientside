@@ -42,7 +42,7 @@ const Recruitment = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Recruitment</h2>
@@ -101,8 +101,8 @@ const Recruitment = () => {
 
       {/* Post Job Modal */}
       {showPostModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 relative my-8">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+          <div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-2xl max-h-[92dvh] overflow-y-auto p-5 relative sm:rounded-3xl sm:p-6">
             <button onClick={() => setShowPostModal(false)} className="absolute right-6 top-6 text-gray-400 hover:text-gray-600 transition-colors">
               <X size={20} />
             </button>

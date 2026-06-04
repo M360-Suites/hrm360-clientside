@@ -328,10 +328,10 @@ const Employees = () => {
 	};
 
 	return (
-		<div className='max-w-7xl mx-auto space-y-6'>
+		<div className='w-full max-w-7xl mx-auto space-y-6'>
 			{toast && (
 				<div
-					className={`fixed top-6 right-6 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
+					className={`fixed left-3 right-3 top-4 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold sm:left-auto sm:right-6 sm:top-6 ${
 						toast.type === "success"
 							? "bg-emerald-600 text-white"
 							: "bg-rose-600 text-white"
@@ -394,11 +394,11 @@ const Employees = () => {
 						/>
 					</div>
 
-					<div className='flex gap-2'>
+					<div className='grid grid-cols-2 gap-2 sm:flex'>
 						<select
 							value={statusFilter}
 							onChange={(e) => setStatusFilter(e.target.value)}
-							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+							className='min-w-0 flex-1 sm:flex-none text-sm font-medium text-gray-600 px-3 sm:px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
 						>
 							<option value='all'>All Status</option>
 							<option value='active'>Active</option>
@@ -407,7 +407,7 @@ const Employees = () => {
 						<select
 							value={modeFilter}
 							onChange={(e) => setModeFilter(e.target.value)}
-							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+							className='min-w-0 flex-1 sm:flex-none text-sm font-medium text-gray-600 px-3 sm:px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
 						>
 							<option value='all'>All Modes</option>
 							<option value='remote'>Remote</option>
@@ -417,7 +417,7 @@ const Employees = () => {
 						<select
 							value={roleFilter}
 							onChange={(e) => setRoleFilter(e.target.value)}
-							className='flex-1 sm:flex-none text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
+							className='min-w-0 flex-1 sm:flex-none text-sm font-medium text-gray-600 px-3 sm:px-4 py-2.5 rounded-xl border border-gray-200 bg-white'
 						>
 							<option value='all'>All Roles</option>
 							{uniqueRoles.map((role) => (
@@ -428,7 +428,7 @@ const Employees = () => {
 						</select>
 						<button
 							onClick={handleExport}
-							className='flex-1 sm:flex-none flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors'
+							className='flex-1 sm:flex-none flex items-center justify-center gap-2 text-sm font-medium text-gray-600 px-3 sm:px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors'
 						>
 							Export
 						</button>
@@ -698,7 +698,7 @@ const Employees = () => {
 						employees
 					</div>
 
-					<div className='flex items-center gap-2'>
+					<div className='grid grid-cols-2 items-center gap-2 sm:flex'>
 						<select
 							value={limit}
 							onChange={(e) =>
@@ -740,9 +740,9 @@ const Employees = () => {
 			</div>
 
 			{isModalOpen && (
-				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
-					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden'>
-						<div className='p-8'>
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4'>
+					<div className='mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto sm:rounded-3xl'>
+						<div className='p-5 sm:p-8'>
 							<div className='flex items-center justify-between mb-8'>
 								<div>
 									<h3 className='text-2xl font-bold text-gray-900'>
@@ -881,9 +881,9 @@ const Employees = () => {
 			)}
 
 			{isEditModalOpen && (
-				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4'>
-					<div className='bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden'>
-						<div className='p-8'>
+				<div className='fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4'>
+					<div className='mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto sm:rounded-3xl'>
+						<div className='p-5 sm:p-8'>
 							<div className='flex items-center justify-between mb-8'>
 								<div>
 									<h3 className='text-2xl font-bold text-gray-900'>

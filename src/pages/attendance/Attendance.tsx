@@ -351,8 +351,8 @@ const Attendance = () => {
 
 	if (!isAdmin) {
 		return (
-			<div className="max-w-5xl mx-auto pb-12">
-				<div className="flex items-start justify-between gap-4 mb-6">
+			<div className="w-full max-w-5xl mx-auto pb-12">
+				<div className="flex flex-col items-start justify-between gap-3 mb-6 sm:flex-row sm:gap-4">
 					<div>
 						<h2 className="text-lg font-semibold text-slate-900">
 							Attendance
@@ -373,7 +373,7 @@ const Attendance = () => {
 					</div>
 				</div>
 
-				<div className="flex gap-2 overflow-x-auto pb-3 mb-8">
+				<div className="ios-scroll flex gap-2 overflow-x-auto pb-3 mb-6 sm:mb-8">
 					{days.map((item) => (
 						<div
 							key={`${item.date}-${item.day}`}
@@ -385,9 +385,9 @@ const Attendance = () => {
 					))}
 				</div>
 
-				<div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
-					<div className="flex flex-col items-center justify-center py-8">
-						<div className="relative flex h-64 w-64 items-center justify-center rounded-full border-[10px] border-violet-200 bg-white shadow-[0_0_35px_rgba(124,58,237,0.18)]">
+				<div className="rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm sm:rounded-[2rem] sm:p-6">
+					<div className="flex flex-col items-center justify-center py-6 sm:py-8">
+						<div className="relative flex h-56 w-56 items-center justify-center rounded-full border-[10px] border-violet-200 bg-white shadow-[0_0_35px_rgba(124,58,237,0.18)] sm:h-64 sm:w-64">
 							<div className="absolute inset-[-10px] rounded-full border-[10px] border-violet-500 border-r-violet-200" />
 
 							<div className="relative z-10 text-center px-6">
@@ -466,7 +466,7 @@ const Attendance = () => {
 							<Clock size={14} className="text-slate-400" />
 						</div>
 
-						<div className="grid grid-cols-2 gap-3 text-xs text-slate-600">
+						<div className="grid grid-cols-1 gap-3 text-xs text-slate-600 min-[380px]:grid-cols-2">
 							<div className="flex items-center gap-2">
 								<span className="h-2 w-7 rounded-full bg-emerald-300" />
 								Punctual
@@ -506,7 +506,7 @@ const Attendance = () => {
 	}
 
 	return (
-		<div className="max-w-7xl mx-auto space-y-6 pb-12">
+		<div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
 			<div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
 				<div>
 					<h2 className="text-xl font-semibold text-gray-800 mb-1">
@@ -564,7 +564,7 @@ const Attendance = () => {
 									</p>
 								</div>
 
-								<div className="flex items-center gap-2">
+								<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
 									<span className="hidden sm:inline-block text-xs text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full font-semibold">
 										{employees.length} Employees
 									</span>
@@ -574,7 +574,7 @@ const Attendance = () => {
 											fetchQrCode();
 											setShowQrModal(true);
 										}}
-										className="flex items-center gap-1.5 text-xs bg-[#3B00D9] text-white px-3 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+										className="flex items-center justify-center gap-1.5 text-xs bg-[#3B00D9] text-white px-3 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-sm"
 									>
 										<QrCode size={14} />
 										Show Today’s QR
@@ -597,8 +597,8 @@ const Attendance = () => {
 							</div>
 						</div>
 
-						<div className="overflow-x-auto">
-							<table className="w-full text-left text-sm text-gray-600 whitespace-nowrap">
+						<div className="ios-scroll overflow-x-auto">
+							<table className="w-full min-w-[680px] text-left text-sm text-gray-600 whitespace-nowrap">
 								<thead className="bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100">
 									<tr>
 										<th className="px-6 py-4">Employee</th>
@@ -709,7 +709,7 @@ const Attendance = () => {
 											<Clock size={14} />
 										</div>
 
-										<div className="min-w-0">
+										<div className="min-w-0 flex-1">
 											<p className="text-xs font-bold text-gray-900 truncate">
 												{record.employeeName ||
 													record.employee?.name ||
@@ -832,8 +832,8 @@ const AdminQrModal = ({
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-			<div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 relative">
+		<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+			<div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-sm p-6 relative sm:rounded-3xl">
 				<button
 					onClick={onClose}
 					className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -964,7 +964,7 @@ const ScanQrModal = ({
 
 	return (
 		<div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-			<div className="relative h-full w-full max-w-md overflow-hidden bg-black text-white sm:h-[760px] sm:rounded-[2rem]">
+			<div className="relative h-[100dvh] w-full max-w-md overflow-hidden bg-black text-white sm:h-[760px] sm:rounded-[2rem]">
 				<button
 					onClick={() => {
 						scannerRef.current?.stop();
@@ -982,8 +982,8 @@ const ScanQrModal = ({
 					</p>
 				</div>
 
-				<div className="relative z-10 mt-10 flex justify-center px-6">
-					<div className="relative h-80 w-full overflow-hidden rounded-3xl border border-white/20 bg-slate-900">
+				<div className="relative z-10 mt-6 flex justify-center px-4 sm:mt-10 sm:px-6">
+					<div className="relative h-72 w-full overflow-hidden rounded-3xl border border-white/20 bg-slate-900 sm:h-80">
 						<video
 							ref={videoRef}
 							className="h-full w-full object-cover"
@@ -992,7 +992,7 @@ const ScanQrModal = ({
 						/>
 
 						<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-							<div className="relative h-64 w-64 rounded-3xl border-2 border-white/90">
+							<div className="relative h-52 w-52 rounded-3xl border-2 border-white/90 sm:h-64 sm:w-64">
 								<div className="absolute left-0 top-0 h-10 w-10 rounded-tl-3xl border-l-4 border-t-4 border-white" />
 								<div className="absolute right-0 top-0 h-10 w-10 rounded-tr-3xl border-r-4 border-t-4 border-white" />
 								<div className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-3xl border-b-4 border-l-4 border-white" />
@@ -1009,7 +1009,7 @@ const ScanQrModal = ({
 					</div>
 				</div>
 
-				<div className="absolute bottom-0 left-0 right-0 z-20 rounded-t-3xl bg-white p-5 text-slate-900">
+				<div className="mobile-safe-bottom absolute bottom-0 left-0 right-0 z-20 rounded-t-3xl bg-white p-5 text-slate-900">
 					{cameraError ? (
 						<div className="mb-3 flex items-start gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-xs text-rose-600">
 							<AlertCircle size={16} className="mt-0.5 shrink-0" />

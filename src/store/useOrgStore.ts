@@ -13,6 +13,30 @@ interface OrgState {
   completeOnboarding: (data: any) => Promise<boolean>;
 }
 
+const normalizeOrganization = (item: any) => {
+  const org = item?.organization || item?.org || item;
+  return {
+    ...org,
+    _id: org?._id || org?.id || item?._id || item?.id,
+    id: org?.id || org?._id || item?.id || item?._id,
+    name: org?.name || item?.name || "Organization",
+    role: item?.role || org?.role,
+  };
+};
+
+const normalizeOrganizations = (responseData: any) => {
+  const data = responseData?.data || responseData?.organizations || responseData;
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.organizations)
+      ? data.organizations
+      : Array.isArray(data?.data)
+        ? data.data
+        : [];
+
+  return list.map(normalizeOrganization).filter((org: any) => org?._id || org?.id);
+};
+
 export const useOrgStore = create<OrgState>((set) => ({
   organization: null,
   organizations: [],
@@ -65,11 +89,11 @@ export const useOrgStore = create<OrgState>((set) => ({
 
     try {
       const response = await api.get("/org");
-
-      const organizations = response.data.data || response.data.organizations || response.data;
+      const organizations = normalizeOrganizations(response.data);
 
       set({
-        organizations: Array.isArray(organizations) ? organizations : [],
+        organizations,
+        organization: organizations[0] || null,
         isLoading: false,
         error: null,
       });

@@ -62,21 +62,22 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
 	const activeOrgId = getCookie("orgId");
 	const userOrganizations = organizations.filter((org) => {
-		const orgId = org._id || org.id;
+		const nestedOrg = org.organization || org.org || org;
+		const orgId = nestedOrg._id || nestedOrg.id || org._id || org.id;
 		return orgId === activeOrgId;
 	});
 
 	return (
 		<aside
 			className={`
-      fixed inset-y-0 left-0 z-50 w-64 bg-[#3B00D9] border-r border-[#4a1ae0] flex flex-col h-full transition-transform duration-300 ease-in-out lg:static lg:translate-x-0
+      fixed inset-y-0 left-0 z-50 h-[100dvh] w-[min(18rem,86vw)] bg-[#3B00D9] border-r border-[#4a1ae0] flex flex-col transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:translate-x-0
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
     `}
 		>
 			<div className='p-6 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
 					<span className='font-bold text-xl text-white'>
-						Hrm360
+						HRM360
 					</span>
 				</div>
 				<button
@@ -135,9 +136,13 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 					</p>
 					<div className='space-y-2'>
 						{userOrganizations.map((org, index) => {
+							const nestedOrg = org.organization || org.org || org;
 							const colorClass =
 								ORG_COLORS[index % ORG_COLORS.length];
-							const orgId = org._id || org.id;
+							const orgId =
+								nestedOrg._id || nestedOrg.id || org._id || org.id;
+							const orgName =
+								nestedOrg.name || org.name || "Organization";
 
 							return (
 								<button
@@ -150,7 +155,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 										<div className='w-2.5 h-2.5 bg-white/30 rounded-xs'></div>
 									</div>
 									<span className='text-sm text-white/90 truncate group-hover:text-white'>
-										{org.name}
+										{orgName}
 									</span>
 								</button>
 							);

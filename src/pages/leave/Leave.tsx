@@ -296,10 +296,10 @@ const Leave = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       {toast && (
         <div
-          className={`fixed top-6 right-6 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
+          className={`fixed left-3 right-3 top-4 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold sm:left-auto sm:right-6 sm:top-6 ${
             toast.type === "success" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
           }`}
         >
@@ -308,7 +308,7 @@ const Leave = () => {
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Leave Management</h2>
           <p className="text-sm text-gray-500">
@@ -346,7 +346,7 @@ const Leave = () => {
           <select
             value={selectedEmployeeId}
             onChange={(e) => setSelectedEmployeeId(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] sm:w-auto"
           >
             <option value="all">All employees</option>
             {employees.map((emp: any, idx: number) => {
@@ -386,8 +386,8 @@ const Leave = () => {
           )}
 
           {isAdmin ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-600 whitespace-nowrap">
+            <div className="ios-scroll overflow-x-auto">
+              <table className="w-full min-w-[860px] text-left text-sm text-gray-600 whitespace-nowrap">
                 <thead className="bg-white text-gray-800 font-medium border-b border-gray-100">
                   <tr>
                     <th className="px-6 py-4">Employee</th>
@@ -456,7 +456,7 @@ const Leave = () => {
               </table>
             </div>
           ) : (
-            <div className="p-6 space-y-5">
+            <div className="p-4 space-y-4 sm:p-6 sm:space-y-5">
               {filteredLeaves.map((leave: any, idx: number) => {
                 const leaveId = leave._id || leave.id || idx;
                 const status = leave.status || "Pending";
@@ -468,8 +468,8 @@ const Leave = () => {
                     : leave.document?.name || "Attachment";
 
                 return (
-                  <div key={leaveId} className="border border-gray-100 rounded-2xl p-5">
-                    <div className="flex items-start justify-between gap-4 mb-4">
+                  <div key={leaveId} className="border border-gray-100 rounded-2xl p-4 sm:p-5">
+                    <div className="flex flex-col items-start justify-between gap-3 mb-4 sm:flex-row sm:gap-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-2 text-sm">
                         <p><span className="text-gray-500">Leave Type:</span> {leave.type || "Annual Leave"}</p>
                         <p><span className="text-gray-500">End Date:</span> {dateRange.end}</p>
@@ -506,8 +506,8 @@ const Leave = () => {
       </div>
 
       {selectedLeave && isAdmin && (
-        <div className="fixed inset-0 bg-black/35 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden">
+        <div className="fixed inset-0 bg-black/35 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+          <div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-3xl max-h-[92dvh] overflow-y-auto sm:rounded-3xl">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">Leave Details</h3>
@@ -561,7 +561,7 @@ const Leave = () => {
             </div>
 
             {String(selectedLeave.status || "").toLowerCase() === "pending" && (
-              <div className="p-6 border-t border-gray-100 flex items-center justify-end gap-3">
+              <div className="p-6 border-t border-gray-100 flex flex-col-reverse items-stretch justify-end gap-3 sm:flex-row sm:items-center">
                 <button
                   type="button"
                   onClick={() => handleReject(selectedLeave)}
@@ -583,9 +583,9 @@ const Leave = () => {
       )}
 
       {showRequestModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
-            <div className="p-8">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+          <div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-lg max-h-[92dvh] overflow-y-auto sm:rounded-3xl">
+            <div className="p-5 sm:p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Request Leave</h3>
               <p className="text-sm text-gray-500 mb-6">Submit a new leave request</p>
 

@@ -21,6 +21,7 @@ interface TaskState {
   deleteProject: (projectId: string) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
+  commentTask: (payload: { taskId: string; comment: string; projectId?: string }) => Promise<boolean>;
   deleteTask: (taskId: string) => Promise<boolean>;
   fetchProjectTasks: (args: {
     projectId: string;
@@ -242,6 +243,34 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } catch (error: any) {
       set({
         error: getErrorMessage(error, "Failed to update task"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  commentTask: async (payload) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.patch(
+        "/task",
+        { taskId: payload.taskId, comment: payload.comment },
+        getOrgConfig(),
+      );
+      const projectId = payload?.projectId || get().selectedProject?._id || get().selectedProject?.id;
+      if (projectId) {
+        await get().fetchProjectTasks({
+          projectId,
+          status: "All",
+          page: get().pagination.page,
+          limit: get().pagination.limit,
+        });
+      }
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to add comment"),
         isLoading: false,
       });
       return false;

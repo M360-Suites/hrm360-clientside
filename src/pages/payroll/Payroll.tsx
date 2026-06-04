@@ -227,10 +227,10 @@ const Payroll = () => {
   const isPayrollLocked = isAdmin && !isPayrollUnlocked;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       {toast && (
         <div
-          className={`fixed top-6 right-6 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
+          className={`fixed left-3 right-3 top-4 z-100 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold sm:left-auto sm:right-6 sm:top-6 ${
             toast.type === "success" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
           }`}
         >
@@ -245,7 +245,7 @@ const Payroll = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Payroll Management</h2>
           <p className="text-sm text-gray-500">{payPeriod} payroll cycle</p>
         </div>
-        <div className="flex w-full sm:w-auto gap-3">
+        <div className="grid w-full grid-cols-1 gap-3 sm:flex sm:w-auto">
           <button
             onClick={handleExportPayroll}
             className="flex-1 sm:flex-none bg-white border border-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-xs"
@@ -273,7 +273,7 @@ const Payroll = () => {
       )}
 
       {!isPayrollLocked && isAdmin && !isPayrollPinConfigured && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start justify-between gap-4">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
           <div>
             <p className="text-sm font-semibold text-amber-800">Payroll PIN setup required</p>
             <p className="text-sm text-amber-700 mt-1">
@@ -332,8 +332,8 @@ const Payroll = () => {
 
       {!isPayrollLocked && (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
+        <div className="p-4 border-b border-gray-100 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
@@ -345,13 +345,13 @@ const Payroll = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto min-h-[400px] relative">
+        <div className="ios-scroll overflow-x-auto min-h-[400px] relative">
           {isLoading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
               <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
             </div>
           )}
-          <table className="w-full text-left text-sm text-gray-600 whitespace-nowrap">
+          <table className="w-full min-w-[920px] text-left text-sm text-gray-600 whitespace-nowrap">
             <thead className="bg-white text-gray-800 font-medium border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4">Employee</th>
@@ -423,7 +423,7 @@ const Payroll = () => {
       )}
 
       {isPayrollLocked && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-10 text-center">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center sm:p-10">
           <ShieldCheck className="mx-auto text-[#3B00D9]" size={42} />
           <h3 className="mt-4 text-lg font-semibold text-gray-900">Payroll is locked</h3>
           <p className="text-sm text-gray-500 mt-1">Enter payroll PIN to access payroll dashboard.</p>
@@ -527,12 +527,12 @@ const SummaryCard = ({
   const displayValue = format ? formatter?.(value) || value : value;
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+    <div className="min-w-0 bg-white p-4 rounded-2xl border border-gray-100 shadow-xs sm:p-5">
       <div className="flex items-center gap-3 mb-3">
         <div className={`p-2 rounded-lg ${tones[tone]}`}>{icon}</div>
         <span className="text-sm font-medium text-gray-600">{label}</span>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900">{displayValue}</h3>
+      <h3 className="break-words text-xl font-bold text-gray-900 sm:text-2xl">{displayValue}</h3>
     </div>
   );
 };
@@ -557,8 +557,8 @@ const PinModal = ({
   confirmLabel: string;
 }) => {
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden p-6">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+      <div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-xl w-full max-w-sm overflow-hidden p-6 sm:rounded-3xl">
         <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
         <p className="text-sm text-gray-500 mb-6">{description}</p>
 
@@ -572,7 +572,7 @@ const PinModal = ({
           maxLength={6}
         />
 
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
           <button
             onClick={onCancel}
             className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50"
@@ -611,8 +611,8 @@ const SetupPinModal = ({
   onConfirm: () => void;
 }) => {
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden p-6">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
+      <div className="mobile-safe-bottom bg-white rounded-t-3xl shadow-xl w-full max-w-sm overflow-hidden p-6 sm:rounded-3xl">
         <h3 className="text-xl font-bold text-gray-900 mb-2">Configure Payroll PIN</h3>
         <p className="text-sm text-gray-500 mb-6">
           Set a secure PIN for payroll actions like running payroll and paying employees.
@@ -639,7 +639,7 @@ const SetupPinModal = ({
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row">
           <button
             onClick={onCancel}
             className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50"

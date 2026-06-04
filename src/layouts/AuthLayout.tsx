@@ -152,7 +152,7 @@ const AuthLayout = () => {
         <div className="flex-1 flex flex-col items-center justify-start lg:justify-center px-4 sm:px-10 py-8 lg:px-20 overflow-y-auto custom-scrollbar">
           {/* Logo (Desktop only, already handled for mobile) */}
           <div className="hidden lg:flex absolute top-12 right-12">
-             <span className="font-bold text-3xl text-[#3B00D9] tracking-tight">Hrm360</span>
+             <span className="font-bold text-3xl text-[#3B00D9] tracking-tight">HRM360</span>
           </div>
 
           <motion.div 

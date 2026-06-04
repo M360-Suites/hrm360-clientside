@@ -142,7 +142,7 @@ const DashboardEmployee = () => {
     };
 
     return (
-        <div className='max-w-7xl mx-auto space-y-6'>
+        <div className='w-full max-w-7xl mx-auto space-y-6'>
             {toast && (
                 <div
                     className={`fixed top-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold ${
@@ -325,8 +325,8 @@ const DashboardEmployee = () => {
             </div>
 
             {isModalOpen && (
-                <div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4'>
-                    <div className='bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden'>
+                <div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center p-0 sm:items-center sm:p-4'>
+                    <div className='mobile-safe-bottom bg-white rounded-t-3xl shadow-2xl w-full max-w-md max-h-[92dvh] overflow-y-auto sm:rounded-3xl'>
                         <div className='p-8'>
                             <div className='flex items-center justify-between mb-8'>
                                 <div>
@@ -415,7 +415,7 @@ const DashboardEmployee = () => {
                                     )}
                                 </div>
 
-                                <div className='pt-4 flex gap-3'>
+                                <div className='pt-4 flex flex-col-reverse gap-3 sm:flex-row'>
                                     <button
                                         type='button'
                                         onClick={() => {

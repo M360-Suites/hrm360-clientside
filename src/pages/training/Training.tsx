@@ -78,7 +78,7 @@ const Training = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Training Management</h2>
@@ -197,7 +197,7 @@ const Training = () => {
       {/* Add Course Modal */}
       {showAddModal && isAdmin && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-2xl h-[92vh] sm:h-auto sm:max-h-[92vh] flex flex-col">
+          <div className="mobile-safe-bottom bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-2xl h-[92dvh] sm:h-auto sm:max-h-[92dvh] flex flex-col">
             <div className="p-5 sm:p-6 border-b border-gray-100 relative shrink-0">
               <button
                 onClick={() => setShowAddModal(false)}
@@ -266,7 +266,7 @@ const Training = () => {
 
       {showDetailsModal && courseDetails && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-xl h-[82vh] sm:h-auto sm:max-h-[88vh] flex flex-col">
+          <div className="mobile-safe-bottom bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-xl h-[82dvh] sm:h-auto sm:max-h-[88dvh] flex flex-col">
             <div className="p-5 sm:p-6 border-b border-gray-100 relative shrink-0">
               <button
                 onClick={() => setShowDetailsModal(false)}

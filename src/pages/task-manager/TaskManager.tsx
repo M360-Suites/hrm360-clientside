@@ -8,8 +8,11 @@ import {
   CheckCircle2,
   CircleDot,
   Clock3,
+  MessageSquare,
   Pencil,
+  Send,
   Trash2,
+  Users,
   X,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -23,6 +26,13 @@ const isValidObjectId = (value?: string) =>
 const getTaskDate = (task: any) => task?.dueDate || task?.endDate || task?.deadline || "";
 const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString() : "-");
 const getTodayDateInput = () => new Date().toISOString().slice(0, 10);
+const getAssignees = (item: any) => {
+  const people = item?.assignedTo || item?.team || item?.members || [];
+  return Array.isArray(people) ? people : [];
+};
+const getPersonLabel = (person: any) =>
+  typeof person === "string" ? person : person?.name || person?.email || "Team member";
+const getComments = (task: any) => (Array.isArray(task?.comments) ? task.comments : []);
 
 const TaskManager = () => {
   const { isAdmin } = useAuthStore();
@@ -40,6 +50,7 @@ const TaskManager = () => {
     deleteProject,
     createTask,
     updateTask,
+    commentTask,
     deleteTask,
     fetchProjectTasks,
     setSelectedProject,
@@ -52,6 +63,8 @@ const TaskManager = () => {
   const [draggedTask, setDraggedTask] = useState<any | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<"completed" | "inProgress" | "pending" | null>(null);
   const [activeTaskMenuId, setActiveTaskMenuId] = useState<string | null>(null);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [editingTask, setEditingTask] = useState<any | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [projectForm, setProjectForm] = useState({
@@ -288,11 +301,28 @@ const TaskManager = () => {
     }
   };
 
+  const handleAddComment = async (task: any) => {
+    const taskId = task?._id || task?.id;
+    const comment = commentDrafts[taskId]?.trim();
+    if (!taskId || !comment) return;
+
+    const ok = await commentTask({
+      taskId,
+      comment,
+      projectId: selectedProject?._id || selectedProject?.id,
+    });
+    if (ok) {
+      setCommentDrafts((prev) => ({ ...prev, [taskId]: "" }));
+      setExpandedTaskId(taskId);
+      showToast("success", "Comment added.");
+    }
+  };
+
   return (
-    <div className="max-w-[1400px] mx-auto space-y-5">
+    <div className="w-full max-w-[1400px] mx-auto space-y-5">
       {toast && (
         <div
-          className={`fixed top-6 right-6 z-100 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg ${
+          className={`fixed left-3 right-3 top-4 z-100 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg sm:left-auto sm:right-6 sm:top-6 ${
             toast.type === "success" ? "bg-emerald-600" : "bg-rose-600"
           }`}
         >
@@ -309,7 +339,7 @@ const TaskManager = () => {
           <button
             type="button"
             onClick={() => setShowTaskModal(true)}
-            className="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50"
+            className="inline-flex w-full items-center justify-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 sm:w-auto"
           >
             <Plus size={16} /> Create Task
           </button>
@@ -317,16 +347,17 @@ const TaskManager = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-4">
-        <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit">
+        <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit min-w-0">
           <h3 className="font-semibold text-gray-800">Projects</h3>
-          <div className="space-y-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
             {projects.map((project: any, idx: number) => {
               const projectId = project?._id || project?.id || String(idx);
               const isActive = (selectedProject?._id || selectedProject?.id) === projectId;
+              const projectAssignees = getAssignees(project);
               return (
                 <div
                   key={projectId}
-                  className={`w-full rounded-lg border text-sm flex items-center ${
+                  className={`min-w-[220px] rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full ${
                     isActive
                       ? "bg-[#3B00D9] text-white border-[#3B00D9]"
                       : "bg-white border-gray-200 text-gray-700 hover:border-[#3B00D9]/40"
@@ -338,6 +369,10 @@ const TaskManager = () => {
                     className="min-w-0 flex-1 text-left px-3 py-2.5"
                   >
                     <span className="block truncate">{project?.title || project?.name || "Untitled Project"}</span>
+                    <span className={`mt-1 flex items-center gap-1 text-[11px] ${isActive ? "text-white/70" : "text-gray-400"}`}>
+                      <Users size={11} />
+                      {projectAssignees.length} member{projectAssignees.length === 1 ? "" : "s"}
+                    </span>
                   </button>
                   {isAdmin && (
                     <button
@@ -359,19 +394,19 @@ const TaskManager = () => {
             <button
               type="button"
               onClick={() => setShowProjectModal(true)}
-              className="w-full border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5"
+            className="w-full shrink-0 border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5 lg:w-full"
             >
               + Add new project
             </button>
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="min-w-0 text-lg font-semibold text-gray-900 truncate">
               {selectedProject?.title || selectedProject?.name || "Select a project"}
             </h3>
-            <div className="relative w-full sm:w-[280px]">
+            <div className="relative w-full sm:w-70">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input
                 value={search}
@@ -384,18 +419,23 @@ const TaskManager = () => {
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             <BoardColumn
-              columnKey="completed"
-              title="Completed"
-              tone="green"
-              icon={<CheckCircle2 size={14} />}
-              tasks={boardData.completed}
+              columnKey="pending"
+              title="Pending"
+              tone="slate"
+              icon={<Clock3 size={14} />}
+              tasks={boardData.pending}
               onDropTask={handleDropTask}
               onDragTask={setDraggedTask}
               onDeleteTask={handleDeleteTask}
               onEditTask={openEditTask}
+              onAddComment={handleAddComment}
               onManualStatusChange={handleManualStatusChange}
               activeTaskMenuId={activeTaskMenuId}
               setActiveTaskMenuId={setActiveTaskMenuId}
+              expandedTaskId={expandedTaskId}
+              setExpandedTaskId={setExpandedTaskId}
+              commentDrafts={commentDrafts}
+              setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
               isAdmin={isAdmin}
@@ -410,26 +450,36 @@ const TaskManager = () => {
               onDragTask={setDraggedTask}
               onDeleteTask={handleDeleteTask}
               onEditTask={openEditTask}
+              onAddComment={handleAddComment}
               onManualStatusChange={handleManualStatusChange}
               activeTaskMenuId={activeTaskMenuId}
               setActiveTaskMenuId={setActiveTaskMenuId}
+              expandedTaskId={expandedTaskId}
+              setExpandedTaskId={setExpandedTaskId}
+              commentDrafts={commentDrafts}
+              setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
               isAdmin={isAdmin}
             />
             <BoardColumn
-              columnKey="pending"
-              title="Pending"
-              tone="slate"
-              icon={<Clock3 size={14} />}
-              tasks={boardData.pending}
+              columnKey="completed"
+              title="Completed"
+              tone="green"
+              icon={<CheckCircle2 size={14} />}
+              tasks={boardData.completed}
               onDropTask={handleDropTask}
               onDragTask={setDraggedTask}
               onDeleteTask={handleDeleteTask}
               onEditTask={openEditTask}
+              onAddComment={handleAddComment}
               onManualStatusChange={handleManualStatusChange}
               activeTaskMenuId={activeTaskMenuId}
               setActiveTaskMenuId={setActiveTaskMenuId}
+              expandedTaskId={expandedTaskId}
+              setExpandedTaskId={setExpandedTaskId}
+              commentDrafts={commentDrafts}
+              setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
               isAdmin={isAdmin}
@@ -448,7 +498,7 @@ const TaskManager = () => {
         <ModalShell title="Create Project" onClose={() => setShowProjectModal(false)}>
           <form className="space-y-3" onSubmit={handleCreateProject}>
             <TextInput value={projectForm.title} onChange={(v) => setProjectForm((p) => ({ ...p, title: v }))} placeholder="Project title" required />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <DateInput value={projectForm.startDate} onChange={(v) => setProjectForm((p) => ({ ...p, startDate: v }))} required />
               <DateInput value={projectForm.dueDate} onChange={(v) => setProjectForm((p) => ({ ...p, dueDate: v }))} required />
             </div>
@@ -506,7 +556,7 @@ const TaskManager = () => {
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm min-h-24"
               required
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <DateInput value={taskForm.startDate} onChange={(v) => setTaskForm((p) => ({ ...p, startDate: v }))} required />
               <DateInput value={taskForm.dueDate} onChange={(v) => setTaskForm((p) => ({ ...p, dueDate: v }))} required />
             </div>
@@ -594,9 +644,14 @@ const BoardColumn = ({
   onDragTask,
   onDeleteTask,
   onEditTask,
+  onAddComment,
   onManualStatusChange,
   activeTaskMenuId,
   setActiveTaskMenuId,
+  expandedTaskId,
+  setExpandedTaskId,
+  commentDrafts,
+  setCommentDrafts,
   dragOverColumn,
   setDragOverColumn,
   isAdmin,
@@ -610,9 +665,14 @@ const BoardColumn = ({
   onDragTask: (task: any | null) => void;
   onDeleteTask: (task: any) => void;
   onEditTask: (task: any) => void;
+  onAddComment: (task: any) => void;
   onManualStatusChange: (task: any, status: "Pending" | "In progress" | "Completed") => void;
   activeTaskMenuId: string | null;
   setActiveTaskMenuId: (taskId: string | null) => void;
+  expandedTaskId: string | null;
+  setExpandedTaskId: (taskId: string | null) => void;
+  commentDrafts: Record<string, string>;
+  setCommentDrafts: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   dragOverColumn: "completed" | "inProgress" | "pending" | null;
   setDragOverColumn: (column: "completed" | "inProgress" | "pending" | null) => void;
   isAdmin: boolean;
@@ -634,14 +694,15 @@ const BoardColumn = ({
       <div className={`px-4 py-3 text-sm font-semibold flex items-center gap-2 border-b ${headerTone[tone]}`}>
         {icon} {title} <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
-      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
         <span>Task</span>
         <span>Due Date</span>
         <span>Team</span>
+        <span>Comments</span>
         <span />
       </div>
       <div
-        className="min-h-[420px] max-h-[68vh] overflow-y-auto"
+        className="min-h-[280px] max-h-none overflow-y-auto xl:max-h-[68vh]"
         onDragOver={(e) => {
           e.preventDefault();
           setDragOverColumn(columnKey);
@@ -661,7 +722,20 @@ const BoardColumn = ({
             onDragEnd={() => onDragTask(null)}
             onDelete={() => onDeleteTask(task)}
             onEdit={() => onEditTask(task)}
+            onAddComment={() => onAddComment(task)}
             onManualStatusChange={(status) => onManualStatusChange(task, status)}
+            isExpanded={expandedTaskId === (task?._id || task?.id)}
+            onToggleExpanded={() => {
+              const taskId = task?._id || task?.id;
+              setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+            }}
+            commentDraft={commentDrafts[task?._id || task?.id] || ""}
+            onCommentDraftChange={(value) =>
+              setCommentDrafts((prev) => ({
+                ...prev,
+                [task?._id || task?.id]: value,
+              }))
+            }
             isMenuOpen={activeTaskMenuId === (task?._id || task?.id)}
             onToggleMenu={() =>
               setActiveTaskMenuId(
@@ -685,7 +759,12 @@ const TaskCard = ({
   onDragEnd,
   onDelete,
   onEdit,
+  onAddComment,
   onManualStatusChange,
+  isExpanded,
+  onToggleExpanded,
+  commentDraft,
+  onCommentDraftChange,
   isMenuOpen,
   onToggleMenu,
   isAdmin,
@@ -695,65 +774,129 @@ const TaskCard = ({
   onDragEnd: () => void;
   onDelete: () => void;
   onEdit: () => void;
+  onAddComment: () => void;
   onManualStatusChange: (status: "Pending" | "In progress" | "Completed") => void;
+  isExpanded: boolean;
+  onToggleExpanded: () => void;
+  commentDraft: string;
+  onCommentDraftChange: (value: string) => void;
   isMenuOpen: boolean;
   onToggleMenu: () => void;
   isAdmin: boolean;
 }) => {
-  const teamCount = Array.isArray(task?.team) ? task.team.length : 0;
+  const assignees = getAssignees(task);
+  const comments = getComments(task);
   return (
-    <div
-      className="group grid gap-2 border-b border-gray-100 bg-white px-3 py-3 text-sm transition hover:bg-gray-50 md:grid-cols-[minmax(0,1fr)_96px_76px_32px] md:items-center cursor-grab active:cursor-grabbing"
-      draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-    >
-      <div className="min-w-0">
-        <h4 className="truncate text-sm font-semibold text-gray-800">{task?.title || "Untitled task"}</h4>
-        <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">{task?.description || "No description provided."}</p>
+    <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50">
+      <div
+        className="group grid gap-2 px-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] md:items-center cursor-grab active:cursor-grabbing"
+        draggable
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+      >
+        <button type="button" onClick={onToggleExpanded} className="min-w-0 text-left">
+          <h4 className="truncate text-sm font-semibold text-gray-800">{task?.title || "Untitled task"}</h4>
+          <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">{task?.description || "No description provided."}</p>
+        </button>
+
+        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+          <Calendar size={12} /> {formatDate(getTaskDate(task))}
+        </span>
+
+        <span className="text-xs text-gray-500">
+          {assignees.length} member{assignees.length === 1 ? "" : "s"}
+        </span>
+
+        <button type="button" onClick={onToggleExpanded} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#3B00D9]">
+          <MessageSquare size={12} /> {comments.length}
+        </button>
+
+        <div className="relative flex justify-end">
+          {isAdmin && (
+            <>
+              <button
+                type="button"
+                onClick={onToggleMenu}
+                className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
+                title="Task options"
+              >
+                <MoreVertical size={15} />
+              </button>
+              {isMenuOpen && (
+                <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+                  <button type="button" onClick={onEdit} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-50">
+                    <Pencil size={13} /> Edit task
+                  </button>
+                  <button type="button" onClick={() => onManualStatusChange("Pending")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                    Move to Pending
+                  </button>
+                  <button type="button" onClick={() => onManualStatusChange("In progress")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                    Move to In progress
+                  </button>
+                  <button type="button" onClick={() => onManualStatusChange("Completed")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
+                    Move to Completed
+                  </button>
+                  <button type="button" onClick={onDelete} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50">
+                    <Trash2 size={13} /> Delete task
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
-      <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-        <Calendar size={12} /> {formatDate(getTaskDate(task))}
-      </span>
+      {isExpanded && (
+        <div className="border-t border-gray-100 bg-gray-50 px-3 py-3">
+          <div className="mb-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Assigned to</p>
+            <div className="flex flex-wrap gap-2">
+              {assignees.length ? (
+                assignees.map((person: any, index: number) => (
+                  <span key={person?._id || person?.id || index} className="rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 ring-1 ring-gray-200">
+                    {getPersonLabel(person)}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-gray-400">No assignees</span>
+              )}
+            </div>
+          </div>
 
-      <span className="text-xs text-gray-500">
-        {teamCount} member{teamCount === 1 ? "" : "s"}
-      </span>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Comments</p>
+            {comments.length ? (
+              comments.map((comment: any, index: number) => (
+                <div key={comment?._id || index} className="rounded-lg bg-white px-3 py-2 text-xs text-gray-700 ring-1 ring-gray-100">
+                  <p>{typeof comment === "string" ? comment : comment?.comment || comment?.message || ""}</p>
+                  {(comment?.createdBy?.name || comment?.user?.name) && (
+                    <p className="mt-1 text-[11px] text-gray-400">{comment?.createdBy?.name || comment?.user?.name}</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-xs text-gray-400">No comments yet</p>
+            )}
+          </div>
 
-      <div className="relative flex justify-end">
-        {isAdmin && (
-          <>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <input
+              value={commentDraft}
+              onChange={(e) => onCommentDraftChange(e.target.value)}
+              placeholder="Add a comment..."
+              className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#3B00D9]"
+            />
             <button
               type="button"
-              onClick={onToggleMenu}
-              className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
-              title="Task options"
+              onClick={onAddComment}
+              disabled={!commentDraft.trim()}
+              className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#3B00D9] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
             >
-              <MoreVertical size={15} />
+              <Send size={12} /> Send
             </button>
-            {isMenuOpen && (
-              <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
-                <button type="button" onClick={onEdit} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-50">
-                  <Pencil size={13} /> Edit task
-                </button>
-                <button type="button" onClick={() => onManualStatusChange("Pending")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                  Move to Pending
-                </button>
-                <button type="button" onClick={() => onManualStatusChange("In progress")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                  Move to In progress
-                </button>
-                <button type="button" onClick={() => onManualStatusChange("Completed")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                  Move to Completed
-                </button>
-                <button type="button" onClick={onDelete} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50">
-                  <Trash2 size={13} /> Delete task
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -767,8 +910,8 @@ const ModalShell = ({
   onClose: () => void;
   children: React.ReactNode;
 }) => (
-  <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-xs flex items-center justify-center p-4">
-    <div className="bg-white rounded-3xl w-full max-w-lg p-6 shadow-xl">
+  <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-xs flex items-end justify-center p-0 sm:items-center sm:p-4">
+    <div className="mobile-safe-bottom max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-xl sm:rounded-3xl sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700">

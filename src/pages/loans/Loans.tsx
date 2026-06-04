@@ -19,7 +19,7 @@ const getStatusColor = (status: string) => {
 
 const Loans = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Loan Management</h2>
@@ -78,8 +78,8 @@ const Loans = () => {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden mt-4">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600 whitespace-nowrap">
+        <div className="ios-scroll overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm text-gray-600 whitespace-nowrap">
             <thead className="bg-white text-gray-800 font-medium border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4">Employee</th>

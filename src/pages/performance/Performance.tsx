@@ -2,7 +2,7 @@ import { TrendingUp, CheckCircle2, Award, ChevronDown, Search, Plus, FileEdit } 
 
 const Performance = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Performance Management</h2>
