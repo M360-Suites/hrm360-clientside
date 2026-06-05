@@ -19,20 +19,28 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 import { useTaskStore } from "../../store/useTaskStore";
 
-const normalizeStatus = (status: string) => String(status || "").trim().toLowerCase();
+const normalizeStatus = (status: string) =>
+  String(status || "")
+    .trim()
+    .toLowerCase();
 const isValidObjectId = (value?: string) =>
   typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
 
-const getTaskDate = (task: any) => task?.dueDate || task?.endDate || task?.deadline || "";
-const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString() : "-");
+const getTaskDate = (task: any) =>
+  task?.dueDate || task?.endDate || task?.deadline || "";
+const formatDate = (value?: string) =>
+  value ? new Date(value).toLocaleDateString() : "-";
 const getTodayDateInput = () => new Date().toISOString().slice(0, 10);
 const getAssignees = (item: any) => {
   const people = item?.assignedTo || item?.team || item?.members || [];
   return Array.isArray(people) ? people : [];
 };
 const getPersonLabel = (person: any) =>
-  typeof person === "string" ? person : person?.name || person?.email || "Team member";
-const getComments = (task: any) => (Array.isArray(task?.comments) ? task.comments : []);
+  typeof person === "string"
+    ? person
+    : person?.name || person?.email || "Team member";
+const getComments = (task: any) =>
+  Array.isArray(task?.comments) ? task.comments : [];
 
 const TaskManager = () => {
   const { isAdmin } = useAuthStore();
@@ -61,12 +69,20 @@ const TaskManager = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<any | null>(null);
-  const [dragOverColumn, setDragOverColumn] = useState<"completed" | "inProgress" | "pending" | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<
+    "completed" | "inProgress" | "pending" | null
+  >(null);
   const [activeTaskMenuId, setActiveTaskMenuId] = useState<string | null>(null);
+
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
-  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
+    {},
+  );
   const [editingTask, setEditingTask] = useState<any | null>(null);
-  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [toast, setToast] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const [projectForm, setProjectForm] = useState({
     title: "",
     startDate: getTodayDateInput(),
@@ -111,7 +127,13 @@ const TaskManager = () => {
     if (!selectedProject) return;
     const projectId = selectedProject?._id || selectedProject?.id;
     if (!projectId) return;
-    fetchProjectTasks({ projectId, query: search, status: "All", page: 1, limit: 80 });
+    fetchProjectTasks({
+      projectId,
+      query: search,
+      status: "All",
+      page: 1,
+      limit: 80,
+    });
   }, [selectedProject, search, fetchProjectTasks]);
 
   useEffect(() => {
@@ -129,10 +151,16 @@ const TaskManager = () => {
   }, [error]);
 
   const boardData = useMemo(() => {
-    const completed = tasks.filter((task: any) => normalizeStatus(task.status) === "completed");
+    const completed = tasks.filter(
+      (task: any) => normalizeStatus(task.status) === "completed",
+    );
     const inProgress = tasks.filter((task: any) => {
       const status = normalizeStatus(task.status);
-      return status === "in progress" || status === "in-progress" || status === "progress";
+      return (
+        status === "in progress" ||
+        status === "in-progress" ||
+        status === "progress"
+      );
     });
     const pending = tasks.filter((task: any) => {
       const status = normalizeStatus(task.status);
@@ -143,7 +171,9 @@ const TaskManager = () => {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    const docId = isValidObjectId(projectForm.document) ? projectForm.document.trim() : undefined;
+    const docId = isValidObjectId(projectForm.document)
+      ? projectForm.document.trim()
+      : undefined;
     const payload = {
       title: projectForm.title,
       startDate: projectForm.startDate,
@@ -168,7 +198,9 @@ const TaskManager = () => {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    const docId = isValidObjectId(taskForm.document) ? taskForm.document.trim() : undefined;
+    const docId = isValidObjectId(taskForm.document)
+      ? taskForm.document.trim()
+      : undefined;
     const payload = {
       projectId: taskForm.projectId,
       title: taskForm.title,
@@ -212,13 +244,17 @@ const TaskManager = () => {
     if (ok) showToast("success", "Project deleted successfully.");
   };
 
-  const mapColumnToStatus = (column: "completed" | "inProgress" | "pending") => {
+  const mapColumnToStatus = (
+    column: "completed" | "inProgress" | "pending",
+  ) => {
     if (column === "completed") return "Completed";
     if (column === "inProgress") return "In progress";
     return "Pending";
   };
 
-  const handleDropTask = async (column: "completed" | "inProgress" | "pending") => {
+  const handleDropTask = async (
+    column: "completed" | "inProgress" | "pending",
+  ) => {
     if (!draggedTask) return;
     const nextStatus = mapColumnToStatus(column);
     if (normalizeStatus(draggedTask?.status) === normalizeStatus(nextStatus)) {
@@ -250,7 +286,10 @@ const TaskManager = () => {
     if (ok) showToast("success", "Task deleted successfully.");
   };
 
-  const handleManualStatusChange = async (task: any, status: "Pending" | "In progress" | "Completed") => {
+  const handleManualStatusChange = async (
+    task: any,
+    status: "Pending" | "In progress" | "Completed",
+  ) => {
     const ok = await updateTask({
       _id: task?._id || task?.id,
       status,
@@ -271,13 +310,15 @@ const TaskManager = () => {
       _id: task?._id || task?.id || "",
       title: task?.title || "",
       description: task?.description || "",
-      dueDate: task?.dueDate ? String(task.dueDate).slice(0, 10) : getTodayDateInput(),
+      dueDate: task?.dueDate
+        ? String(task.dueDate).slice(0, 10)
+        : getTodayDateInput(),
       status:
         normalizeStatus(task?.status) === "completed"
           ? "Completed"
           : normalizeStatus(task?.status).includes("progress")
-          ? "In progress"
-          : "Pending",
+            ? "In progress"
+            : "Pending",
     });
     setShowEditTaskModal(true);
     setActiveTaskMenuId(null);
@@ -333,7 +374,9 @@ const TaskManager = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">Task Manager</h2>
-          <p className="text-sm text-gray-500">Projects, owners, dates, and task status in one place</p>
+          <p className="text-sm text-gray-500">
+            Projects, owners, dates, and task status in one place
+          </p>
         </div>
         {isAdmin && (
           <button
@@ -352,7 +395,8 @@ const TaskManager = () => {
           <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
             {projects.map((project: any, idx: number) => {
               const projectId = project?._id || project?.id || String(idx);
-              const isActive = (selectedProject?._id || selectedProject?.id) === projectId;
+              const isActive =
+                (selectedProject?._id || selectedProject?.id) === projectId;
               const projectAssignees = getAssignees(project);
               return (
                 <div
@@ -368,10 +412,15 @@ const TaskManager = () => {
                     onClick={() => onSwitchProject(project)}
                     className="min-w-0 flex-1 text-left px-3 py-2.5"
                   >
-                    <span className="block truncate">{project?.title || project?.name || "Untitled Project"}</span>
-                    <span className={`mt-1 flex items-center gap-1 text-[11px] ${isActive ? "text-white/70" : "text-gray-400"}`}>
+                    <span className="block truncate">
+                      {project?.title || project?.name || "Untitled Project"}
+                    </span>
+                    <span
+                      className={`mt-1 flex items-center gap-1 text-[11px] ${isActive ? "text-white/70" : "text-gray-400"}`}
+                    >
                       <Users size={11} />
-                      {projectAssignees.length} member{projectAssignees.length === 1 ? "" : "s"}
+                      {projectAssignees.length} member
+                      {projectAssignees.length === 1 ? "" : "s"}
                     </span>
                   </button>
                   {isAdmin && (
@@ -379,7 +428,9 @@ const TaskManager = () => {
                       type="button"
                       onClick={() => handleDeleteProject(project)}
                       className={`mr-2 rounded p-1 ${
-                        isActive ? "text-white/80 hover:bg-white/10" : "text-rose-500 hover:bg-rose-50"
+                        isActive
+                          ? "text-white/80 hover:bg-white/10"
+                          : "text-rose-500 hover:bg-rose-50"
                       }`}
                       title="Delete project"
                     >
@@ -394,7 +445,7 @@ const TaskManager = () => {
             <button
               type="button"
               onClick={() => setShowProjectModal(true)}
-            className="w-full shrink-0 border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5 lg:w-full"
+              className="w-full shrink-0 border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5 lg:w-full"
             >
               + Add new project
             </button>
@@ -404,10 +455,15 @@ const TaskManager = () => {
         <div className="min-w-0 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h3 className="min-w-0 text-lg font-semibold text-gray-900 truncate">
-              {selectedProject?.title || selectedProject?.name || "Select a project"}
+              {selectedProject?.title ||
+                selectedProject?.name ||
+                "Select a project"}
             </h3>
             <div className="relative w-full sm:w-70">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={16}
+              />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -495,12 +551,30 @@ const TaskManager = () => {
       )}
 
       {showProjectModal && (
-        <ModalShell title="Create Project" onClose={() => setShowProjectModal(false)}>
+        <ModalShell
+          title="Create Project"
+          onClose={() => setShowProjectModal(false)}
+        >
           <form className="space-y-3" onSubmit={handleCreateProject}>
-            <TextInput value={projectForm.title} onChange={(v) => setProjectForm((p) => ({ ...p, title: v }))} placeholder="Project title" required />
+            <TextInput
+              value={projectForm.title}
+              onChange={(v) => setProjectForm((p) => ({ ...p, title: v }))}
+              placeholder="Project title"
+              required
+            />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <DateInput value={projectForm.startDate} onChange={(v) => setProjectForm((p) => ({ ...p, startDate: v }))} required />
-              <DateInput value={projectForm.dueDate} onChange={(v) => setProjectForm((p) => ({ ...p, dueDate: v }))} required />
+              <DateInput
+                value={projectForm.startDate}
+                onChange={(v) =>
+                  setProjectForm((p) => ({ ...p, startDate: v }))
+                }
+                required
+              />
+              <DateInput
+                value={projectForm.dueDate}
+                onChange={(v) => setProjectForm((p) => ({ ...p, dueDate: v }))}
+                required
+              />
             </div>
             <UploadField
               label="Project Document (optional)"
@@ -537,28 +611,48 @@ const TaskManager = () => {
           <form className="space-y-3" onSubmit={handleCreateTask}>
             <select
               value={taskForm.projectId}
-              onChange={(e) => setTaskForm((p) => ({ ...p, projectId: e.target.value }))}
+              onChange={(e) =>
+                setTaskForm((p) => ({ ...p, projectId: e.target.value }))
+              }
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"
               required
             >
               <option value="">Select project</option>
               {projects.map((project: any, idx: number) => (
-                <option key={project._id || project.id || idx} value={project._id || project.id}>
+                <option
+                  key={project._id || project.id || idx}
+                  value={project._id || project.id}
+                >
                   {project.title || project.name || "Untitled Project"}
                 </option>
               ))}
             </select>
-            <TextInput value={taskForm.title} onChange={(v) => setTaskForm((p) => ({ ...p, title: v }))} placeholder="Task title" required />
+            <TextInput
+              value={taskForm.title}
+              onChange={(v) => setTaskForm((p) => ({ ...p, title: v }))}
+              placeholder="Task title"
+              required
+            />
             <textarea
               value={taskForm.description}
-              onChange={(e) => setTaskForm((p) => ({ ...p, description: e.target.value }))}
+              onChange={(e) =>
+                setTaskForm((p) => ({ ...p, description: e.target.value }))
+              }
               placeholder="Task description"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm min-h-24"
               required
             />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <DateInput value={taskForm.startDate} onChange={(v) => setTaskForm((p) => ({ ...p, startDate: v }))} required />
-              <DateInput value={taskForm.dueDate} onChange={(v) => setTaskForm((p) => ({ ...p, dueDate: v }))} required />
+              <DateInput
+                value={taskForm.startDate}
+                onChange={(v) => setTaskForm((p) => ({ ...p, startDate: v }))}
+                required
+              />
+              <DateInput
+                value={taskForm.dueDate}
+                onChange={(v) => setTaskForm((p) => ({ ...p, dueDate: v }))}
+                required
+              />
             </div>
             <UploadField
               label="Task Document (optional)"
@@ -591,7 +685,10 @@ const TaskManager = () => {
       )}
 
       {showEditTaskModal && editingTask && (
-        <ModalShell title="Edit Task" onClose={() => setShowEditTaskModal(false)}>
+        <ModalShell
+          title="Edit Task"
+          onClose={() => setShowEditTaskModal(false)}
+        >
           <form className="space-y-3" onSubmit={handleEditTask}>
             <TextInput
               value={editTaskForm.title}
@@ -601,7 +698,9 @@ const TaskManager = () => {
             />
             <textarea
               value={editTaskForm.description}
-              onChange={(e) => setEditTaskForm((p) => ({ ...p, description: e.target.value }))}
+              onChange={(e) =>
+                setEditTaskForm((p) => ({ ...p, description: e.target.value }))
+              }
               placeholder="Task description"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm min-h-24"
               required
@@ -613,7 +712,15 @@ const TaskManager = () => {
             />
             <select
               value={editTaskForm.status}
-              onChange={(e) => setEditTaskForm((p) => ({ ...p, status: e.target.value as "Pending" | "In progress" | "Completed" }))}
+              onChange={(e) =>
+                setEditTaskForm((p) => ({
+                  ...p,
+                  status: e.target.value as
+                    | "Pending"
+                    | "In progress"
+                    | "Completed",
+                }))
+              }
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm"
             >
               <option value="Pending">Pending</option>
@@ -627,7 +734,9 @@ const TaskManager = () => {
 
       {!isLoading && selectedProject && (
         <p className="text-xs text-gray-400">
-          {pagination.total > 0 ? `${pagination.total} total tasks loaded` : "No tasks returned for this project yet."}
+          {pagination.total > 0
+            ? `${pagination.total} total tasks loaded`
+            : "No tasks returned for this project yet."}
         </p>
       )}
     </div>
@@ -666,15 +775,22 @@ const BoardColumn = ({
   onDeleteTask: (task: any) => void;
   onEditTask: (task: any) => void;
   onAddComment: (task: any) => void;
-  onManualStatusChange: (task: any, status: "Pending" | "In progress" | "Completed") => void;
+  onManualStatusChange: (
+    task: any,
+    status: "Pending" | "In progress" | "Completed",
+  ) => void;
   activeTaskMenuId: string | null;
   setActiveTaskMenuId: (taskId: string | null) => void;
   expandedTaskId: string | null;
   setExpandedTaskId: (taskId: string | null) => void;
   commentDrafts: Record<string, string>;
-  setCommentDrafts: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setCommentDrafts: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
   dragOverColumn: "completed" | "inProgress" | "pending" | null;
-  setDragOverColumn: (column: "completed" | "inProgress" | "pending" | null) => void;
+  setDragOverColumn: (
+    column: "completed" | "inProgress" | "pending" | null,
+  ) => void;
   isAdmin: boolean;
 }) => {
   const headerTone = {
@@ -691,10 +807,13 @@ const BoardColumn = ({
           : "border-gray-100"
       }`}
     >
-      <div className={`px-4 py-3 text-sm font-semibold flex items-center gap-2 border-b ${headerTone[tone]}`}>
-        {icon} {title} <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
+      <div
+        className={`px-4 py-3 text-sm font-semibold flex items-center gap-2 border-b ${headerTone[tone]}`}
+      >
+        {icon} {title}{" "}
+        <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
-      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+      <div className="hidden md:grid grid-cols-4 gap-1 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
         <span>Task</span>
         <span>Due Date</span>
         <span>Team</span>
@@ -723,7 +842,9 @@ const BoardColumn = ({
             onDelete={() => onDeleteTask(task)}
             onEdit={() => onEditTask(task)}
             onAddComment={() => onAddComment(task)}
-            onManualStatusChange={(status) => onManualStatusChange(task, status)}
+            onManualStatusChange={(status) =>
+              onManualStatusChange(task, status)
+            }
             isExpanded={expandedTaskId === (task?._id || task?.id)}
             onToggleExpanded={() => {
               const taskId = task?._id || task?.id;
@@ -741,13 +862,17 @@ const BoardColumn = ({
               setActiveTaskMenuId(
                 activeTaskMenuId === (task?._id || task?.id)
                   ? null
-                  : (task?._id || task?.id),
+                  : task?._id || task?.id,
               )
             }
             isAdmin={isAdmin}
           />
         ))}
-        {tasks.length === 0 && <div className="text-xs text-gray-500 text-center py-10">No tasks here</div>}
+        {tasks.length === 0 && (
+          <div className="text-xs text-gray-500 text-center py-10">
+            No tasks here
+          </div>
+        )}
       </div>
     </div>
   );
@@ -775,7 +900,10 @@ const TaskCard = ({
   onDelete: () => void;
   onEdit: () => void;
   onAddComment: () => void;
-  onManualStatusChange: (status: "Pending" | "In progress" | "Completed") => void;
+
+  onManualStatusChange: (
+    status: "Pending" | "In progress" | "Completed",
+  ) => void;
   isExpanded: boolean;
   onToggleExpanded: () => void;
   commentDraft: string;
@@ -784,76 +912,119 @@ const TaskCard = ({
   onToggleMenu: () => void;
   isAdmin: boolean;
 }) => {
+  const { deleteComment } = useTaskStore();
   const assignees = getAssignees(task);
   const comments = getComments(task);
+
+  const [commentToDelete, setCommentToDelete] = useState<any | null>(null);
+
   return (
     <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50">
       <div
-        className="group grid gap-2 px-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] md:items-center cursor-grab active:cursor-grabbing"
+        className="group grid grid-cols-4 gap-2 px-3 py-3 text-sm md:items-center cursor-grab active:cursor-grabbing"
         draggable
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        <button type="button" onClick={onToggleExpanded} className="min-w-0 text-left">
-          <h4 className="truncate text-sm font-semibold text-gray-800">{task?.title || "Untitled task"}</h4>
-          <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">{task?.description || "No description provided."}</p>
+        <button
+          type="button"
+          onClick={onToggleExpanded}
+          className="min-w-0 flex flex-col text-left"
+        >
+          <h4 className="truncate text-sm font-semibold text-gray-800">
+            {task?.title || "Untitled task"}
+          </h4>
+          <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">
+            {task?.description || "No description provided."}
+          </p>
         </button>
 
         <span className="inline-flex items-center gap-1 text-xs text-gray-500">
-          <Calendar size={12} /> {formatDate(getTaskDate(task))}
+          {formatDate(getTaskDate(task))}
         </span>
 
         <span className="text-xs text-gray-500">
           {assignees.length} member{assignees.length === 1 ? "" : "s"}
         </span>
 
-        <button type="button" onClick={onToggleExpanded} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#3B00D9]">
-          <MessageSquare size={12} /> {comments.length}
-        </button>
+        <div className="flex w-full justify-end items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleExpanded}
+            className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#3B00D9]"
+          >
+            <MessageSquare size={12} /> {comments.length}
+          </button>
 
-        <div className="relative flex justify-end">
-          {isAdmin && (
-            <>
-              <button
-                type="button"
-                onClick={onToggleMenu}
-                className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
-                title="Task options"
-              >
-                <MoreVertical size={15} />
-              </button>
-              {isMenuOpen && (
-                <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
-                  <button type="button" onClick={onEdit} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-50">
-                    <Pencil size={13} /> Edit task
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("Pending")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                    Move to Pending
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("In progress")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                    Move to In progress
-                  </button>
-                  <button type="button" onClick={() => onManualStatusChange("Completed")} className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50">
-                    Move to Completed
-                  </button>
-                  <button type="button" onClick={onDelete} className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50">
-                    <Trash2 size={13} /> Delete task
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+          <div className="relative flex justify-end">
+            {isAdmin && (
+              <>
+                <button
+                  type="button"
+                  onClick={onToggleMenu}
+                  className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
+                  title="Task options"
+                >
+                  <MoreVertical size={15} />
+                </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+                    <button
+                      type="button"
+                      onClick={onEdit}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-gray-50"
+                    >
+                      <Pencil size={13} /> Edit task
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onManualStatusChange("Pending")}
+                      className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50"
+                    >
+                      Move to Pending
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onManualStatusChange("In progress")}
+                      className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50"
+                    >
+                      Move to In progress
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onManualStatusChange("Completed")}
+                      className="w-full px-3 py-2 text-left text-xs hover:bg-gray-50"
+                    >
+                      Move to Completed
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onDelete}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50"
+                    >
+                      <Trash2 size={13} /> Delete task
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {isExpanded && (
         <div className="border-t border-gray-100 bg-gray-50 px-3 py-3">
           <div className="mb-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Assigned to</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Assigned to
+            </p>
             <div className="flex flex-wrap gap-2">
               {assignees.length ? (
                 assignees.map((person: any, index: number) => (
-                  <span key={person?._id || person?.id || index} className="rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 ring-1 ring-gray-200">
+                  <span
+                    key={person?._id || person?.id || index}
+                    className="rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 ring-1 ring-gray-200"
+                  >
                     {getPersonLabel(person)}
                   </span>
                 ))
@@ -864,16 +1035,61 @@ const TaskCard = ({
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Comments</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Comments
+            </p>
             {comments.length ? (
-              comments.map((comment: any, index: number) => (
-                <div key={comment?._id || index} className="rounded-lg bg-white px-3 py-2 text-xs text-gray-700 ring-1 ring-gray-100">
-                  <p>{typeof comment === "string" ? comment : comment?.comment || comment?.message || ""}</p>
-                  {(comment?.createdBy?.name || comment?.user?.name) && (
-                    <p className="mt-1 text-[11px] text-gray-400">{comment?.createdBy?.name || comment?.user?.name}</p>
-                  )}
-                </div>
-              ))
+              comments.map((comment: any, index: number) => {
+                const commentId = comment?._id || index;
+                return (
+                  <div
+                    key={commentId}
+                    className="rounded-lg bg-white pl-3 pr-1 py-2 text-xs text-gray-700 ring-1 ring-gray-100 relative"
+                  >
+                    <span className="flex items-center justify-between">
+                      <p>
+                        {typeof comment === "string"
+                          ? comment
+                          : comment?.comment || comment?.message || ""}
+                      </p>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCommentToDelete(
+                              commentToDelete?._id === comment?._id
+                                ? null
+                                : comment,
+                            )
+                          }
+                          className="rounded p-1 text-gray-400 hover:text-gray-700"
+                        >
+                          <MoreVertical size={14} />
+                        </button>
+
+                        {/* comment dropdown */}
+                        {commentToDelete?._id === comment?._id && (
+                          <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                console.log("task:", task._id);
+                                console.log("comment:", commentId);
+                                if (!commentId || !task?._id) return;
+                                deleteComment({ commentId, taskId: task._id });
+                                setCommentToDelete(null);
+                              }}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50"
+                            >
+                              <Trash2 size={13} /> Delete comment
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </span>
+                  </div>
+                );
+              })
             ) : (
               <p className="text-xs text-gray-400">No comments yet</p>
             )}
@@ -914,7 +1130,11 @@ const ModalShell = ({
     <div className="mobile-safe-bottom max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-5 shadow-xl sm:rounded-3xl sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-700"
+        >
           <X size={18} />
         </button>
       </div>
@@ -963,10 +1183,17 @@ const DateInput = ({
 
 const SubmitActions = ({ onCancel }: { onCancel: () => void }) => (
   <div className="pt-2 flex items-center gap-3">
-    <button type="button" onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600">
+    <button
+      type="button"
+      onClick={onCancel}
+      className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600"
+    >
       Cancel
     </button>
-    <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#3B00D9] text-white hover:bg-[#3500c0]">
+    <button
+      type="submit"
+      className="flex-1 py-2.5 rounded-xl bg-[#3B00D9] text-white hover:bg-[#3500c0]"
+    >
       Save
     </button>
   </div>
@@ -982,7 +1209,9 @@ const UploadField = ({
   onSelect: (file: File | null) => void;
 }) => (
   <div>
-    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{label}</label>
+    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+      {label}
+    </label>
     <label className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-[#3B00D9]/40 text-[#3B00D9] text-sm font-medium cursor-pointer hover:bg-[#3B00D9]/5">
       Upload document
       <input
@@ -992,7 +1221,11 @@ const UploadField = ({
         onChange={(e) => onSelect(e.target.files?.[0] || null)}
       />
     </label>
-    {fileName && <p className="mt-2 text-xs text-gray-500 truncate">Selected: {fileName}</p>}
+    {fileName && (
+      <p className="mt-2 text-xs text-gray-500 truncate">
+        Selected: {fileName}
+      </p>
+    )}
   </div>
 );
 
@@ -1006,13 +1239,18 @@ const TeamCheckboxList = ({
   onToggle: (value: string) => void;
 }) => (
   <div className="rounded-xl border border-gray-200 p-3 max-h-44 overflow-y-auto">
-    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Select Team Members</p>
+    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+      Select Team Members
+    </p>
     <div className="space-y-2">
       {employees.map((emp: any, idx: number) => {
         const id = emp._id || emp.id || String(idx);
         const checked = selected.includes(id);
         return (
-          <label key={id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <label
+            key={id}
+            className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+          >
             <input
               type="checkbox"
               checked={checked}

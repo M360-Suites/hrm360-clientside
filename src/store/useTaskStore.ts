@@ -21,7 +21,16 @@ interface TaskState {
   deleteProject: (projectId: string) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
-  commentTask: (payload: { taskId: string; comment: string; projectId?: string }) => Promise<boolean>;
+  commentTask: (payload: {
+    taskId: string;
+    comment: string;
+    projectId?: string;
+  }) => Promise<boolean>;
+  deleteComment: (payload: {
+    taskId: string;
+    commentId: string;
+    projectId?: string;
+  }) => Promise<boolean>;
   deleteTask: (taskId: string) => Promise<boolean>;
   fetchProjectTasks: (args: {
     projectId: string;
@@ -104,7 +113,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       let projects = normalizeArrayData(response.data);
 
       if (!projects.length) {
-        const userProjectsResponse = await api.get("/task/project/user", getOrgConfig());
+        const userProjectsResponse = await api.get(
+          "/task/project/user",
+          getOrgConfig(),
+        );
         const userProjects = normalizeArrayData(userProjectsResponse.data);
         if (userProjects.length) {
           projects = userProjects;
@@ -162,7 +174,9 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       if (createdProject?._id || createdProject?.id) {
         const current = get().projects;
         const createdId = createdProject?._id || createdProject?.id;
-        const exists = current.some((p: any) => (p?._id || p?.id) === createdId);
+        const exists = current.some(
+          (p: any) => (p?._id || p?.id) === createdId,
+        );
         const nextProjects = exists ? current : [createdProject, ...current];
         set({
           projects: nextProjects,
@@ -187,7 +201,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     try {
       await api.post("/task", payload, getOrgConfig());
       if (payload?.projectId) {
-        await get().fetchProjectTasks({ projectId: payload.projectId, status: "All" });
+        await get().fetchProjectTasks({
+          projectId: payload.projectId,
+          status: "All",
+        });
       }
       set({ isLoading: false, error: null });
       return true;
@@ -207,7 +224,8 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       const nextProjects = get().projects.filter(
         (project: any) => (project?._id || project?.id) !== projectId,
       );
-      const currentSelectedId = get().selectedProject?._id || get().selectedProject?.id;
+      const currentSelectedId =
+        get().selectedProject?._id || get().selectedProject?.id;
       const nextSelectedProject =
         currentSelectedId === projectId
           ? nextProjects[0] || null
@@ -234,9 +252,17 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await api.put("/task", payload, getOrgConfig());
-      const projectId = payload?.projectId || get().selectedProject?._id || get().selectedProject?.id;
+      const projectId =
+        payload?.projectId ||
+        get().selectedProject?._id ||
+        get().selectedProject?.id;
       if (projectId) {
-        await get().fetchProjectTasks({ projectId, status: "All", page: get().pagination.page, limit: get().pagination.limit });
+        await get().fetchProjectTasks({
+          projectId,
+          status: "All",
+          page: get().pagination.page,
+          limit: get().pagination.limit,
+        });
       }
       set({ isLoading: false, error: null });
       return true;
@@ -257,7 +283,40 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         { taskId: payload.taskId, comment: payload.comment },
         getOrgConfig(),
       );
-      const projectId = payload?.projectId || get().selectedProject?._id || get().selectedProject?.id;
+      const projectId =
+        payload?.projectId ||
+        get().selectedProject?._id ||
+        get().selectedProject?.id;
+      if (projectId) {
+        await get().fetchProjectTasks({
+          projectId,
+          status: "All",
+          page: get().pagination.page,
+          limit: get().pagination.limit,
+        });
+      }
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to add comment"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  deleteComment: async (payload) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(
+        `/task/d/${payload.taskId}/${payload.commentId}`,
+        getOrgConfig(),
+      );
+      const projectId =
+        payload?.projectId ||
+        get().selectedProject?._id ||
+        get().selectedProject?.id;
       if (projectId) {
         await get().fetchProjectTasks({
           projectId,
@@ -281,9 +340,15 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await api.delete(`/task/${taskId}`, getOrgConfig());
-      const selectedProjectId = get().selectedProject?._id || get().selectedProject?.id;
+      const selectedProjectId =
+        get().selectedProject?._id || get().selectedProject?.id;
       if (selectedProjectId) {
-        await get().fetchProjectTasks({ projectId: selectedProjectId, status: "All", page: get().pagination.page, limit: get().pagination.limit });
+        await get().fetchProjectTasks({
+          projectId: selectedProjectId,
+          status: "All",
+          page: get().pagination.page,
+          limit: get().pagination.limit,
+        });
       } else {
         set({
           tasks: get().tasks.filter((t: any) => (t?._id || t?.id) !== taskId),
@@ -300,7 +365,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     }
   },
 
-  fetchProjectTasks: async ({ projectId, query, status = "All", page = 1, limit = 50 }) => {
+  fetchProjectTasks: async ({
+    projectId,
+    query,
+    status = "All",
+    page = 1,
+    limit = 50,
+  }) => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.get(`/task/project/${projectId}/tasks`, {
