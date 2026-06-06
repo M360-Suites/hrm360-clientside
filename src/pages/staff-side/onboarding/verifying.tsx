@@ -5,7 +5,9 @@ export const Verifying = () => {
   const loading = true;
   const pathRef = useRef<SVGPathElement>(null);
   const navigate = useNavigate();
-  const [message, setMessage] = useState("We are getting your dashboard ready...");
+  const [message, setMessage] = useState(
+    "We are getting your dashboard ready...",
+  );
 
   useEffect(() => {
     const msgTimer = setTimeout(() => {
@@ -37,7 +39,7 @@ export const Verifying = () => {
             viewBox="0 0 366 367"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-[366px] h-auto max-md:w-[280px]"
+            className="lg:w-[366px] h-auto md:w-[300px] w-[250px]"
           >
             <rect
               width="366"
@@ -60,7 +62,9 @@ export const Verifying = () => {
             />
           </svg>
         </div>
-        <p className="text-xl/[100%] max-md:text-base/[100%] font-normal transform-opacity-50">{message}</p>
+        <p className="text-xl/[100%] text-center max-md:text-base/[100%] font-normal transform-opacity-50">
+          {message}
+        </p>
       </div>
     </div>
   );
