@@ -107,6 +107,11 @@ const TaskManager = () => {
     dueDate: getTodayDateInput(),
     status: "Pending",
   });
+  const canCreateProjects = true;
+  const canCreateTasks = true;
+  const canManageTaskDetails = true;
+  const canDeleteProjects = isAdmin;
+  const canDeleteTasks = isAdmin;
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -114,9 +119,9 @@ const TaskManager = () => {
   };
 
   useEffect(() => {
+    fetchEmployees();
     if (isAdmin) {
       fetchProjects();
-      fetchEmployees();
     } else {
       fetchUserProjects();
     }
@@ -180,7 +185,7 @@ const TaskManager = () => {
       team: projectForm.team.filter(Boolean),
       document: docId,
     };
-    const ok = await createProject(payload);
+    const ok = await createProject(payload, { refreshUserProjects: !isAdmin });
     if (!ok) return;
 
     setShowProjectModal(false);
@@ -377,7 +382,7 @@ const TaskManager = () => {
             Projects, owners, dates, and task status in one place
           </p>
         </div>
-        {isAdmin && (
+        {canCreateTasks && (
           <button
             type="button"
             onClick={() => setShowTaskModal(true)}
@@ -422,7 +427,7 @@ const TaskManager = () => {
                       {projectAssignees.length === 1 ? "" : "s"}
                     </span>
                   </button>
-                  {isAdmin && (
+                  {canDeleteProjects && (
                     <button
                       type="button"
                       onClick={() => handleDeleteProject(project)}
@@ -440,7 +445,7 @@ const TaskManager = () => {
               );
             })}
           </div>
-          {isAdmin && (
+          {canCreateProjects && (
             <button
               type="button"
               onClick={() => setShowProjectModal(true)}
@@ -493,7 +498,8 @@ const TaskManager = () => {
               setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
-              isAdmin={isAdmin}
+              canManageTaskDetails={canManageTaskDetails}
+              canDeleteTasks={canDeleteTasks}
             />
             <BoardColumn
               columnKey="inProgress"
@@ -515,7 +521,8 @@ const TaskManager = () => {
               setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
-              isAdmin={isAdmin}
+              canManageTaskDetails={canManageTaskDetails}
+              canDeleteTasks={canDeleteTasks}
             />
             <BoardColumn
               columnKey="completed"
@@ -537,7 +544,8 @@ const TaskManager = () => {
               setCommentDrafts={setCommentDrafts}
               dragOverColumn={dragOverColumn}
               setDragOverColumn={setDragOverColumn}
-              isAdmin={isAdmin}
+              canManageTaskDetails={canManageTaskDetails}
+              canDeleteTasks={canDeleteTasks}
             />
           </div>
         </div>
@@ -586,20 +594,18 @@ const TaskManager = () => {
                 }))
               }
             />
-            {isAdmin && (
-              <TeamCheckboxList
-                employees={employees}
-                selected={projectForm.team}
-                onToggle={(value) =>
-                  setProjectForm((p) => ({
-                    ...p,
-                    team: p.team.includes(value)
-                      ? p.team.filter((id) => id !== value)
-                      : [...p.team, value],
-                  }))
-                }
-              />
-            )}
+            <TeamCheckboxList
+              employees={employees}
+              selected={projectForm.team}
+              onToggle={(value) =>
+                setProjectForm((p) => ({
+                  ...p,
+                  team: p.team.includes(value)
+                    ? p.team.filter((id) => id !== value)
+                    : [...p.team, value],
+                }))
+              }
+            />
             <SubmitActions onCancel={() => setShowProjectModal(false)} />
           </form>
         </ModalShell>
@@ -664,20 +670,18 @@ const TaskManager = () => {
                 }))
               }
             />
-            {isAdmin && (
-              <TeamCheckboxList
-                employees={employees}
-                selected={taskForm.team}
-                onToggle={(value) =>
-                  setTaskForm((p) => ({
-                    ...p,
-                    team: p.team.includes(value)
-                      ? p.team.filter((id) => id !== value)
-                      : [...p.team, value],
-                  }))
-                }
-              />
-            )}
+            <TeamCheckboxList
+              employees={employees}
+              selected={taskForm.team}
+              onToggle={(value) =>
+                setTaskForm((p) => ({
+                  ...p,
+                  team: p.team.includes(value)
+                    ? p.team.filter((id) => id !== value)
+                    : [...p.team, value],
+                }))
+              }
+            />
             <SubmitActions onCancel={() => setShowTaskModal(false)} />
           </form>
         </ModalShell>
@@ -762,7 +766,8 @@ const BoardColumn = ({
   setCommentDrafts,
   dragOverColumn,
   setDragOverColumn,
-  isAdmin,
+  canManageTaskDetails,
+  canDeleteTasks,
 }: {
   columnKey: "completed" | "inProgress" | "pending";
   title: string;
@@ -790,7 +795,8 @@ const BoardColumn = ({
   setDragOverColumn: (
     column: "completed" | "inProgress" | "pending" | null,
   ) => void;
-  isAdmin: boolean;
+  canManageTaskDetails: boolean;
+  canDeleteTasks: boolean;
 }) => {
   const headerTone = {
     green: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -812,7 +818,7 @@ const BoardColumn = ({
         {icon} {title}{" "}
         <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
-      <div className="hidden md:grid grid-cols-4 gap-1 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
         <span>Task</span>
         <span>Due Date</span>
         <span>Team</span>
@@ -864,7 +870,8 @@ const BoardColumn = ({
                   : task?._id || task?.id,
               )
             }
-            isAdmin={isAdmin}
+            canManageTaskDetails={canManageTaskDetails}
+            canDeleteTasks={canDeleteTasks}
           />
         ))}
         {tasks.length === 0 && (
@@ -891,7 +898,8 @@ const TaskCard = ({
   onCommentDraftChange,
   isMenuOpen,
   onToggleMenu,
-  isAdmin,
+  canManageTaskDetails,
+  canDeleteTasks,
 }: {
   task: any;
   onDragStart: () => void;
@@ -909,7 +917,8 @@ const TaskCard = ({
   onCommentDraftChange: (value: string) => void;
   isMenuOpen: boolean;
   onToggleMenu: () => void;
-  isAdmin: boolean;
+  canManageTaskDetails: boolean;
+  canDeleteTasks: boolean;
 }) => {
   const { deleteComment } = useTaskStore();
   const assignees = getAssignees(task);
@@ -920,7 +929,7 @@ const TaskCard = ({
   return (
     <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50">
       <div
-        className="group grid grid-cols-4 gap-2 px-3 py-3 text-sm md:items-center cursor-grab active:cursor-grabbing"
+        className="group grid gap-2 px-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] md:items-center cursor-grab active:cursor-grabbing"
         draggable
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -956,18 +965,17 @@ const TaskCard = ({
           </button>
 
           <div className="relative flex justify-end">
-            {isAdmin && (
-              <>
-                <button
-                  type="button"
-                  onClick={onToggleMenu}
-                  className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
-                  title="Task options"
-                >
-                  <MoreVertical size={15} />
-                </button>
-                {isMenuOpen && (
-                  <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+            <button
+              type="button"
+              onClick={onToggleMenu}
+              className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
+              title="Task options"
+            >
+              <MoreVertical size={15} />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
+                {canManageTaskDetails && (
                     <button
                       type="button"
                       onClick={onEdit}
@@ -975,6 +983,7 @@ const TaskCard = ({
                     >
                       <Pencil size={13} /> Edit task
                     </button>
+                )}
                     <button
                       type="button"
                       onClick={() => onManualStatusChange("Pending")}
@@ -996,6 +1005,7 @@ const TaskCard = ({
                     >
                       Move to Completed
                     </button>
+                {canDeleteTasks && (
                     <button
                       type="button"
                       onClick={onDelete}
@@ -1003,9 +1013,8 @@ const TaskCard = ({
                     >
                       <Trash2 size={13} /> Delete task
                     </button>
-                  </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
