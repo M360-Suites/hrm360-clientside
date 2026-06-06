@@ -7,7 +7,6 @@ import {
 
 export function CustomInputOtp() {
   const { code, setCode } = useOnboardingStore();
-  console.log("Current code value:", code); // Debugging log to check the current value of code
   return (
     <InputOTP
       maxLength={6}
@@ -20,7 +19,7 @@ export function CustomInputOtp() {
           <InputOTPSlot
             key={index}
             index={index}
-            className="h-[80px] w-[85px] max-md:w-[50px] max-md:h-[50px] rounded-[10px]"
+            className="lg:h-20 lg:w-20 md:w-12.5 md:h-12.5 w-10 h-10 rounded-[10px]"
           />
         ))}
       </InputOTPGroup>

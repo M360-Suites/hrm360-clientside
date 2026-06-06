@@ -8,9 +8,8 @@ import { Outlet } from "react-router";
 export const StaffOnboardingLayout = () => {
   const location = useLocation();
   const isFinalVerification = location.pathname === "/employee/verified";
-  console.log()
   return (
-    <div className="flex flex-row items-center w-full bg-white">
+    <div className="flex flex-row items-center min-h-screen w-full bg-white">
       <div
         className={`flex-1 h-screen flex flex-col px-8 w-full max-md:px-5 bg-[#F2F2F24D] relative ${isFinalVerification ? "pt-0 max-md:pt-6 items-center max-md:justify-start justify-center" : "pt-38 max-md:pt-6 items-start justify-start"}`}
       >
