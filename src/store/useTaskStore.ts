@@ -310,7 +310,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await api.delete(
-        `/task/d/${payload.taskId}/${payload.commentId}`,
+        `/task/${payload.taskId}/${payload.commentId}`,
         getOrgConfig(),
       );
       const projectId =
