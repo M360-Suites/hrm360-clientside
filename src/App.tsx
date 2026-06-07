@@ -33,6 +33,7 @@ import Loans from "./pages/loans/Loans";
 import Performance from "./pages/performance/Performance";
 import Announcement from "./pages/announcement/Announcement";
 import TaskManager from "./pages/task-manager/TaskManager";
+import PwaInstallPrompt from "./components/PwaInstallPrompt";
 
 const RequireAuth = () => {
 	const token = getCookie("token");
@@ -79,6 +80,7 @@ const RedirectIfAuthenticated = () => {
 const App = () => {
 	return (
 		<BrowserRouter>
+			<PwaInstallPrompt />
 			<Routes>
 				<Route element={<AuthLayout />}>
 					<Route element={<RedirectIfAuthenticated />}>
