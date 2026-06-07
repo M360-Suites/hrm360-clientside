@@ -374,7 +374,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
 
   fetchProjectTasks: async ({
     projectId,
-    query,
     status = "All",
     page = 1,
     limit = 50,
@@ -384,7 +383,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       const response = await api.get(`/task/project/${projectId}/tasks`, {
         ...getOrgConfig(),
         params: {
-          ...(query ? { query } : {}),
           ...(status ? { status } : {}),
           page,
           limit,

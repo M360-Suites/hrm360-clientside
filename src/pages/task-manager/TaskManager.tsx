@@ -133,12 +133,11 @@ const TaskManager = () => {
     if (!projectId) return;
     fetchProjectTasks({
       projectId,
-      query: search,
       status: "All",
       page: 1,
       limit: 80,
     });
-  }, [selectedProject, search, fetchProjectTasks]);
+  }, [selectedProject, fetchProjectTasks]);
 
   useEffect(() => {
     if (!taskForm.projectId && selectedProject) {
@@ -154,11 +153,41 @@ const TaskManager = () => {
     showToast("error", error);
   }, [error]);
 
+  const filteredTasks = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+    if (!normalizedSearch) return tasks;
+
+    return tasks.filter((task: any) => {
+      const assigneeText = getAssignees(task).map(getPersonLabel).join(" ");
+      const commentText = getComments(task)
+        .map((comment: any) =>
+          typeof comment === "string"
+            ? comment
+            : comment?.comment || comment?.message || "",
+        )
+        .join(" ");
+      const searchableText = [
+        task?.title,
+        task?.description,
+        task?.status,
+        task?.createdBy?.name,
+        task?.createdBy?.email,
+        assigneeText,
+        commentText,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [search, tasks]);
+
   const boardData = useMemo(() => {
-    const completed = tasks.filter(
+    const completed = filteredTasks.filter(
       (task: any) => normalizeStatus(task.status) === "completed",
     );
-    const inProgress = tasks.filter((task: any) => {
+    const inProgress = filteredTasks.filter((task: any) => {
       const status = normalizeStatus(task.status);
       return (
         status === "in progress" ||
@@ -166,12 +195,12 @@ const TaskManager = () => {
         status === "progress"
       );
     });
-    const pending = tasks.filter((task: any) => {
+    const pending = filteredTasks.filter((task: any) => {
       const status = normalizeStatus(task.status);
       return status === "due" || status === "pending" || status === "todo";
     });
     return { completed, inProgress, pending };
-  }, [tasks]);
+  }, [filteredTasks]);
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
