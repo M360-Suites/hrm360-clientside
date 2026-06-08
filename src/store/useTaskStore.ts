@@ -17,7 +17,10 @@ interface TaskState {
   error: string | null;
   fetchProjects: () => Promise<void>;
   fetchUserProjects: () => Promise<void>;
-  createProject: (payload: any) => Promise<boolean>;
+  createProject: (
+    payload: any,
+    options?: { refreshUserProjects?: boolean },
+  ) => Promise<boolean>;
   deleteProject: (projectId: string) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
@@ -165,7 +168,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     }
   },
 
-  createProject: async (payload) => {
+  createProject: async (payload, options) => {
     set({ isLoading: true, error: null });
     try {
       const response = await api.post("/task/project", payload, getOrgConfig());
@@ -184,7 +187,11 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         });
       }
 
-      await get().fetchProjects();
+      if (options?.refreshUserProjects) {
+        await get().fetchUserProjects();
+      } else {
+        await get().fetchProjects();
+      }
       set({ isLoading: false, error: null });
       return true;
     } catch (error: any) {
@@ -367,7 +374,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
 
   fetchProjectTasks: async ({
     projectId,
-    query,
     status = "All",
     page = 1,
     limit = 50,
@@ -377,7 +383,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       const response = await api.get(`/task/project/${projectId}/tasks`, {
         ...getOrgConfig(),
         params: {
-          ...(query ? { query } : {}),
           ...(status ? { status } : {}),
           page,
           limit,

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HRM360">
+  <rect width="512" height="512" fill="#3B00D9"/>
+  <circle cx="410" cy="94" r="106" fill="#7C3AED" opacity=".7"/>
+  <circle cx="86" cy="432" r="142" fill="#22D3EE" opacity=".26"/>
+  <rect x="72" y="72" width="368" height="368" rx="92" fill="#ffffff" opacity=".1"/>
+  <path fill="#fff" d="M289.8 380.2c-10.1 12.9-30.7 5.7-30.7-10.7v-79a34.4 34.4 0 0 0-34.4-34.4h-87c-14 0-22.2-15.8-14-27.2l57.2-80.1c16.3-22.8 0-54.5-28.1-54.5H94.7c-14 0-22.2-15.8-14-27.2l74.2-103.8c3.2-4.6 8.5-7.2 14-7.2h221c14 0 22.2 15.8 14 27.2l-57.2 80.1c-16.3 22.8 0 54.5 28.1 54.5h87c14.4 0 22.5 16.6 13.5 27.9L289.8 380.2Z" opacity=".96" transform="translate(-12 96) scale(.86)"/>
+  <text x="256" y="396" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="800" letter-spacing="-3">360</text>
+</svg>
