@@ -32,6 +32,15 @@ const formatDate = (date: Date) =>
 		year: "numeric",
 	});
 
+const formatAttendanceRate = (value: unknown) => {
+	const normalized =
+		typeof value === "string" ? value.replace("%", "").trim() : value;
+	const rate = Number(normalized);
+
+	if (!Number.isFinite(rate)) return "0.00%";
+	return `${rate.toFixed(2)}%`;
+};
+
 const formatDuration = (ms: number) => {
 	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
 	const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
@@ -545,7 +554,7 @@ const Attendance = () => {
 				/>
 				<StatCard
 					label="Attendance Rate"
-					value={todayStats?.rate || "0%"}
+					value={formatAttendanceRate(todayStats?.rate)}
 					tone="emerald"
 				/>
 			</div>
@@ -780,7 +789,7 @@ const StatCard = ({
 			<p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">
 				{label}
 			</p>
-			<h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+			<h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 tabular-nums break-words">
 				{value}
 			</h3>
 		</div>

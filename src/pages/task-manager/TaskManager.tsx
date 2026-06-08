@@ -847,67 +847,67 @@ const BoardColumn = ({
         {icon} {title}{" "}
         <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
-      <div className="hidden md:grid grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] gap-3 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-        <span>Task</span>
-        <span>Due Date</span>
-        <span>Team</span>
-        <span>Comments</span>
-        <span />
-      </div>
-      <div
-        className="min-h-[280px] max-h-none overflow-y-auto xl:max-h-[68vh]"
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOverColumn(columnKey);
-        }}
-        onDragLeave={() => setDragOverColumn(null)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOverColumn(null);
-          onDropTask(columnKey);
-        }}
-      >
-        {tasks.map((task: any, idx: number) => (
-          <TaskCard
-            key={task._id || task.id || idx}
-            task={task}
-            onDragStart={() => onDragTask(task)}
-            onDragEnd={() => onDragTask(null)}
-            onDelete={() => onDeleteTask(task)}
-            onEdit={() => onEditTask(task)}
-            onAddComment={() => onAddComment(task)}
-            onManualStatusChange={(status) =>
-              onManualStatusChange(task, status)
-            }
-            isExpanded={expandedTaskId === (task?._id || task?.id)}
-            onToggleExpanded={() => {
-              const taskId = task?._id || task?.id;
-              setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
-            }}
-            commentDraft={commentDrafts[task?._id || task?.id] || ""}
-            onCommentDraftChange={(value) =>
-              setCommentDrafts((prev) => ({
-                ...prev,
-                [task?._id || task?.id]: value,
-              }))
-            }
-            isMenuOpen={activeTaskMenuId === (task?._id || task?.id)}
-            onToggleMenu={() =>
-              setActiveTaskMenuId(
-                activeTaskMenuId === (task?._id || task?.id)
-                  ? null
-                  : task?._id || task?.id,
-              )
-            }
-            canManageTaskDetails={canManageTaskDetails}
-            canDeleteTasks={canDeleteTasks}
-          />
-        ))}
-        {tasks.length === 0 && (
-          <div className="text-xs text-gray-500 text-center py-10">
-            No tasks here
-          </div>
-        )}
+      <div>
+        <div className="hidden grid-cols-[minmax(0,1fr)_92px_76px] gap-3 border-b border-gray-100 bg-gray-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500 md:grid">
+          <span className="whitespace-nowrap">Task</span>
+          <span className="whitespace-nowrap">Due Date</span>
+          <span className="text-right whitespace-nowrap">Activity</span>
+        </div>
+        <div
+          className="min-h-[280px] max-h-none min-w-0 overflow-y-auto xl:max-h-[68vh]"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOverColumn(columnKey);
+          }}
+          onDragLeave={() => setDragOverColumn(null)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOverColumn(null);
+            onDropTask(columnKey);
+          }}
+        >
+          {tasks.map((task: any, idx: number) => (
+            <TaskCard
+              key={task._id || task.id || idx}
+              task={task}
+              onDragStart={() => onDragTask(task)}
+              onDragEnd={() => onDragTask(null)}
+              onDelete={() => onDeleteTask(task)}
+              onEdit={() => onEditTask(task)}
+              onAddComment={() => onAddComment(task)}
+              onManualStatusChange={(status) =>
+                onManualStatusChange(task, status)
+              }
+              isExpanded={expandedTaskId === (task?._id || task?.id)}
+              onToggleExpanded={() => {
+                const taskId = task?._id || task?.id;
+                setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+              }}
+              commentDraft={commentDrafts[task?._id || task?.id] || ""}
+              onCommentDraftChange={(value) =>
+                setCommentDrafts((prev) => ({
+                  ...prev,
+                  [task?._id || task?.id]: value,
+                }))
+              }
+              isMenuOpen={activeTaskMenuId === (task?._id || task?.id)}
+              onToggleMenu={() =>
+                setActiveTaskMenuId(
+                  activeTaskMenuId === (task?._id || task?.id)
+                    ? null
+                    : task?._id || task?.id,
+                )
+              }
+              canManageTaskDetails={canManageTaskDetails}
+              canDeleteTasks={canDeleteTasks}
+            />
+          ))}
+          {tasks.length === 0 && (
+            <div className="text-xs text-gray-500 text-center py-10">
+              No tasks here
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -958,7 +958,7 @@ const TaskCard = ({
   return (
     <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50">
       <div
-        className="group grid gap-2 px-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_96px_76px_82px_32px] md:items-center cursor-grab active:cursor-grabbing"
+        className="group grid cursor-grab gap-2 px-3 py-3 text-sm active:cursor-grabbing md:grid-cols-[minmax(0,1fr)_92px_76px] md:items-center md:gap-3 md:px-4"
         draggable
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -974,17 +974,16 @@ const TaskCard = ({
           <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">
             {task?.description || "No description provided."}
           </p>
+          <p className="mt-1 text-[11px] font-medium text-gray-400">
+            {assignees.length} member{assignees.length === 1 ? "" : "s"}
+          </p>
         </button>
 
-        <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+        <span className="inline-flex items-center gap-1 whitespace-nowrap text-xs text-gray-500">
           {formatDate(getTaskDate(task))}
         </span>
 
-        <span className="text-xs text-gray-500">
-          {assignees.length} member{assignees.length === 1 ? "" : "s"}
-        </span>
-
-        <div className="flex w-full justify-end items-center gap-2">
+        <div className="flex w-full items-center justify-start gap-1.5 md:justify-end">
           <button
             type="button"
             onClick={onToggleExpanded}
