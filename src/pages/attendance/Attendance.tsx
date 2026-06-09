@@ -536,6 +536,7 @@ const Attendance = () => {
             qrInput={qrInput}
             setQrInput={setQrInput}
             scanMessage={scanMessage}
+            setScanMessage={setScanMessage}
             onClose={() => {
               setShowScanModal(false);
               setQrInput("");
@@ -941,6 +942,7 @@ const ScanQrModal = ({
   qrInput,
   setQrInput,
   scanMessage,
+  setScanMessage,
   onClose,
   onSubmit,
 }: {
@@ -948,6 +950,7 @@ const ScanQrModal = ({
   qrInput: string;
   setQrInput: (value: string) => void;
   scanMessage: string;
+  setScanMessage: (value: string) => void;
   onClose: () => void;
   onSubmit: (value?: string) => void;
 }) => {
@@ -1011,18 +1014,28 @@ const ScanQrModal = ({
     const scanner = new QrScanner(
       videoRef.current,
       async (result) => {
-        const scannedValue = result.data; // QrScanner always returns an object
+        const scannedValue = result.data;
 
         if (!scannedValue || hasScannedRef.current) return;
 
         hasScannedRef.current = true;
-        console.log("Scanned QR code:", scannedValue);
-        // setHasScanned(true);
-        setQrInput(scannedValue);
 
+        // Parse JSON and extract signature
+        let signature = scannedValue;
+        try {
+          const parsed = JSON.parse(scannedValue);
+          if (parsed?.signature) {
+            signature = parsed.signature;
+          }
+        } catch {
+          // not JSON, use raw value as fallback
+        }
+
+        setQrInput(signature);
+        setScanMessage("QR code scanned successfully. Verifying attendance...");
         scanner.stop();
-        const response = await onSubmit(scannedValue);
-        console.log("QR submit response:", response);
+
+        await onSubmit(signature);
       },
       {
         preferredCamera: "environment",
@@ -1051,7 +1064,7 @@ const ScanQrModal = ({
       scanner.destroy();
       scannerRef.current = null;
     };
-  }, [onSubmit, setQrInput]); // hasScanned removed
+  }, [onSubmit, setQrInput, setScanMessage]);
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
       <div className="relative h-dvh w-full max-w-md overflow-hidden bg-black text-white sm:h-190 sm:rounded-[2rem]">
@@ -1114,7 +1127,7 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            // value={""}
+            value={qrInput.trim() === "{" ? "" : qrInput}
             onChange={(e) => setQrInput(e.target.value)}
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
