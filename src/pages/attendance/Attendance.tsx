@@ -101,6 +101,8 @@ const Attendance = () => {
     clockWithQr,
     getUserLocation,
     location,
+    setQrInput,
+    qrInput,
   } = useAttendanceStore();
 
   const { employees, fetchEmployees } = useEmployeeStore();
@@ -110,7 +112,6 @@ const Attendance = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showQrModal, setShowQrModal] = useState(false);
   const [showScanModal, setShowScanModal] = useState(false);
-  const [qrInput, setQrInput] = useState("");
   const [scanMessage, setScanMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [attendancePhase, setAttendancePhase] = useState<
@@ -286,7 +287,7 @@ const Attendance = () => {
         return; // ensure we don't call clockWithQr with nullable values
       }
 
-      if (!qrData.qrCode.trim() || qrData.qrCode.trim().length < 5) {
+      if (!qrData.qrCode) {
         setScanMessage("Please scan or paste a valid QR code.");
         return;
       }
@@ -306,7 +307,7 @@ const Attendance = () => {
         const action = result.action || lastQrAction;
 
         setShowScanModal(false);
-        setQrInput("");
+        setQrInput({ orgId: "", signature: "" });
         setScanMessage("");
         await fetchEmployeeDashboard();
 
@@ -539,12 +540,12 @@ const Attendance = () => {
             setScanMessage={setScanMessage}
             onClose={() => {
               setShowScanModal(false);
-              setQrInput("");
+              setQrInput({ orgId: "", signature: "" });
               setScanMessage("");
             }}
             onSubmit={() => {
               handleQrSubmit({
-                qrCode: qrInput,
+                qrCode: qrInput.signature,
                 location: location,
               });
             }}
@@ -947,18 +948,21 @@ const ScanQrModal = ({
   onSubmit,
 }: {
   isLoading: boolean;
-  qrInput: string;
-  setQrInput: (value: string) => void;
+  qrInput: { orgId: string; signature: string };
+  setQrInput: (value: { orgId: string; signature: string }) => void;
   scanMessage: string;
   setScanMessage: (value: string) => void;
   onClose: () => void;
-  onSubmit: (value?: string) => void;
+  onSubmit: (value: {
+    qrCode: string;
+    location: { latitude: number; longitude: number } | null;
+  }) => void;
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scannerRef = useRef<QrScanner | null>(null);
+  const { location } = useAttendanceStore();
 
   const [cameraError, setCameraError] = useState("");
-  const [scanSignature, setScanSignature] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
   //   const [hasScanned, setHasScanned] = useState(false);
 
@@ -1015,29 +1019,24 @@ const ScanQrModal = ({
     const scanner = new QrScanner(
       videoRef.current,
       async (result) => {
-        const scannedValue = result.data;
+        const scannedValue = result.data as unknown as {
+          orgId: string;
+          signature: string;
+        };
+        console.log("QR scan result:", scannedValue);
 
         if (!scannedValue || hasScannedRef.current) return;
 
         hasScannedRef.current = true;
 
-        // Parse JSON and extract signature
-        let signature = scannedValue;
-        try {
-          const parsed = JSON.parse(scannedValue);
-          if (parsed?.signature) {
-            signature = parsed.signature;
-            setScanSignature(signature);
-          }
-        } catch {
-          // not JSON, use raw value as fallback
-        }
-
-        setQrInput(signature);
-        setScanMessage("QR code scanned successfully. Verifying attendance...");
+        setQrInput({
+          orgId: scannedValue.orgId,
+          signature: scannedValue.signature,
+        });
+        setScanMessage("QR code scanned...");
         scanner.stop();
 
-        await onSubmit(scannedValue);
+        await onSubmit({ qrCode: scannedValue.signature, location: location });
       },
       {
         preferredCamera: "environment",
@@ -1067,6 +1066,7 @@ const ScanQrModal = ({
       scannerRef.current = null;
     };
   }, [onSubmit, setQrInput, setScanMessage]);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
       <div className="relative h-dvh w-full max-w-md overflow-hidden bg-black text-white sm:h-190 sm:rounded-[2rem]">
@@ -1129,8 +1129,10 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            value={qrInput.trim() === "{" ? "" : scanSignature || qrInput}
-            onChange={(e) => setQrInput(e.target.value)}
+            value={qrInput.signature}
+            onChange={(e) =>
+              setQrInput({ ...qrInput, signature: e.target.value })
+            }
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
           />
@@ -1143,8 +1145,8 @@ const ScanQrModal = ({
           )}
 
           <button
-            onClick={() => onSubmit()}
-            disabled={isLoading || !qrInput.trim()}
+            onClick={() => onSubmit({ qrCode: qrInput.signature, location })}
+            disabled={isLoading || !qrInput}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-70"
           >
             {isLoading ? (

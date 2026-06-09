@@ -11,10 +11,15 @@ interface QrCodeProps {
 }
 
 interface AttendanceState {
+  qrInput?: {
+    orgId: string;
+    signature: string;
+  };
   location: {
     latitude: number | null;
     longitude: number | null;
   };
+  setQrInput?: (input: { orgId: string; signature: string }) => void;
   setLocation?: (latitude: number, longitude: number) => void;
   dayAttendance: any[];
   weekAttendance: any[];
@@ -137,6 +142,11 @@ const getOrgConfig = () => {
 };
 
 export const useAttendanceStore = create<AttendanceState>((set, get) => ({
+  qrInput: {
+    orgId: "",
+    signature: "",
+  },
+  setQrInput: (input) => set({ qrInput: input }),
   location: {
     latitude: null,
     longitude: null,
