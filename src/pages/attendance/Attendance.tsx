@@ -1016,11 +1016,13 @@ const ScanQrModal = ({
         if (!scannedValue || hasScannedRef.current) return;
 
         hasScannedRef.current = true;
+        console.log("Scanned QR code:", scannedValue);
         // setHasScanned(true);
         setQrInput(scannedValue);
 
         scanner.stop();
-        await onSubmit(scannedValue);
+        const response = await onSubmit(scannedValue);
+        console.log("QR submit response:", response);
       },
       {
         preferredCamera: "environment",
@@ -1112,7 +1114,7 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            value={qrInput}
+            // value={""}
             onChange={(e) => setQrInput(e.target.value)}
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
