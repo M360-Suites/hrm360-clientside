@@ -42,6 +42,14 @@ const validateEmployee = (data: EmployeeFormData) => {
   return errors;
 };
 
+const formatAttendanceRate = (value: unknown) => {
+  const normalized = typeof value === "string" ? value.replace("%", "").trim() : value;
+  const rate = Number(normalized);
+
+  if (!Number.isFinite(rate)) return "0.00%";
+  return `${rate.toFixed(2)}%`;
+};
+
 const getCalendarCells = (baseDate: Date) => {
   const year = baseDate.getFullYear();
   const month = baseDate.getMonth();
@@ -69,7 +77,7 @@ const Dashboard = () => {
   );
   const [now, setNow] = useState(new Date());
 
-  const { employees, isLoading, error, fetchEmployees, createEmployee } = useEmployeeStore();
+  const { employees, total, isLoading, error, fetchEmployees, createEmployee } = useEmployeeStore();
   const { todayStats, fetchTodayStats } = useAttendanceStore();
   const { leaves, fetchLeaves } = useLeaveStore();
   const { user, isAdmin } = useAuthStore();
@@ -77,12 +85,14 @@ const Dashboard = () => {
   const employeeName = user?.name?.split(" ")[0] || "Employee";
 
   useEffect(() => {
+    if (!isAdmin) return;
     if (fetchedOnce.current) return;
     fetchedOnce.current = true;
+
     fetchEmployees();
     fetchTodayStats();
     fetchLeaves();
-  }, [fetchEmployees, fetchTodayStats, fetchLeaves]);
+  }, [isAdmin, fetchEmployees, fetchTodayStats, fetchLeaves]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -101,6 +111,17 @@ const Dashboard = () => {
       : currentHour < 17
       ? "Good afternoon"
       : "Good evening";
+  const timeLabel = now.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const dateLabel = now.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+  });
+  const attendanceRate = formatAttendanceRate(todayStats?.rate);
+  const totalEmployeeCount = total || employees?.length || 0;
 
   const showToast = (type: Toast["type"], message: string) => {
     setToast({ type, message });
@@ -174,7 +195,9 @@ const Dashboard = () => {
             {isAdmin ? "Welcome back" : `${greeting}, ${employeeName}`}
           </h2>
           <p className="text-sm text-gray-500">
-            Here is an overview of what is happening across your organization today
+            {isAdmin
+              ? "Here is an overview of what is happening across your organization today"
+              : "Here is your personal workspace snapshot for today"}
           </p>
         </div>
         {/* {isAdmin && (
@@ -191,25 +214,49 @@ const Dashboard = () => {
         )} */}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-          <p className="text-sm font-medium text-gray-600 mb-2">Total Employee</p>
-          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{employees?.length || 0}</h3>
-        </div>
+      {isAdmin ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+            <p className="text-sm font-medium text-gray-600 mb-2">Total Employees</p>
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{totalEmployeeCount}</h3>
+          </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-          <p className="text-sm font-medium text-gray-600 mb-2">Attendance Today</p>
-          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{todayStats?.present || 0}</h3>
-          <p className="text-xs text-gray-500 mt-2">Rate: {todayStats?.rate || "0%"}</p>
-        </div>
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+            <p className="text-sm font-medium text-gray-600 mb-2">Attendance Today</p>
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{todayStats?.present || 0}</h3>
+            <p className="text-xs text-gray-500 mt-2">Rate: {attendanceRate}</p>
+          </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1">
-          <p className="text-sm font-medium text-gray-600 mb-2">On Leave</p>
-          <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            {leaves?.filter((l: any) => String(l.status).toLowerCase() === "approved").length || 0}
-          </h3>
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1">
+            <p className="text-sm font-medium text-gray-600 mb-2">On Leave</p>
+            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              {leaves?.filter((l: any) => String(l.status).toLowerCase() === "approved").length || 0}
+            </h3>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+            <p className="text-sm font-medium text-gray-600 mb-2">Current Time</p>
+            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 tabular-nums">
+              {timeLabel}
+            </h3>
+            <p className="text-xs text-gray-500 mt-2">Local workspace time</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+            <p className="text-sm font-medium text-gray-600 mb-2">Today</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{dateLabel}</h3>
+            <p className="text-xs text-gray-500 mt-2">Plan your workday with the calendar below</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1">
+            <p className="text-sm font-medium text-gray-600 mb-2">Quick Reminder</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Check attendance</h3>
+            <p className="text-xs text-gray-500 mt-2">Use the Attendance page to scan your workplace QR.</p>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
         <h3 className="font-semibold text-gray-800 mb-4">Calendar</h3>

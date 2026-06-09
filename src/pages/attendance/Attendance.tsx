@@ -32,6 +32,15 @@ const formatDate = (date: Date) =>
     year: "numeric",
   });
 
+const formatAttendanceRate = (value: unknown) => {
+  const normalized =
+    typeof value === "string" ? value.replace("%", "").trim() : value;
+  const rate = Number(normalized);
+
+  if (!Number.isFinite(rate)) return "0.00%";
+  return `${rate.toFixed(2)}%`;
+};
+
 const formatDuration = (ms: number) => {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
@@ -565,6 +574,28 @@ const Attendance = () => {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          label="Present Today"
+          value={todayStats?.present || 0}
+          tone="indigo"
+        />
+        <StatCard
+          label="Late Arrivals"
+          value={todayStats?.late || 0}
+          tone="amber"
+        />
+        <StatCard
+          label="Absent Today"
+          value={todayStats?.absent || 0}
+          tone="rose"
+        />
+        <StatCard
+          label="Attendance Rate"
+          value={formatAttendanceRate(todayStats?.rate)}
+          tone="emerald"
+        />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label="Present Today"
