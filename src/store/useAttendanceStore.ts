@@ -4,22 +4,22 @@ import { getCookie } from "../utils/cookies";
 
 interface QrCodeProps {
   qrCode: string;
-  location?: {
+  location: {
     latitude: number;
     longitude: number;
   };
 }
 
 interface AttendanceState {
-  qrInput?: {
+  qrInput: {
     orgId: string;
     signature: string;
   };
   location: {
-    latitude: number | null;
-    longitude: number | null;
+    latitude: number;
+    longitude: number;
   };
-  setQrInput?: (input: { orgId: string; signature: string }) => void;
+  setQrInput: (input: { orgId: string; signature: string }) => void;
   setLocation?: (latitude: number, longitude: number) => void;
   dayAttendance: any[];
   weekAttendance: any[];
@@ -148,8 +148,8 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
   },
   setQrInput: (input) => set({ qrInput: input }),
   location: {
-    latitude: null,
-    longitude: null,
+    latitude: 0,
+    longitude: 0,
   },
   dayAttendance: [],
   weekAttendance: [],
