@@ -958,6 +958,7 @@ const ScanQrModal = ({
   const scannerRef = useRef<QrScanner | null>(null);
 
   const [cameraError, setCameraError] = useState("");
+  const [scanSignature, setScanSignature] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
   //   const [hasScanned, setHasScanned] = useState(false);
 
@@ -1026,6 +1027,7 @@ const ScanQrModal = ({
           const parsed = JSON.parse(scannedValue);
           if (parsed?.signature) {
             signature = parsed.signature;
+            setScanSignature(signature);
           }
         } catch {
           // not JSON, use raw value as fallback
@@ -1035,7 +1037,7 @@ const ScanQrModal = ({
         setScanMessage("QR code scanned successfully. Verifying attendance...");
         scanner.stop();
 
-        await onSubmit(signature);
+        await onSubmit(scannedValue);
       },
       {
         preferredCamera: "environment",
@@ -1127,7 +1129,7 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            value={qrInput.trim() === "{" ? "" : qrInput}
+            value={qrInput.trim() === "{" ? "" : scanSignature || qrInput}
             onChange={(e) => setQrInput(e.target.value)}
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
