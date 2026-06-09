@@ -958,16 +958,64 @@ const ScanQrModal = ({
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
 
+  //   useEffect(() => {
+  //     if (!videoRef.current) return;
+
+  //     const scanner = new QrScanner(
+  //       videoRef.current,
+  //       async (result) => {
+  //         const scannedValue = typeof result === "string" ? result : result.data;
+
+  //         if (!scannedValue || hasScanned) return;
+
+  //         setHasScanned(true);
+  //         setQrInput(scannedValue);
+
+  //         scanner.stop();
+  //         await onSubmit(scannedValue);
+  //       },
+  //       {
+  //         preferredCamera: "environment",
+  //         highlightScanRegion: false,
+  //         highlightCodeOutline: false,
+  //         maxScansPerSecond: 5,
+  //       },
+  //     );
+
+  //     scannerRef.current = scanner;
+
+  //     scanner
+  //       .start()
+  //       .then(() => {
+  //         setIsCameraReady(true);
+  //         setCameraError("");
+  //       })
+  //       .catch(() => {
+  //         setCameraError(
+  //           "Camera access failed. Allow camera permission or paste the QR data manually.",
+  //         );
+  //       });
+
+  //     return () => {
+  //       scanner.stop();
+  //       scanner.destroy();
+  //       scannerRef.current = null;
+  //     };
+  //   }, [hasScanned, onSubmit, setQrInput]);
+
+  const hasScannedRef = useRef(false);
+
   useEffect(() => {
     if (!videoRef.current) return;
 
     const scanner = new QrScanner(
       videoRef.current,
       async (result) => {
-        const scannedValue = typeof result === "string" ? result : result.data;
+        const scannedValue = result.data; // QrScanner always returns an object
 
-        if (!scannedValue || hasScanned) return;
+        if (!scannedValue || hasScannedRef.current) return;
 
+        hasScannedRef.current = true;
         setHasScanned(true);
         setQrInput(scannedValue);
 
@@ -1001,8 +1049,7 @@ const ScanQrModal = ({
       scanner.destroy();
       scannerRef.current = null;
     };
-  }, [hasScanned, onSubmit, setQrInput]);
-
+  }, [onSubmit, setQrInput]); // hasScanned removed
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
       <div className="relative h-dvh w-full max-w-md overflow-hidden bg-black text-white sm:h-190 sm:rounded-[2rem]">
