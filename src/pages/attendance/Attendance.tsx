@@ -287,7 +287,7 @@ const Attendance = () => {
         return; // ensure we don't call clockWithQr with nullable values
       }
 
-      if (!qrData.qrCode) {
+      if (!qrData.qrCode || typeof qrData.qrCode !== "string") {
         setScanMessage("Please scan or paste a valid QR code.");
         return;
       }
