@@ -272,6 +272,7 @@ const Attendance = () => {
       };
     }) => {
       const qrData = value;
+      console.log("Submitting QR data:", qrData);
 
       // validate location before proceeding
       if (
@@ -285,7 +286,7 @@ const Attendance = () => {
         return; // ensure we don't call clockWithQr with nullable values
       }
 
-      if (!qrData.qrCode.trim()) {
+      if (!qrData.qrCode.trim() || qrData.qrCode.trim().length < 5) {
         setScanMessage("Please scan or paste a valid QR code.");
         return;
       }
@@ -422,8 +423,8 @@ const Attendance = () => {
 
         <div className="rounded-[1.5rem] border border-slate-100 bg-white p-4 shadow-sm sm:rounded-[2rem] sm:p-6">
           <div className="flex flex-col items-center justify-center py-6 sm:py-8">
-            <div className="relative flex h-56 w-56 items-center justify-center rounded-full border-[10px] border-violet-200 bg-white shadow-[0_0_35px_rgba(124,58,237,0.18)] sm:h-64 sm:w-64">
-              <div className="absolute inset-[-10px] rounded-full border-[10px] border-violet-500 border-r-violet-200" />
+            <div className="relative flex h-56 w-56 items-center justify-center rounded-full border-10 border-violet-200 bg-white shadow-[0_0_35px_rgba(124,58,237,0.18)] sm:h-64 sm:w-64">
+              {/* <div className="absolute inset-2.5 rounded-full border-10 border-violet-500 border-r-violet-200" /> */}
 
               <div className="relative z-10 text-center px-6">
                 {attendancePhase === "clocked_in" ? (
@@ -592,29 +593,7 @@ const Attendance = () => {
         />
         <StatCard
           label="Attendance Rate"
-          value={formatAttendanceRate(todayStats?.rate)}
-          tone="emerald"
-        />
-      </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard
-          label="Present Today"
-          value={todayStats?.present || 0}
-          tone="indigo"
-        />
-        <StatCard
-          label="Late Arrivals"
-          value={todayStats?.late || 0}
-          tone="amber"
-        />
-        <StatCard
-          label="Absent Today"
-          value={todayStats?.absent || 0}
-          tone="rose"
-        />
-        <StatCard
-          label="Attendance Rate"
-          value={todayStats?.rate || "0%"}
+          value={formatAttendanceRate(todayStats?.rate || "0%")}
           tone="emerald"
         />
       </div>
@@ -644,7 +623,7 @@ const Attendance = () => {
                     className="flex items-center justify-center gap-1.5 text-xs bg-[#3B00D9] text-white px-3 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-sm"
                   >
                     <QrCode size={14} />
-                    Show Today’s QR
+                    Show Today&apos;s QR
                   </button>
                 </div>
               </div>
@@ -665,7 +644,7 @@ const Attendance = () => {
             </div>
 
             <div className="ios-scroll overflow-x-auto">
-              <table className="w-full min-w-[680px] text-left text-sm text-gray-600 whitespace-nowrap">
+              <table className="w-full min-w-170 text-left text-sm text-gray-600 whitespace-nowrap">
                 <thead className="bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100">
                   <tr>
                     <th className="px-6 py-4">Employee</th>
@@ -905,14 +884,14 @@ const AdminQrModal = ({
         </button>
 
         <h3 className="text-xl font-bold text-gray-900 mb-2">
-          Today’s QR Code
+          Today&apos;s QR Code
         </h3>
         <p className="text-sm text-gray-500 mb-6">
           Display this for employees to scan. Do not share it outside your
           workplace.
         </p>
 
-        <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 min-h-[250px]">
+        <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 min-h-62.5">
           {isLoading && !qrCode ? (
             <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
           ) : qrCode ? (
@@ -1026,7 +1005,7 @@ const ScanQrModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-      <div className="relative h-[100dvh] w-full max-w-md overflow-hidden bg-black text-white sm:h-[760px] sm:rounded-[2rem]">
+      <div className="relative h-dvh w-full max-w-md overflow-hidden bg-black text-white sm:h-190 sm:rounded-[2rem]">
         <button
           onClick={() => {
             scannerRef.current?.stop();
