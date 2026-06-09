@@ -956,7 +956,7 @@ const ScanQrModal = ({
 
   const [cameraError, setCameraError] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const [hasScanned, setHasScanned] = useState(false);
+  //   const [hasScanned, setHasScanned] = useState(false);
 
   //   useEffect(() => {
   //     if (!videoRef.current) return;
@@ -1016,7 +1016,7 @@ const ScanQrModal = ({
         if (!scannedValue || hasScannedRef.current) return;
 
         hasScannedRef.current = true;
-        setHasScanned(true);
+        // setHasScanned(true);
         setQrInput(scannedValue);
 
         scanner.stop();
