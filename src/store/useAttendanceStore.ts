@@ -2,7 +2,20 @@ import { create } from "zustand";
 import api from "../api/axios";
 import { getCookie } from "../utils/cookies";
 
+interface QrCodeProps {
+  qrCode: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
 interface AttendanceState {
+  location: {
+    latitude: number | null;
+    longitude: number | null;
+  };
+  setLocation?: (latitude: number, longitude: number) => void;
   dayAttendance: any[];
   weekAttendance: any[];
   weekOverview: any | null;
@@ -21,8 +34,11 @@ interface AttendanceState {
   qrCode: any | null;
   fetchQrCode: () => Promise<void>;
   clockWithQr: (
-    qrData: string,
+    qrData: QrCodeProps,
   ) => Promise<{ success: boolean; action?: "clock-in" | "clock-out" }>;
+  getUserLocation: () => Promise<
+    { latitude: number; longitude: number } | { error: string }
+  >;
 }
 
 const getErrorMessage = (error: any, fallback: string) =>
@@ -121,6 +137,10 @@ const getOrgConfig = () => {
 };
 
 export const useAttendanceStore = create<AttendanceState>((set, get) => ({
+  location: {
+    latitude: null,
+    longitude: null,
+  },
   dayAttendance: [],
   weekAttendance: [],
   weekOverview: null,
@@ -283,8 +303,8 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
       const response = await api.post(
         "/attendance/qr",
         {
-          qrData,
-          location: {},
+          qrData: qrData.qrCode,
+          location: qrData.location || get().location,
           deviceInfo: {},
         },
         getOrgConfig(),
@@ -301,5 +321,36 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
       });
       return { success: false };
     }
+  },
+  getUserLocation: async () => {
+    if (!navigator.geolocation) {
+      return { error: "Geolocation is not supported by this browser." };
+    }
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          console.log("User location retrieved:", {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          set({
+            location: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          });
+        },
+        (error) => {
+          console.error("Geolocation Error:", error);
+          resolve({ error: "Unable to retrieve location." });
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      );
+    });
   },
 }));
