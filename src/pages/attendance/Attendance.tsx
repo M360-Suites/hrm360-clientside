@@ -265,14 +265,11 @@ const Attendance = () => {
   };
 
   const handleQrSubmit = useCallback(
-    async (value: {
+    async (payload?: {
       qrCode: string;
-      location: {
-        latitude: number | null;
-        longitude: number | null;
-      };
+      location: { latitude: number | null; longitude: number | null } | null;
     }) => {
-      const qrData = value;
+      const qrData = payload ?? { qrCode: qrInput, location: location ?? null };
       console.log("Submitting QR data:", qrData);
 
       // validate location before proceeding
@@ -293,21 +290,21 @@ const Attendance = () => {
       }
 
       // build a payload with non-null latitude/longitude (we validated above)
-      const payload = {
+      const payloadToSend = {
         qrCode: qrData.qrCode,
         location: {
-          latitude: qrData.location.latitude!,
-          longitude: qrData.location.longitude!,
+          latitude: qrData.location!.latitude!,
+          longitude: qrData.location!.longitude!,
         },
       };
 
-      const result = await clockWithQr(payload);
+      const result = await clockWithQr(payloadToSend);
 
       if (result.success) {
         const action = result.action || lastQrAction;
 
         setShowScanModal(false);
-        setQrInput({ orgId: "", signature: "" });
+        setQrInput("");
         setScanMessage("");
         await fetchEmployeeDashboard();
 
@@ -357,6 +354,7 @@ const Attendance = () => {
     },
     [
       qrInput,
+      location,
       clockWithQr,
       fetchEmployeeDashboard,
       attendancePhase,
@@ -534,20 +532,19 @@ const Attendance = () => {
         {showScanModal && (
           <ScanQrModal
             isLoading={isLoading}
-            qrInput={qrInput}
-            setQrInput={setQrInput}
             scanMessage={scanMessage}
             setScanMessage={setScanMessage}
             onClose={() => {
               setShowScanModal(false);
-              setQrInput({ orgId: "", signature: "" });
+              setQrInput("`");
               setScanMessage("");
             }}
-            onSubmit={() => {
-              handleQrSubmit({
-                qrCode: qrInput.signature,
-                location: location,
-              });
+            onSubmit={(value) => {
+              console.log(
+                "Submitting QR with location and code:",
+                value ?? { qrCode: qrInput, location },
+              );
+              handleQrSubmit(value);
             }}
           />
         )}
@@ -940,16 +937,12 @@ const AdminQrModal = ({
 
 const ScanQrModal = ({
   isLoading,
-  qrInput,
-  setQrInput,
   scanMessage,
   setScanMessage,
   onClose,
   onSubmit,
 }: {
   isLoading: boolean;
-  qrInput: { orgId: string; signature: string };
-  setQrInput: (value: { orgId: string; signature: string }) => void;
   scanMessage: string;
   setScanMessage: (value: string) => void;
   onClose: () => void;
@@ -960,56 +953,11 @@ const ScanQrModal = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scannerRef = useRef<QrScanner | null>(null);
-  const { location } = useAttendanceStore();
+  const { location, qrInput, setQrInput } = useAttendanceStore();
 
   const [cameraError, setCameraError] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
-  //   const [hasScanned, setHasScanned] = useState(false);
-
-  //   useEffect(() => {
-  //     if (!videoRef.current) return;
-
-  //     const scanner = new QrScanner(
-  //       videoRef.current,
-  //       async (result) => {
-  //         const scannedValue = typeof result === "string" ? result : result.data;
-
-  //         if (!scannedValue || hasScanned) return;
-
-  //         setHasScanned(true);
-  //         setQrInput(scannedValue);
-
-  //         scanner.stop();
-  //         await onSubmit(scannedValue);
-  //       },
-  //       {
-  //         preferredCamera: "environment",
-  //         highlightScanRegion: false,
-  //         highlightCodeOutline: false,
-  //         maxScansPerSecond: 5,
-  //       },
-  //     );
-
-  //     scannerRef.current = scanner;
-
-  //     scanner
-  //       .start()
-  //       .then(() => {
-  //         setIsCameraReady(true);
-  //         setCameraError("");
-  //       })
-  //       .catch(() => {
-  //         setCameraError(
-  //           "Camera access failed. Allow camera permission or paste the QR data manually.",
-  //         );
-  //       });
-
-  //     return () => {
-  //       scanner.stop();
-  //       scanner.destroy();
-  //       scannerRef.current = null;
-  //     };
-  //   }, [hasScanned, onSubmit, setQrInput]);
+  let parsed: string;
 
   const hasScannedRef = useRef(false);
 
@@ -1019,24 +967,27 @@ const ScanQrModal = ({
     const scanner = new QrScanner(
       videoRef.current,
       async (result) => {
-        const scannedValue = result.data as unknown as {
-          orgId: string;
-          signature: string;
-        };
-        console.log("QR scan result:", scannedValue);
+        const raw = result.data;
 
-        if (!scannedValue || hasScannedRef.current) return;
+        if (!raw || hasScannedRef.current) return;
+
+        // result.data is always a string — parse it
+
+        try {
+          parsed = JSON.stringify(raw);
+          console.log("Parsed QR data:", parsed);
+        } catch {
+          setCameraError("Invalid QR code. Please try again.");
+          return;
+        }
 
         hasScannedRef.current = true;
 
-        setQrInput({
-          orgId: scannedValue.orgId,
-          signature: scannedValue.signature,
-        });
-        setScanMessage("QR code scanned...");
+        setQrInput(parsed);
+        setScanMessage("QR code scanned successfully. Verifying attendance...");
         scanner.stop();
 
-        await onSubmit({ qrCode: scannedValue.signature, location: location });
+        onSubmit({ qrCode: parsed, location });
       },
       {
         preferredCamera: "environment",
@@ -1129,10 +1080,8 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            value={qrInput.signature}
-            onChange={(e) =>
-              setQrInput({ ...qrInput, signature: e.target.value })
-            }
+            value={qrInput}
+            onChange={(e) => setQrInput(e.target.value)}
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
           />
@@ -1145,9 +1094,14 @@ const ScanQrModal = ({
           )}
 
           <button
-            onClick={() =>
-              onSubmit({ qrCode: qrInput.signature, location: location })
-            }
+            onClick={() => {
+              console.log("Submitting QR with location and code:", {
+                qrCode: parsed,
+                location,
+                data: parsed,
+              });
+              onSubmit({ qrCode: parsed, location: location });
+            }}
             disabled={isLoading || !qrInput}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-70"
           >

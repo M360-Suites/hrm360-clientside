@@ -11,15 +11,12 @@ interface QrCodeProps {
 }
 
 interface AttendanceState {
-  qrInput: {
-    orgId: string;
-    signature: string;
-  };
+  qrInput: string;
   location: {
     latitude: number;
     longitude: number;
   };
-  setQrInput: (input: { orgId: string; signature: string }) => void;
+  setQrInput: (input: string) => void;
   setLocation?: (latitude: number, longitude: number) => void;
   dayAttendance: any[];
   weekAttendance: any[];
@@ -142,10 +139,7 @@ const getOrgConfig = () => {
 };
 
 export const useAttendanceStore = create<AttendanceState>((set, get) => ({
-  qrInput: {
-    orgId: "",
-    signature: "",
-  },
+  qrInput: "",
   setQrInput: (input) => set({ qrInput: input }),
   location: {
     latitude: 0,
@@ -310,15 +304,18 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
   clockWithQr: async (qrData) => {
     set({ isLoading: true, error: null });
     try {
+      const parsedQr = JSON.parse(qrData.qrCode);
+
       const response = await api.post(
         "/attendance/qr",
         {
-          qrData: qrData.qrCode,
+          qrData: parsedQr,
           location: qrData.location || get().location,
           deviceInfo: {},
         },
         getOrgConfig(),
       );
+
       const data = response.data?.data || response.data;
       const action = data?.action as "clock-in" | "clock-out" | undefined;
       set({ isLoading: false, error: null, lastQrAction: action || null });
