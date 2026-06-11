@@ -273,7 +273,7 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
   clockOut: async (employeeId) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post("/attendance/manualOut", { employeeId });
+      await api.post("/attendance/manual/out", { employeeId });
       await get().fetchDayAttendance();
     } catch (error: any) {
       console.error("Clock Out Error:", error.response?.data);
