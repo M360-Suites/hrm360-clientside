@@ -521,7 +521,7 @@ const Attendance = () => {
               typeof location.longitude === "number" && (
                 <div className="mt-4 flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
                   <span className="text-xs font-medium">Location:</span>
-                  <div>{`${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}</div>
+                  <div>{`latitude: ${location.latitude}, longitude: ${location.longitude}`}</div>
                 </div>
               )}
           </div>
@@ -538,10 +538,6 @@ const Attendance = () => {
               setScanMessage("");
             }}
             onSubmit={(value) => {
-              console.log(
-                "Submitting QR with location and code:",
-                value ?? { qrCode: qrInput, location },
-              );
               handleQrSubmit(value);
             }}
           />
