@@ -347,9 +347,7 @@ const Attendance = () => {
         }
         setTimeout(() => setSuccessMessage(""), 3500);
       } else {
-        setScanMessage(
-          "QR verification failed. Please scan the active admin QR code.",
-        );
+        setScanMessage(result.message);
       }
     },
     [
@@ -485,12 +483,12 @@ const Attendance = () => {
               </div>
             )}
 
-            {error && (
+            {/* {error && (
               <div className="mt-4 flex w-full items-start gap-2 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
                 <AlertCircle size={16} className="mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="rounded-2xl border border-slate-100 bg-white p-4">
@@ -984,7 +982,7 @@ const ScanQrModal = ({
         hasScannedRef.current = true;
 
         setQrInput(parsed);
-        setScanMessage("QR code scanned successfully. Verifying attendance...");
+        // setScanMessage("QR code scanned successfully. Verifying attendance...");
         scanner.stop();
 
         onSubmit({ qrCode: parsed, location });

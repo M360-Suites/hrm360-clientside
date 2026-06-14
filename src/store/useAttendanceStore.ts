@@ -35,9 +35,11 @@ interface AttendanceState {
   clockOut: (employeeId: string) => Promise<void>;
   qrCode: any | null;
   fetchQrCode: () => Promise<void>;
-  clockWithQr: (
-    qrData: QrCodeProps,
-  ) => Promise<{ success: boolean; action?: "clock-in" | "clock-out" }>;
+  clockWithQr: (qrData: QrCodeProps) => Promise<{
+    success: boolean;
+    action?: "clock-in" | "clock-out";
+    message: string;
+  }>;
   getUserLocation: () => Promise<
     { latitude: number; longitude: number } | { error: string }
   >;
@@ -319,14 +321,17 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
       const data = response.data?.data || response.data;
       const action = data?.action as "clock-in" | "clock-out" | undefined;
       set({ isLoading: false, error: null, lastQrAction: action || null });
-      return { success: true, action };
+      return { success: true, action, message: data?.message };
     } catch (error: any) {
       console.error("Clock with QR Error:", error.response?.data);
       set({
         error: getErrorMessage(error, "Clock in/out with QR failed"),
         isLoading: false,
       });
-      return { success: false };
+      return {
+        success: false,
+        message: getErrorMessage(error, "Clock in/out with QR failed"),
+      };
     }
   },
   getUserLocation: async () => {
