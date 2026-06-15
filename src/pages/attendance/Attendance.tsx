@@ -96,7 +96,6 @@ const Attendance = () => {
     qrCode,
     lastQrAction,
     isLoading,
-    error,
     fetchQrCode,
     clockWithQr,
     getUserLocation,
@@ -104,6 +103,7 @@ const Attendance = () => {
     setQrInput,
     qrInput,
   } = useAttendanceStore();
+  console.log("location:", location)
 
   const { employees, fetchEmployees } = useEmployeeStore();
   const { isAdmin } = useAuthStore();
