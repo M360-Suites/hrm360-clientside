@@ -950,7 +950,7 @@ const ScanQrModal = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-      <div className="relative h-svh w-full max-w-md overflow-hidden bg-black text-white sm:rounded-[2rem]">
+      <div className="relative h-[95vh] w-full max-w-md overflow-hidden bg-black text-white sm:rounded-[2rem]">
         <button
           onClick={() => {
             onClose();
