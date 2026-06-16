@@ -307,7 +307,10 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       if (!qrData.location) {
-        return;
+        return {
+          success: false,
+          message: "Location data is required for clocking in/out with QR.",
+        };
       }
       const parsedQr = JSON.parse(qrData.qrCode);
 
