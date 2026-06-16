@@ -306,6 +306,9 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
   clockWithQr: async (qrData) => {
     set({ isLoading: true, error: null });
     try {
+      if (!qrData.location) {
+        return;
+      }
       const parsedQr = JSON.parse(qrData.qrCode);
 
       const response = await api.post(
