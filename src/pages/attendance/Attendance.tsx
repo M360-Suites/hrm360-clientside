@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import QrScanner from "qr-scanner";
+import { Scanner } from "@yudiel/react-qr-scanner";
 import {
   Clock,
   UserPlus,
@@ -96,7 +96,6 @@ const Attendance = () => {
     qrCode,
     lastQrAction,
     isLoading,
-    error,
     fetchQrCode,
     clockWithQr,
     getUserLocation,
@@ -104,6 +103,7 @@ const Attendance = () => {
     setQrInput,
     qrInput,
   } = useAttendanceStore();
+  // console.log("location:", location);
 
   const { employees, fetchEmployees } = useEmployeeStore();
   const { isAdmin } = useAuthStore();
@@ -347,9 +347,7 @@ const Attendance = () => {
         }
         setTimeout(() => setSuccessMessage(""), 3500);
       } else {
-        setScanMessage(
-          "QR verification failed. Please scan the active admin QR code.",
-        );
+        setScanMessage(result.message);
       }
     },
     [
@@ -485,12 +483,12 @@ const Attendance = () => {
               </div>
             )}
 
-            {error && (
+            {/* {error && (
               <div className="mt-4 flex w-full items-start gap-2 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-600">
                 <AlertCircle size={16} className="mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="rounded-2xl border border-slate-100 bg-white p-4">
@@ -523,7 +521,7 @@ const Attendance = () => {
               typeof location.longitude === "number" && (
                 <div className="mt-4 flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
                   <span className="text-xs font-medium">Location:</span>
-                  <div>{`${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`}</div>
+                  <div>{`latitude: ${location.latitude}, longitude: ${location.longitude}`}</div>
                 </div>
               )}
           </div>
@@ -540,10 +538,6 @@ const Attendance = () => {
               setScanMessage("");
             }}
             onSubmit={(value) => {
-              console.log(
-                "Submitting QR with location and code:",
-                value ?? { qrCode: qrInput, location },
-              );
               handleQrSubmit(value);
             }}
           />
@@ -938,7 +932,6 @@ const AdminQrModal = ({
 const ScanQrModal = ({
   isLoading,
   scanMessage,
-  setScanMessage,
   onClose,
   onSubmit,
 }: {
@@ -951,79 +944,15 @@ const ScanQrModal = ({
     location: { latitude: number; longitude: number } | null;
   }) => void;
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const scannerRef = useRef<QrScanner | null>(null);
   const { location, qrInput, setQrInput } = useAttendanceStore();
-
   const [cameraError, setCameraError] = useState("");
-  const [isCameraReady, setIsCameraReady] = useState(false);
-  let parsed: string;
-
-  const hasScannedRef = useRef(false);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    const scanner = new QrScanner(
-      videoRef.current,
-      async (result) => {
-        const raw = result.data;
-
-        if (!raw || hasScannedRef.current) return;
-
-        // result.data is always a string — parse it
-
-        try {
-          parsed = JSON.stringify(raw);
-          console.log("Parsed QR data:", parsed);
-        } catch {
-          setCameraError("Invalid QR code. Please try again.");
-          return;
-        }
-
-        hasScannedRef.current = true;
-
-        setQrInput(parsed);
-        setScanMessage("QR code scanned successfully. Verifying attendance...");
-        scanner.stop();
-
-        onSubmit({ qrCode: parsed, location });
-      },
-      {
-        preferredCamera: "environment",
-        highlightScanRegion: false,
-        highlightCodeOutline: false,
-        maxScansPerSecond: 5,
-      },
-    );
-
-    scannerRef.current = scanner;
-
-    scanner
-      .start()
-      .then(() => {
-        setIsCameraReady(true);
-        setCameraError("");
-      })
-      .catch(() => {
-        setCameraError(
-          "Camera access failed. Allow camera permission or paste the QR data manually.",
-        );
-      });
-
-    return () => {
-      scanner.stop();
-      scanner.destroy();
-      scannerRef.current = null;
-    };
-  }, [onSubmit, setQrInput, setScanMessage]);
+  const [inputValue, setInputValue] = useState("");
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-      <div className="relative h-dvh w-full max-w-md overflow-hidden bg-black text-white sm:h-190 sm:rounded-[2rem]">
+      <div className="relative h-[95vh] w-full max-w-md overflow-hidden bg-black text-white sm:rounded-[2rem]">
         <button
           onClick={() => {
-            scannerRef.current?.stop();
             onClose();
           }}
           className="absolute right-4 top-4 z-30 rounded-full border border-white/30 p-1 text-white"
@@ -1039,29 +968,25 @@ const ScanQrModal = ({
         </div>
 
         <div className="relative z-10 mt-6 flex justify-center px-4 sm:mt-10 sm:px-6">
-          <div className="relative h-72 w-full overflow-hidden rounded-3xl border border-white/20 bg-slate-900 sm:h-80">
-            <video
-              ref={videoRef}
-              className="h-full w-full object-cover"
-              muted
-              playsInline
+          <div className="relative h-72 w-full overflow-hidden rounded-3xl  bg-slate-900">
+            <Scanner
+              onScan={(codes) => {
+                const value = codes[0]?.rawValue;
+                if (value) {
+                  const orgId = JSON.parse(value).orgId;
+                  setInputValue(orgId);
+                  const parsedValue = JSON.stringify(value);
+                  setQrInput(parsedValue);
+                  onSubmit({ qrCode: parsedValue, location });
+                }
+              }}
+              onError={(err) => {
+                setCameraError(
+                  err.message || "Camera access failed. Please try again.",
+                );
+              }}
+              formats={["qr_code"]}
             />
-
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="relative h-52 w-52 rounded-3xl border-2 border-white/90 sm:h-64 sm:w-64">
-                <div className="absolute left-0 top-0 h-10 w-10 rounded-tl-3xl border-l-4 border-t-4 border-white" />
-                <div className="absolute right-0 top-0 h-10 w-10 rounded-tr-3xl border-r-4 border-t-4 border-white" />
-                <div className="absolute bottom-0 left-0 h-10 w-10 rounded-bl-3xl border-b-4 border-l-4 border-white" />
-                <div className="absolute bottom-0 right-0 h-10 w-10 rounded-br-3xl border-b-4 border-r-4 border-white" />
-                <div className="absolute left-6 right-6 top-1/2 h-0.5 bg-violet-400 shadow-[0_0_20px_rgba(167,139,250,0.9)]" />
-              </div>
-            </div>
-
-            {!isCameraReady && !cameraError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                <Loader2 className="animate-spin text-white" size={28} />
-              </div>
-            )}
           </div>
         </div>
 
@@ -1080,7 +1005,7 @@ const ScanQrModal = ({
 
           <input
             type="text"
-            value={qrInput}
+            value={inputValue}
             onChange={(e) => setQrInput(e.target.value)}
             placeholder="Paste QR data manually..."
             className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
@@ -1096,11 +1021,10 @@ const ScanQrModal = ({
           <button
             onClick={() => {
               console.log("Submitting QR with location and code:", {
-                qrCode: parsed,
+                qrCode: qrInput,
                 location,
-                data: parsed,
               });
-              onSubmit({ qrCode: parsed, location: location });
+              onSubmit({ qrCode: qrInput, location: location });
             }}
             disabled={isLoading || !qrInput}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:opacity-70"
