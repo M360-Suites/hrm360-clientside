@@ -34,6 +34,7 @@ import Performance from "./pages/performance/Performance";
 import Announcement from "./pages/announcement/Announcement";
 import TaskManager from "./pages/task-manager/TaskManager";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
+import LandingPage from "./pages/landing/LandingPage";
 
 const RequireAuth = () => {
 	const token = getCookie("token");
@@ -97,12 +98,9 @@ const App = () => {
 					<Route element={<RequireAuth />}>
 						<Route path='/onboarding' element={<Onboarding />} />
 					</Route>
-
-					<Route
-						path='/'
-						element={<Navigate to='/login' replace />}
-					/>
 				</Route>
+
+				<Route path='/' element={<LandingPage />} />
 
 				<Route element={<StaffOnboardingLayout />}>
 					<Route path='/employee' element={<Verification />} />
