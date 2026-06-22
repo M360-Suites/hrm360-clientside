@@ -445,7 +445,7 @@ const Employees = () => {
 						</div>
 					)}
 
-					<table className='w-full text-left text-sm text-gray-600 whitespace-nowrap hidden md:table'>
+					<table className='w-full text-left text-sm text-gray-600 hidden md:table'>
 						<thead className='bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100'>
 							<tr>
 								<th className='px-6 py-4'>Employee</th>
@@ -525,44 +525,23 @@ const Employees = () => {
 												: "N/A"}
 										</td>
 
-										<td className='px-6 py-4 text-right relative'>
-											<button
-												type='button'
-												onClick={() =>
-													setActiveMenu(
-														activeMenu === employeeId
-															? null
-															: employeeId,
-													)
-												}
-												className='text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100'
-											>
-												<MoreVertical size={18} />
-											</button>
-
-											{activeMenu === employeeId && (
-												<div className='absolute right-6 top-12 w-40 bg-white rounded-xl shadow-xl border border-gray-100 z-20 py-2'>
-													<button
-														type='button'
-														onClick={() => openEditModal(emp)}
-														className='w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50'
-													>
-														Edit Profile
-													</button>
-
-													<div className='h-px bg-gray-100 my-1' />
-
-													<button
-														type='button'
-														onClick={() =>
-															handleDeleteEmployee(employeeId)
-														}
-														className='w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50'
-													>
-														Delete Employee
-													</button>
-												</div>
-											)}
+										<td className='px-6 py-4 text-right'>
+											<div className='flex items-center justify-end gap-2'>
+												<button
+													type='button'
+													onClick={() => openEditModal(emp)}
+													className='text-[#3B00D9] hover:bg-[#3B00D9]/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors'
+												>
+													Edit
+												</button>
+												<button
+													type='button'
+													onClick={() => handleDeleteEmployee(employeeId)}
+													className='text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors'
+												>
+													Delete
+												</button>
+											</div>
 										</td>
 									</tr>
 								);
