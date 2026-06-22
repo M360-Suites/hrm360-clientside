@@ -422,7 +422,7 @@ const TaskManager = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-4 lg:gap-6">
         <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit min-w-0">
           <h3 className="font-semibold text-gray-800">Projects</h3>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
@@ -506,7 +506,7 @@ const TaskManager = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <BoardColumn
               columnKey="pending"
               title="Pending"
@@ -848,10 +848,10 @@ const BoardColumn = ({
         <span className="ml-auto text-xs opacity-90">{tasks.length}</span>
       </div>
       <div>
-        <div className="hidden grid-cols-[minmax(0,1fr)_92px_76px] gap-3 border-b border-gray-100 bg-gray-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500 md:grid">
+        <div className="hidden grid-cols-[minmax(0,1fr)_70px_60px] gap-2 border-b border-gray-100 bg-gray-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500 md:grid">
           <span className="whitespace-nowrap">Task</span>
-          <span className="whitespace-nowrap">Due Date</span>
-          <span className="text-right whitespace-nowrap">Activity</span>
+          <span className="whitespace-nowrap text-right">Due Date</span>
+          <span className="whitespace-nowrap text-right">Activity</span>
         </div>
         <div
           className="min-h-[280px] max-h-none min-w-0 overflow-y-auto xl:max-h-[68vh]"
@@ -951,14 +951,15 @@ const TaskCard = ({
 }) => {
   const { deleteComment } = useTaskStore();
   const assignees = getAssignees(task);
+
   const comments = getComments(task);
 
   const [commentToDelete, setCommentToDelete] = useState<any | null>(null);
 
   return (
-    <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50">
+    <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50/80">
       <div
-        className="group grid cursor-grab gap-2 px-3 py-3 text-sm active:cursor-grabbing md:grid-cols-[minmax(0,1fr)_92px_76px] md:items-center md:gap-3 md:px-4"
+        className="group grid cursor-grab gap-1.5 px-3 py-2 text-xs active:cursor-grabbing md:grid-cols-[minmax(0,1fr)_70px_60px] md:items-start md:gap-2"
         draggable
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -968,38 +969,41 @@ const TaskCard = ({
           onClick={onToggleExpanded}
           className="min-w-0 flex flex-col text-left"
         >
-          <h4 className="truncate text-sm font-semibold text-gray-800">
+          <h4 className="truncate text-xs font-bold text-gray-800 leading-tight">
             {task?.title || "Untitled task"}
           </h4>
-          <p className="mt-0.5 line-clamp-1 text-xs text-gray-500">
+          <p className="mt-0.5 line-clamp-1 text-[10px] text-gray-500 leading-snug">
             {task?.description || "No description provided."}
           </p>
-          <p className="mt-1 text-[11px] font-medium text-gray-400">
-            {assignees.length} member{assignees.length === 1 ? "" : "s"}
+          <p className="mt-1 flex items-center gap-2 text-[10px] font-medium text-gray-400">
+            <span>{assignees.length} member{assignees.length === 1 ? "" : "s"}</span>
+            <span className="text-[9px] px-1.5 py-0.5 bg-gray-100 rounded-sm text-gray-500 group-hover:bg-[#3B00D9]/10 group-hover:text-[#3B00D9] transition-colors">
+              Click to expand details
+            </span>
           </p>
         </button>
 
-        <span className="inline-flex items-center gap-1 whitespace-nowrap text-xs text-gray-500">
+        <span className="inline-flex items-center justify-end gap-1 whitespace-nowrap text-[10px] text-gray-500 md:mt-0 mt-1">
           {formatDate(getTaskDate(task))}
         </span>
 
-        <div className="flex w-full items-center justify-start gap-1.5 md:justify-end">
+        <div className="flex w-full items-center justify-between md:justify-end gap-1 mt-1 md:mt-0">
           <button
             type="button"
             onClick={onToggleExpanded}
-            className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-[#3B00D9]"
+            className="inline-flex items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-[#3B00D9] bg-gray-50 px-1.5 py-0.5 rounded"
           >
-            <MessageSquare size={12} /> {comments.length}
+            <MessageSquare size={10} /> {comments.length}
           </button>
 
           <div className="relative flex justify-end">
             <button
               type="button"
               onClick={onToggleMenu}
-              className="rounded p-1 text-gray-500 hover:bg-white hover:text-gray-800"
+              className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-800"
               title="Task options"
             >
-              <MoreVertical size={15} />
+              <MoreVertical size={14} />
             </button>
             {isMenuOpen && (
               <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-gray-100 bg-white shadow-lg py-1">
@@ -1050,8 +1054,17 @@ const TaskCard = ({
 
       {isExpanded && (
         <div className="border-t border-gray-100 bg-gray-50 px-3 py-3">
-          <div className="mb-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <div className="mb-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
+              Description
+            </p>
+            <p className="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">
+              {task?.description || "No description provided."}
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
               Assigned to
             </p>
             <div className="flex flex-wrap gap-2">
