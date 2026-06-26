@@ -3,7 +3,6 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle,
-  Download,
   Edit3,
   Eye,
   Loader2,
@@ -12,7 +11,6 @@ import {
   Plus,
   Send,
   Trash2,
-  UploadCloud,
   X,
 } from "lucide-react";
 import {
@@ -25,7 +23,6 @@ const emptyForm = {
   title: "",
   body: "",
   receivers: "all",
-  doc: "",
 };
 
 const getAnnouncementId = (announcement: AnnouncementItem) =>
@@ -51,10 +48,7 @@ const isUnread = (announcement: AnnouncementItem) =>
   announcement.isRead === false ||
   (!announcement.read && !announcement.isRead && !announcement.readAt);
 
-const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
 
-const createFileReference = (file: File) =>
-  `${file.name} (${file.type || "file"}, ${Math.ceil(file.size / 1024)}kb)`;
 
 const Announcement = () => {
   const { isAdmin } = useAuthStore();
@@ -79,7 +73,7 @@ const Announcement = () => {
   const [showSendModal, setShowSendModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDeletedNotice, setShowDeletedNotice] = useState(false);
-  const [docFileName, setDocFileName] = useState("");
+
   const [toast, setToast] = useState<{
     type: "success" | "error";
     message: string;
@@ -120,7 +114,7 @@ const Announcement = () => {
     clearSelectedAnnouncement();
     setEditingAnnouncement(null);
     setFormData(emptyForm);
-    setDocFileName("");
+
     setMode("compose");
   };
 
@@ -150,17 +144,14 @@ const Announcement = () => {
       title: selectedAnnouncement.title || "",
       body: getAnnouncementBody(selectedAnnouncement),
       receivers: selectedAnnouncement.receivers || "all",
-      doc: selectedAnnouncement.doc || "",
     });
-    setDocFileName(selectedAnnouncement.doc ? "Existing attachment" : "");
     setMode("compose");
     setShowSendModal(true);
   };
 
   const canSubmit =
     formData.title.trim().length > 0 &&
-    formData.body.trim().length > 0 &&
-    (editingAnnouncement || formData.doc.trim().length > 0);
+    formData.body.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!formData.title.trim() || !formData.body.trim()) {
@@ -168,10 +159,7 @@ const Announcement = () => {
       return;
     }
 
-    if (!editingAnnouncement && !formData.doc.trim()) {
-      showToast("error", "Please upload a document or image before sending.");
-      return;
-    }
+
 
     const announcementId = editingAnnouncement
       ? getAnnouncementId(editingAnnouncement)
@@ -180,7 +168,6 @@ const Announcement = () => {
       ? await updateAnnouncement(announcementId, {
           title: formData.title,
           body: formData.body,
-          doc: formData.doc || editingAnnouncement.doc || "",
         })
       : await createAnnouncement(formData);
 
@@ -342,7 +329,7 @@ const Announcement = () => {
                     Announcement workspace
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">
-                    Create a focused company update with a required attachment.
+                    Create a focused company update.
                   </p>
                 </div>
               )}
@@ -377,8 +364,7 @@ const Announcement = () => {
                     </h4>
                     <p className="mt-2 text-sm leading-6 text-gray-500">
                       Use the announcement composer to add a title, message,
-                      recipients, and the required document or image in one
-                      place.
+                      and recipients in one place.
                     </p>
                     <button
                       type="button"
@@ -397,17 +383,7 @@ const Announcement = () => {
                       "No announcement content available."}
                   </p>
 
-                  {selectedAnnouncement.doc && (
-                    <a
-                      href={selectedAnnouncement.doc}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex max-w-full items-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                    >
-                      <Download size={16} />
-                      <span className="truncate">Open attached document</span>
-                    </a>
-                  )}
+
                 </div>
               ) : (
                 <div className="flex h-full min-h-[340px] items-center justify-center text-center text-sm text-gray-400">
@@ -471,8 +447,7 @@ const Announcement = () => {
         <SendAnnouncementModal
           formData={formData}
           setFormData={setFormData}
-          docFileName={docFileName}
-          setDocFileName={setDocFileName}
+
           isLoading={isLoading}
           isEditing={Boolean(editingAnnouncement)}
           canSubmit={Boolean(canSubmit)}
@@ -523,8 +498,7 @@ const EmptyIllustration = () => (
 const SendAnnouncementModal = ({
   formData,
   setFormData,
-  docFileName,
-  setDocFileName,
+
   isLoading,
   isEditing,
   canSubmit,
@@ -533,29 +507,14 @@ const SendAnnouncementModal = ({
 }: {
   formData: typeof emptyForm;
   setFormData: React.Dispatch<React.SetStateAction<typeof emptyForm>>;
-  docFileName: string;
-  setDocFileName: (value: string) => void;
+
   isLoading: boolean;
   isEditing: boolean;
   canSubmit: boolean;
   onClose: () => void;
   onSubmit: () => void;
 }) => {
-  const handleFileSelect = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
 
-    if (file.size > MAX_ATTACHMENT_SIZE) {
-      event.target.value = "";
-      alert("Please upload a file that is not more than 5mb.");
-      return;
-    }
-
-    setDocFileName(file.name);
-    setFormData((prev) => ({ ...prev, doc: createFileReference(file) }));
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-white/65 p-0 backdrop-blur-md sm:items-center sm:p-4">
@@ -625,26 +584,7 @@ const SendAnnouncementModal = ({
             </div>
           </div>
 
-          <div>
-            <label className="mb-2 block text-xs font-medium text-gray-600">
-              Attach document or image <span className="text-rose-500">*</span>
-            </label>
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-violet-200 bg-violet-50/70 px-5 py-8 text-center transition hover:bg-violet-50">
-              <UploadCloud className="text-[#8B5CF6]" size={32} />
-              <span className="mt-3 text-sm font-semibold text-gray-800">
-                {docFileName || "Upload a document"}
-              </span>
-              <span className="mt-1 text-xs font-medium text-[#8B5CF6]">
-                PDF, DOC, image. Max 5mb. File reference is sent securely.
-              </span>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-            </label>
-          </div>
+
 
           <button
             type="button"
@@ -702,7 +642,7 @@ const DeleteConfirmModal = ({
 const DeletedNoticeModal = ({ title }: { title: string }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/65 p-4 backdrop-blur-md">
     <div className="flex h-80 w-full max-w-md flex-col items-center justify-center rounded-3xl bg-white p-8 text-center shadow-2xl">
-      <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full border-[8px] border-red-600 text-red-600">
+      <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full border-8 border-red-600 text-red-600">
         <span className="text-6xl font-bold leading-none">!</span>
       </div>
       <p className="max-w-xs text-lg font-medium text-gray-800">

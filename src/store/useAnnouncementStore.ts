@@ -159,12 +159,14 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
   createAnnouncement: async (payload) => {
     set({ isLoading: true, error: null });
     try {
-      const cleanPayload = {
+      const cleanPayload: any = {
         title: payload.title.trim(),
         body: payload.body.trim(),
         receivers: payload.receivers || "all",
-        doc: normalizeDoc(payload.doc),
       };
+      if (normalizeDoc(payload.doc)) {
+        cleanPayload.doc = normalizeDoc(payload.doc);
+      }
 
       const response = await api.post(
         "/announcements",
@@ -195,11 +197,13 @@ export const useAnnouncementStore = create<AnnouncementState>((set, get) => ({
   updateAnnouncement: async (announcementId, payload) => {
     set({ isLoading: true, error: null });
     try {
-      const cleanPayload = {
+      const cleanPayload: any = {
         ...(payload.title !== undefined ? { title: payload.title.trim() } : {}),
         ...(payload.body !== undefined ? { body: payload.body.trim() } : {}),
-        ...(payload.doc !== undefined ? { doc: normalizeDoc(payload.doc) } : {}),
       };
+      if (payload.doc !== undefined && normalizeDoc(payload.doc)) {
+        cleanPayload.doc = normalizeDoc(payload.doc);
+      }
 
       const response = await api.put(
         `/announcements/${announcementId}`,
