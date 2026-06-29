@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import { setCookie } from "../utils/cookies";
 import { a1, a2, a3 } from "../assets";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +26,7 @@ const AuthLayout = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    setCookie("hasVisitedLandingPage", "true");
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % carouselItems.length);
     }, 5000);

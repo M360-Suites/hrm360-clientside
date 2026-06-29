@@ -43,6 +43,13 @@ interface AttendanceState {
   getUserLocation: () => Promise<
     { latitude: number; longitude: number } | { error: string }
   >;
+  employeeMonthlyReport: any | null;
+  fetchEmployeeMonthlyReport: (
+    employeeId: string,
+    month?: string,
+    year?: string,
+  ) => Promise<void>;
+  clearEmployeeMonthlyReport: () => void;
 }
 
 const getErrorMessage = (error: any, fallback: string) =>
@@ -152,6 +159,7 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
   weekOverview: null,
   todayStats: null,
   employeeDashboard: null,
+  employeeMonthlyReport: null,
   lastQrAction: null,
   qrCode: null,
   isLoading: false,
@@ -257,6 +265,32 @@ export const useAttendanceStore = create<AttendanceState>((set, get) => ({
       });
     }
   },
+
+  fetchEmployeeMonthlyReport: async (employeeId, month, year) => {
+    set({ isLoading: true, error: null, employeeMonthlyReport: null });
+    try {
+      const params: any = { userId: employeeId };
+      if (month) params.month = month;
+      if (year) params.year = year;
+
+      const response = await api.get("/attendance/user/overview", {
+        ...getOrgConfig(),
+        params,
+      });
+
+      set({
+        employeeMonthlyReport: response.data?.data || response.data,
+        isLoading: false,
+      });
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to fetch employee report"),
+        isLoading: false,
+      });
+    }
+  },
+
+  clearEmployeeMonthlyReport: () => set({ employeeMonthlyReport: null }),
 
   clockIn: async (employeeId) => {
     set({ isLoading: true, error: null });

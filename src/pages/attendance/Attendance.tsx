@@ -12,6 +12,8 @@ import {
   CalendarDays,
   CheckCircle2,
   AlertCircle,
+  FileText,
+  Download,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
@@ -112,6 +114,7 @@ const Attendance = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showQrModal, setShowQrModal] = useState(false);
   const [showScanModal, setShowScanModal] = useState(false);
+  const [selectedEmployeeForReport, setSelectedEmployeeForReport] = useState<any | null>(null);
   const [scanMessage, setScanMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [attendancePhase, setAttendancePhase] = useState<
@@ -683,7 +686,14 @@ const Attendance = () => {
                           {emp.role || "Employee"}
                         </td>
 
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                          <button
+                            onClick={() => setSelectedEmployeeForReport(emp)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors"
+                          >
+                            <FileText size={14} />
+                            Report
+                          </button>
                           {isClockedIn ? (
                             <button
                               onClick={() => handleClockOut(employeeId)}
@@ -788,6 +798,13 @@ const Attendance = () => {
           qrCode={qrCode}
           isLoading={isLoading}
           onClose={() => setShowQrModal(false)}
+        />
+      )}
+
+      {selectedEmployeeForReport && (
+        <MonthlyReportModal 
+          employee={selectedEmployeeForReport} 
+          onClose={() => setSelectedEmployeeForReport(null)} 
         />
       )}
     </div>
@@ -1037,6 +1054,183 @@ const ScanQrModal = ({
             Verify QR Attendance
           </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const exportToCSV = (data: any, employeeName: string, month: string, year: string) => {
+  if (!data) return;
+
+  const logs = data.dailyAttendance || data.logs || data.attendance || [];
+  const summary = data.summary || {};
+  
+  // Headers
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Date,Clock In,Clock Out,Status,Time Spent\n";
+
+  // Rows
+  logs.forEach((log: any) => {
+    const row = [
+      log.date || "-",
+      log.clockIn || log.clockInTime || "-",
+      log.clockOut || log.clockOutTime || "-",
+      log.status || "-",
+      log.timeSpent || log.workDuration || "-"
+    ].map(v => `"${v}"`).join(",");
+    csvContent += row + "\n";
+  });
+
+  // Summary at the bottom
+  csvContent += "\nSummary\n";
+  csvContent += `Present,${summary.totalPresent || data.present || 0}\n`;
+  csvContent += `Absent,${summary.totalAbsent || data.absent || 0}\n`;
+  csvContent += `Late,${summary.totalLate || data.late || 0}\n`;
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `attendance_report_${employeeName.replace(/\s+/g, '_')}_${month}_${year}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const MonthlyReportModal = ({ employee, onClose }: { employee: any, onClose: () => void }) => {
+  const { employeeMonthlyReport, fetchEmployeeMonthlyReport, clearEmployeeMonthlyReport, isLoading } = useAttendanceStore();
+  const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+
+  useEffect(() => {
+    if (employee) {
+      const empId = employee._id || employee.id;
+      fetchEmployeeMonthlyReport(empId, month, year);
+    }
+  }, [employee, month, year, fetchEmployeeMonthlyReport]);
+
+  useEffect(() => {
+    return () => clearEmployeeMonthlyReport();
+  }, [clearEmployeeMonthlyReport]);
+
+  const handleExport = () => {
+    if (employeeMonthlyReport) {
+      const monthName = new Date(Number(year), Number(month) - 1).toLocaleString('default', { month: 'long' });
+      exportToCSV(employeeMonthlyReport, employee.name || "Employee", monthName, year);
+    }
+  };
+
+  const logs = employeeMonthlyReport?.dailyAttendance || employeeMonthlyReport?.logs || employeeMonthlyReport?.attendance || [];
+  const summary = employeeMonthlyReport?.summary || {};
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-[2rem] bg-white p-6 sm:p-8 shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900">{employee.name}&apos;s Report</h3>
+            <p className="text-sm text-slate-500">Monthly attendance overview</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <select 
+            value={month} 
+            onChange={(e) => setMonth(e.target.value)}
+            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#3B00D9] focus:border-[#3B00D9] p-2.5 outline-none"
+          >
+            {Array.from({length: 12}, (_, i) => i + 1).map(m => (
+              <option key={m} value={m}>{new Date(2000, m - 1).toLocaleString('default', { month: 'long' })}</option>
+            ))}
+          </select>
+          <select 
+            value={year} 
+            onChange={(e) => setYear(e.target.value)}
+            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#3B00D9] focus:border-[#3B00D9] p-2.5 outline-none"
+          >
+            {[0, 1, 2].map(offset => (
+              <option key={offset} value={new Date().getFullYear() - offset}>{new Date().getFullYear() - offset}</option>
+            ))}
+          </select>
+          
+          <button
+            onClick={handleExport}
+            disabled={!employeeMonthlyReport || isLoading}
+            className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl text-sm font-bold transition-colors disabled:opacity-50"
+          >
+            <Download size={16} />
+            Export CSV
+          </button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center py-12">
+            <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
+          </div>
+        ) : !employeeMonthlyReport ? (
+          <div className="flex-1 flex items-center justify-center py-12 text-slate-500 text-sm">
+            Failed to load report.
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto ios-scroll space-y-6">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-center">
+                <p className="text-xs text-indigo-600 font-semibold mb-1">Present</p>
+                <p className="text-2xl font-bold text-indigo-900">{summary.totalPresent || employeeMonthlyReport.present || 0}</p>
+              </div>
+              <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center">
+                <p className="text-xs text-amber-600 font-semibold mb-1">Late</p>
+                <p className="text-2xl font-bold text-amber-900">{summary.totalLate || employeeMonthlyReport.late || 0}</p>
+              </div>
+              <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 text-center">
+                <p className="text-xs text-rose-600 font-semibold mb-1">Absent</p>
+                <p className="text-2xl font-bold text-rose-900">{summary.totalAbsent || employeeMonthlyReport.absent || 0}</p>
+              </div>
+            </div>
+
+            {logs.length > 0 ? (
+              <div className="border border-slate-100 rounded-2xl overflow-hidden">
+                <table className="w-full text-left text-sm text-slate-600">
+                  <thead className="bg-slate-50 font-medium">
+                    <tr>
+                      <th className="px-4 py-3">Date</th>
+                      <th className="px-4 py-3">In</th>
+                      <th className="px-4 py-3">Out</th>
+                      <th className="px-4 py-3 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {logs.map((log: any, idx: number) => (
+                      <tr key={idx} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-3 font-medium text-slate-900">{log.date || "-"}</td>
+                        <td className="px-4 py-3">{log.clockIn || log.clockInTime || "-"}</td>
+                        <td className="px-4 py-3">{log.clockOut || log.clockOutTime || "-"}</td>
+                        <td className="px-4 py-3 text-right">
+                          <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${
+                            log.status?.toLowerCase() === "present" ? "bg-emerald-50 text-emerald-600" :
+                            log.status?.toLowerCase() === "late" ? "bg-amber-50 text-amber-600" :
+                            "bg-rose-50 text-rose-600"
+                          }`}>
+                            {log.status || "Absent"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="py-8 text-center text-slate-500 text-sm border border-dashed border-slate-200 rounded-2xl">
+                No attendance logs found for this month.
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
