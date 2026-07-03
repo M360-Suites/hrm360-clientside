@@ -55,6 +55,7 @@ const TaskManager = () => {
     fetchProjects,
     fetchUserProjects,
     createProject,
+    editProject,
     deleteProject,
     createTask,
     updateTask,
@@ -66,6 +67,16 @@ const TaskManager = () => {
 
   const [search, setSearch] = useState("");
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<any | null>(null);
+  const [editProjectForm, setEditProjectForm] = useState({
+    title: "",
+    startDate: getTodayDateInput(),
+    dueDate: getTodayDateInput(),
+    team: [] as string[],
+    document: "",
+    documentFile: null as File | null,
+  });
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<any | null>(null);
@@ -201,6 +212,41 @@ const TaskManager = () => {
     });
     return { completed, inProgress, pending };
   }, [filteredTasks]);
+
+  const openEditProject = (project: any) => {
+    setEditingProject(project);
+    setEditProjectForm({
+      title: project.title || project.name || "",
+      startDate: project.startDate ? new Date(project.startDate).toISOString().slice(0, 10) : getTodayDateInput(),
+      dueDate: project.dueDate || project.endDate || project.deadline ? new Date(project.dueDate || project.endDate || project.deadline).toISOString().slice(0, 10) : getTodayDateInput(),
+      team: getAssignees(project).map((p: any) => p._id || p.id || p),
+      document: project.document || project.attachedDoc || "",
+      documentFile: null,
+    });
+    setShowEditProjectModal(true);
+  };
+
+  const handleEditProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    const projectId = editingProject._id || editingProject.id;
+    const docId = isValidObjectId(editProjectForm.document)
+      ? editProjectForm.document.trim()
+      : undefined;
+    const payload = {
+      title: editProjectForm.title,
+      startDate: editProjectForm.startDate,
+      dueDate: editProjectForm.dueDate,
+      team: editProjectForm.team.filter(Boolean),
+      attachedDoc: docId,
+    };
+    const ok = await editProject(projectId, payload, { refreshUserProjects: !isAdmin });
+    if (!ok) return;
+
+    setShowEditProjectModal(false);
+    setEditingProject(null);
+    showToast("success", "Project updated successfully.");
+  };
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -469,18 +515,32 @@ const TaskManager = () => {
                     </span>
                   </button>
                   {canDeleteProjects && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteProject(project)}
-                      className={`mr-2 rounded p-1 ${
-                        isActive
-                          ? "text-white/80 hover:bg-white/10"
-                          : "text-rose-500 hover:bg-rose-50"
-                      }`}
-                      title="Delete project"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <div className="flex items-center">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); openEditProject(project); }}
+                        className={`mr-1 rounded p-1 ${
+                          isActive
+                            ? "text-white/80 hover:bg-white/10"
+                            : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
+                        }`}
+                        title="Edit project"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteProject(project); }}
+                        className={`mr-2 rounded p-1 ${
+                          isActive
+                            ? "text-white/80 hover:bg-white/10"
+                            : "text-rose-500 hover:bg-rose-50"
+                        }`}
+                        title="Delete project"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   )}
                 </div>
               );
@@ -651,6 +711,60 @@ const TaskManager = () => {
               }
             />
             <SubmitActions onCancel={() => setShowProjectModal(false)} />
+          </form>
+        </ModalShell>
+      )}
+
+      {showEditProjectModal && (
+        <ModalShell
+          title="Edit Project"
+          onClose={() => setShowEditProjectModal(false)}
+        >
+          <form className="space-y-3" onSubmit={handleEditProject}>
+            <TextInput
+              value={editProjectForm.title}
+              onChange={(v) => setEditProjectForm((p) => ({ ...p, title: v }))}
+              placeholder="Project title"
+              required
+            />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <DateInput
+                value={editProjectForm.startDate}
+                onChange={(v) =>
+                  setEditProjectForm((p) => ({ ...p, startDate: v }))
+                }
+                required
+              />
+              <DateInput
+                value={editProjectForm.dueDate}
+                onChange={(v) => setEditProjectForm((p) => ({ ...p, dueDate: v }))}
+                required
+              />
+            </div>
+            <UploadField
+              label="Project Document (optional)"
+              fileName={editProjectForm.documentFile?.name || editProjectForm.document}
+              onSelect={(file) =>
+                setEditProjectForm((p) => ({
+                  ...p,
+                  documentFile: file,
+                  document: file?.name || "",
+                }))
+              }
+            />
+            <TeamCheckboxList
+              employees={employees}
+              selected={editProjectForm.team}
+              onToggle={(value) =>
+                setEditProjectForm((p) => ({
+                  ...p,
+                  team: p.team.includes(value)
+                    ? p.team.filter((id) => id !== value)
+                    : [...p.team, value],
+                }))
+              }
+            />
+            <SubmitActions onCancel={() => setShowEditProjectModal(false)} />
           </form>
         </ModalShell>
       )}

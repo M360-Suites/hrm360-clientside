@@ -21,6 +21,11 @@ interface TaskState {
     payload: any,
     options?: { refreshUserProjects?: boolean },
   ) => Promise<boolean>;
+  editProject: (
+    projectId: string,
+    payload: any,
+    options?: { refreshUserProjects?: boolean },
+  ) => Promise<boolean>;
   deleteProject: (projectId: string) => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
@@ -198,6 +203,28 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } catch (error: any) {
       set({
         error: getErrorMessage(error, "Failed to create project"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  editProject: async (projectId, payload, options) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.patch(`/task/project/${projectId}`, payload, getOrgConfig());
+
+      if (options?.refreshUserProjects) {
+        await get().fetchUserProjects();
+      } else {
+        await get().fetchProjects();
+      }
+
+      set({ isLoading: false, error: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to edit project"),
         isLoading: false,
       });
       return false;
