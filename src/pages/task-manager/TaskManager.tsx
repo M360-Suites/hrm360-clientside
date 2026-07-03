@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   Plus,
   Search,
@@ -380,9 +380,21 @@ const TaskManager = () => {
     const comment = commentDrafts[taskId]?.trim();
     if (!taskId || !comment) return;
 
+    const tags: string[] = [];
+    const mentions = comment.match(/@([\w]+)/g) || ([] as string[]);
+    mentions.forEach((mention: string) => {
+      const nameMatch = mention.substring(1).replace(/_/g, ' ').toLowerCase();
+      const emp = employees.find((e: any) => e.name?.toLowerCase() === nameMatch);
+      if (emp) {
+        console.log("Matched Employee for Tagging:", emp);
+        tags.push(emp.user?._id || emp.user || emp.userId || emp.accountId || emp._id || emp.id);
+      }
+    });
+
     const ok = await commentTask({
       taskId,
       comment,
+      tags,
       projectId: selectedProject?._id || selectedProject?.id,
     });
     if (ok) {
@@ -529,6 +541,7 @@ const TaskManager = () => {
               setDragOverColumn={setDragOverColumn}
               canManageTaskDetails={canManageTaskDetails}
               canDeleteTasks={canDeleteTasks}
+              employees={employees}
             />
             <BoardColumn
               columnKey="inProgress"
@@ -552,6 +565,7 @@ const TaskManager = () => {
               setDragOverColumn={setDragOverColumn}
               canManageTaskDetails={canManageTaskDetails}
               canDeleteTasks={canDeleteTasks}
+              employees={employees}
             />
             <BoardColumn
               columnKey="completed"
@@ -575,6 +589,7 @@ const TaskManager = () => {
               setDragOverColumn={setDragOverColumn}
               canManageTaskDetails={canManageTaskDetails}
               canDeleteTasks={canDeleteTasks}
+              employees={employees}
             />
           </div>
         </div>
@@ -797,6 +812,7 @@ const BoardColumn = ({
   setDragOverColumn,
   canManageTaskDetails,
   canDeleteTasks,
+  employees,
 }: {
   columnKey: "completed" | "inProgress" | "pending";
   title: string;
@@ -826,6 +842,7 @@ const BoardColumn = ({
   ) => void;
   canManageTaskDetails: boolean;
   canDeleteTasks: boolean;
+  employees: any[];
 }) => {
   const headerTone = {
     green: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -900,6 +917,7 @@ const BoardColumn = ({
               }
               canManageTaskDetails={canManageTaskDetails}
               canDeleteTasks={canDeleteTasks}
+              employees={employees}
             />
           ))}
           {tasks.length === 0 && (
@@ -929,6 +947,7 @@ const TaskCard = ({
   onToggleMenu,
   canManageTaskDetails,
   canDeleteTasks,
+  employees,
 }: {
   task: any;
   onDragStart: () => void;
@@ -948,6 +967,7 @@ const TaskCard = ({
   onToggleMenu: () => void;
   canManageTaskDetails: boolean;
   canDeleteTasks: boolean;
+  employees: any[];
 }) => {
   const { deleteComment } = useTaskStore();
   const assignees = getAssignees(task);
@@ -955,6 +975,41 @@ const TaskCard = ({
   const comments = getComments(task);
 
   const [commentToDelete, setCommentToDelete] = useState<any | null>(null);
+
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onCommentDraftChange(value);
+    
+    const cursor = e.target.selectionStart || 0;
+    const textBeforeCursor = value.slice(0, cursor);
+    const match = textBeforeCursor.match(/@(\w*)$/);
+    if (match) {
+      setMentionQuery(match[1]);
+      setCursorPosition(cursor);
+    } else {
+      setMentionQuery(null);
+    }
+  };
+
+  const handleSelectMention = (employee: any) => {
+    if (cursorPosition === null || mentionQuery === null) return;
+    const beforeMention = commentDraft.slice(0, cursorPosition - mentionQuery.length - 1);
+    const afterMention = commentDraft.slice(cursorPosition);
+    
+    const newText = `${beforeMention}@${employee.name.replace(/\s+/g, '_')} ${afterMention}`;
+    onCommentDraftChange(newText);
+    setMentionQuery(null);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  const mentionCandidates = employees.filter(emp => 
+    emp.name?.toLowerCase().includes((mentionQuery || "").toLowerCase()) ||
+    emp.email?.toLowerCase().includes((mentionQuery || "").toLowerCase())
+  );
 
   return (
     <div className="border-b border-gray-100 bg-white transition hover:bg-gray-50/80">
@@ -1144,11 +1199,33 @@ const TaskCard = ({
             )}
           </div>
 
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row relative">
+            {mentionQuery !== null && (
+              <div className="absolute bottom-full mb-1 left-0 w-64 max-h-40 overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg z-50 py-1">
+                {mentionCandidates.length > 0 ? (
+                  mentionCandidates.map((emp: any) => (
+                    <button
+                      key={emp._id || emp.id}
+                      type="button"
+                      onClick={() => handleSelectMention(emp)}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-[10px] shrink-0">
+                        {emp.name?.charAt(0) || "U"}
+                      </div>
+                      <span className="truncate">{emp.name}</span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-gray-500">No members found</div>
+                )}
+              </div>
+            )}
             <input
+              ref={inputRef}
               value={commentDraft}
-              onChange={(e) => onCommentDraftChange(e.target.value)}
-              placeholder="Add a comment..."
+              onChange={handleInputChange}
+              placeholder="Add a comment... (Type @ to mention)"
               className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#3B00D9]"
             />
             <button

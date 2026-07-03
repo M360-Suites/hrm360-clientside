@@ -28,6 +28,7 @@ interface TaskState {
     taskId: string;
     comment: string;
     projectId?: string;
+    tags?: string[];
   }) => Promise<boolean>;
   deleteComment: (payload: {
     taskId: string;
@@ -287,7 +288,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     try {
       await api.patch(
         "/task",
-        { taskId: payload.taskId, comment: payload.comment },
+        { taskId: payload.taskId, comment: payload.comment, tags: payload.tags || [] },
         getOrgConfig(),
       );
       const projectId =
