@@ -27,6 +27,8 @@ interface TaskState {
     options?: { refreshUserProjects?: boolean },
   ) => Promise<boolean>;
   deleteProject: (projectId: string) => Promise<boolean>;
+  updateProjectOrder: (projects: any[], isAdmin: boolean) => Promise<boolean>;
+  resetPersonalProjectOrder: () => Promise<boolean>;
   createTask: (payload: any) => Promise<boolean>;
   updateTask: (payload: any) => Promise<boolean>;
   commentTask: (payload: {
@@ -225,6 +227,47 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     } catch (error: any) {
       set({
         error: getErrorMessage(error, "Failed to edit project"),
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  updateProjectOrder: async (projects, isAdmin) => {
+    try {
+      const projectOrders = projects.map((p, index) => ({
+        projectId: p?._id || p?.id,
+        order: index,
+      })).filter(p => p.projectId);
+
+      const endpoint = isAdmin ? "/task/project/order" : "/task/project/personal-order";
+      
+      // Optimistic update
+      set({ projects });
+      
+      await api.put(endpoint, { projectOrders }, getOrgConfig());
+      return true;
+    } catch (error: any) {
+      set({ error: getErrorMessage(error, "Failed to update project order") });
+      // Reload projects to revert optimistic update on failure
+      if (isAdmin) {
+        await get().fetchProjects();
+      } else {
+        await get().fetchUserProjects();
+      }
+      return false;
+    }
+  },
+
+  resetPersonalProjectOrder: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete("/task/project/personal-order", getOrgConfig());
+      await get().fetchUserProjects();
+      return true;
+    } catch (error: any) {
+      set({
+        error: getErrorMessage(error, "Failed to reset personal project order"),
         isLoading: false,
       });
       return false;

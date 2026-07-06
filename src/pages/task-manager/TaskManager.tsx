@@ -14,6 +14,8 @@ import {
   Trash2,
   Users,
   X,
+  GripVertical,
+  Info,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
@@ -57,6 +59,8 @@ const TaskManager = () => {
     createProject,
     editProject,
     deleteProject,
+    updateProjectOrder,
+    resetPersonalProjectOrder,
     createTask,
     updateTask,
     commentTask,
@@ -80,6 +84,7 @@ const TaskManager = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<any | null>(null);
+  const [draggedProjectIdx, setDraggedProjectIdx] = useState<number | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<
     "completed" | "inProgress" | "pending" | null
   >(null);
@@ -482,7 +487,30 @@ const TaskManager = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-4 lg:gap-6">
         <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit min-w-0">
-          <h3 className="font-semibold text-gray-800">Projects</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <h3 className="font-semibold text-gray-800">Projects</h3>
+              <div className="group relative flex items-center">
+                <Info size={14} className="text-gray-400 hover:text-[#3B00D9] cursor-help" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden w-max max-w-[200px] rounded-md bg-gray-800 px-2.5 py-1.5 text-[11px] text-white opacity-0 transition-opacity group-hover:block group-hover:opacity-100 z-50">
+                  Drag and drop projects to reorder them
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
+                </div>
+              </div>
+            </div>
+            {!isAdmin && projects.length > 1 && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const ok = await resetPersonalProjectOrder();
+                  if (ok) showToast("success", "Project order reset to default.");
+                }}
+                className="text-[10px] font-medium text-gray-500 hover:text-gray-800 underline decoration-gray-300"
+              >
+                Reset Order
+              </button>
+            )}
+          </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
             {projects.map((project: any, idx: number) => {
               const projectId = project?._id || project?.id || String(idx);
@@ -492,16 +520,40 @@ const TaskManager = () => {
               return (
                 <div
                   key={projectId}
-                  className={`min-w-[220px] rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full ${
+                  draggable
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    setDraggedProjectIdx(idx);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (draggedProjectIdx === null || draggedProjectIdx === idx) return;
+                    
+                    const newProjects = [...projects];
+                    const [dragged] = newProjects.splice(draggedProjectIdx, 1);
+                    newProjects.splice(idx, 0, dragged);
+                    
+                    await updateProjectOrder(newProjects, isAdmin);
+                    setDraggedProjectIdx(null);
+                  }}
+                  className={`min-w-[220px] rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full cursor-grab active:cursor-grabbing ${
                     isActive
                       ? "bg-[#3B00D9] text-white border-[#3B00D9]"
                       : "bg-white border-gray-200 text-gray-700 hover:border-[#3B00D9]/40"
                   }`}
                 >
+                  <div className={`flex items-center pl-2 ${isActive ? "text-white/60" : "text-gray-400 hover:text-gray-600"}`}>
+                    <GripVertical size={14} />
+                  </div>
                   <button
                     type="button"
                     onClick={() => onSwitchProject(project)}
-                    className="min-w-0 flex-1 text-left px-3 py-2.5"
+                    className="min-w-0 flex-1 text-left px-2 py-2.5"
                   >
                     <span className="block truncate">
                       {project?.title || project?.name || "Untitled Project"}
