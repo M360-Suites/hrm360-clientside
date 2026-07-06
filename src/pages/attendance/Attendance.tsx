@@ -639,13 +639,13 @@ const Attendance = () => {
               </div>
             </div>
 
-            <div className="ios-scroll overflow-x-auto">
-              <table className="w-full min-w-170 text-left text-sm text-gray-600 whitespace-nowrap">
-                <thead className="bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100">
+            <div className="ios-scroll overflow-x-auto max-h-[500px] overflow-y-auto">
+              <table className="w-full min-w-[500px] text-left text-xs text-gray-600 whitespace-nowrap relative">
+                <thead className="bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100 sticky top-0 z-10">
                   <tr>
-                    <th className="px-6 py-4">Employee</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4 text-right">Manual Action</th>
+                    <th className="px-4 py-3">Employee</th>
+                    <th className="px-4 py-3">Role</th>
+                    <th className="px-4 py-3 text-right">Manual Action</th>
                   </tr>
                 </thead>
 
@@ -666,13 +666,13 @@ const Attendance = () => {
                         key={employeeId}
                         className="hover:bg-gray-50/40 transition-colors"
                       >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-xs">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-[10px]">
                               {emp.name?.charAt(0) || "E"}
                             </div>
                             <div>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-gray-900 text-xs">
                                 {emp.name}
                               </p>
                               <p className="text-[10px] text-gray-400">
@@ -682,32 +682,32 @@ const Attendance = () => {
                           </div>
                         </td>
 
-                        <td className="px-6 py-4 text-xs font-medium text-gray-500">
+                        <td className="px-4 py-3 text-[11px] font-medium text-gray-500">
                           {emp.role || "Employee"}
                         </td>
 
-                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                        <td className="px-4 py-3 text-right flex justify-end gap-1.5">
                           <button
                             onClick={() => setSelectedEmployeeForReport(emp)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded text-[10px] font-bold transition-colors"
                           >
-                            <FileText size={14} />
+                            <FileText size={12} />
                             Report
                           </button>
                           {isClockedIn ? (
                             <button
                               onClick={() => handleClockOut(employeeId)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition-colors"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-[10px] font-bold transition-colors"
                             >
-                              <UserMinus size={14} />
+                              <UserMinus size={12} />
                               Clock Out
                             </button>
                           ) : (
                             <button
                               onClick={() => handleClockIn(employeeId)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-xs font-bold transition-colors"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-[10px] font-bold transition-colors"
                             >
-                              <UserPlus size={14} />
+                              <UserPlus size={12} />
                               Clock In
                             </button>
                           )}
