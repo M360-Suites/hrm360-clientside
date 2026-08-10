@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, User, LogOut, ChevronDown, Menu } from "lucide-react";
+import { Bell, User, LogOut, ChevronDown, Menu, Settings } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -48,7 +48,7 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
       </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-6">
-        <button className="hidden sm:flex w-10 h-10 rounded-xl border border-gray-200 items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all relative">
+        <button onClick={() => navigate("/settings")} aria-label="Open notification settings" className="hidden sm:flex w-10 h-10 rounded-xl border border-gray-200 items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all relative">
           <Bell size={18} />
           <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white"></span>
         </button>
@@ -80,6 +80,16 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
                 <p className="text-xs text-gray-400 truncate">{user?.email || ""}</p>
               </div>
               <div className="p-1.5">
+                <button
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate("/settings");
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                >
+                  <Settings size={16} />
+                  Settings
+                </button>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"

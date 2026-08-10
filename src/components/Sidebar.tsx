@@ -8,11 +8,13 @@ import {
 	Banknote,
 	UserPlus,
 	GraduationCap,
-	// TrendingUp,
+	TrendingUp,
+	BadgeCheck,
 	LineChart,
 	// Wallet,
 	// CheckCircle2,
 	Megaphone,
+	Settings,
 	// FileText,
 	X,
 } from "lucide-react";
@@ -27,11 +29,13 @@ const navItems = [
 	{ icon: Banknote, label: "Payroll", path: "/payroll" },
 	{ icon: UserPlus, label: "Recruitment", path: "/recruitment" },
 	{ icon: GraduationCap, label: "Training", path: "/training" },
-	// { icon: TrendingUp, label: "Promotion", path: "/promotion" },
+	{ icon: BadgeCheck, label: "Permissions", path: "/permissions" },
+	{ icon: TrendingUp, label: "Promotions", path: "/promotion" },
 	{ icon: LineChart, label: "Task Manager", path: "/task-manager" },
 	// { icon: Wallet, label: "Loans", path: "/loans" },
 	// { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
 	{ icon: Megaphone, label: "Announcement", path: "/announcement" },
+	{ icon: Settings, label: "Settings", path: "/settings" },
 	// { icon: FileText, label: "Documents", path: "/documents" },
 ];
 
@@ -100,6 +104,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 							"/announcement",
 							"/training",
 							"/task-manager",
+							"/permissions",
+							"/promotion",
+							"/settings",
 						].includes(item.path);
 					})
 					.map((item) => {

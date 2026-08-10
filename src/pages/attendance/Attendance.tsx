@@ -639,8 +639,8 @@ const Attendance = () => {
               </div>
             </div>
 
-            <div className="ios-scroll overflow-x-auto max-h-[500px] overflow-y-auto">
-              <table className="w-full min-w-[500px] text-left text-xs text-gray-600 whitespace-nowrap relative">
+            <div className="ios-scroll overflow-x-auto max-h-125 overflow-y-auto">
+              <table className="w-full min-w-125 text-left text-xs text-gray-600 whitespace-nowrap relative">
                 <thead className="bg-gray-50/50 text-gray-800 font-medium border-b border-gray-100 sticky top-0 z-10">
                   <tr>
                     <th className="px-4 py-3">Employee</th>

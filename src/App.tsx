@@ -29,10 +29,12 @@ import Payroll from "./pages/payroll/Payroll";
 import Recruitment from "./pages/recruitment/Recruitment";
 import Training from "./pages/training/Training";
 import Promotion from "./pages/promotion/Promotion";
+import Permission from "./pages/permission/Permission";
 import Loans from "./pages/loans/Loans";
 import Performance from "./pages/performance/Performance";
 import Announcement from "./pages/announcement/Announcement";
 import TaskManager from "./pages/task-manager/TaskManager";
+import Settings from "./pages/settings/Settings";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import LandingPage from "./pages/landing/LandingPage";
 
@@ -121,7 +123,9 @@ const App = () => {
 						<Route path='/recruitment' element={<Recruitment />} />
 						<Route path='/training' element={<Training />} />
 						<Route path='/task-manager' element={<TaskManager />} />
+						<Route path='/settings' element={<Settings />} />
 						<Route path='/promotion' element={<Promotion />} />
+						<Route path='/permissions' element={<Permission />} />
 						<Route path='/loans' element={<Loans />} />
 						<Route path='/performance' element={<Performance />} />
 

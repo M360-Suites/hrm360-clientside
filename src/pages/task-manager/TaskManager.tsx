@@ -25,8 +25,6 @@ const normalizeStatus = (status: string) =>
   String(status || "")
     .trim()
     .toLowerCase();
-const isValidObjectId = (value?: string) =>
-  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
 
 const getTaskDate = (task: any) =>
   task?.dueDate || task?.endDate || task?.deadline || "";
@@ -78,8 +76,6 @@ const TaskManager = () => {
     startDate: getTodayDateInput(),
     dueDate: getTodayDateInput(),
     team: [] as string[],
-    document: "",
-    documentFile: null as File | null,
   });
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showEditTaskModal, setShowEditTaskModal] = useState(false);
@@ -103,8 +99,6 @@ const TaskManager = () => {
     startDate: getTodayDateInput(),
     dueDate: getTodayDateInput(),
     team: [] as string[],
-    document: "",
-    documentFile: null as File | null,
   });
   const [taskForm, setTaskForm] = useState({
     projectId: "",
@@ -113,8 +107,6 @@ const TaskManager = () => {
     startDate: getTodayDateInput(),
     dueDate: getTodayDateInput(),
     team: [] as string[],
-    document: "",
-    documentFile: null as File | null,
   });
   const [editTaskForm, setEditTaskForm] = useState({
     _id: "",
@@ -225,8 +217,6 @@ const TaskManager = () => {
       startDate: project.startDate ? new Date(project.startDate).toISOString().slice(0, 10) : getTodayDateInput(),
       dueDate: project.dueDate || project.endDate || project.deadline ? new Date(project.dueDate || project.endDate || project.deadline).toISOString().slice(0, 10) : getTodayDateInput(),
       team: getAssignees(project).map((p: any) => p._id || p.id || p),
-      document: project.document || project.attachedDoc || "",
-      documentFile: null,
     });
     setShowEditProjectModal(true);
   };
@@ -235,15 +225,11 @@ const TaskManager = () => {
     e.preventDefault();
     if (!editingProject) return;
     const projectId = editingProject._id || editingProject.id;
-    const docId = isValidObjectId(editProjectForm.document)
-      ? editProjectForm.document.trim()
-      : undefined;
     const payload = {
       title: editProjectForm.title,
       startDate: editProjectForm.startDate,
       dueDate: editProjectForm.dueDate,
       team: editProjectForm.team.filter(Boolean),
-      attachedDoc: docId,
     };
     const ok = await editProject(projectId, payload, { refreshUserProjects: !isAdmin });
     if (!ok) return;
@@ -255,15 +241,11 @@ const TaskManager = () => {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    const docId = isValidObjectId(projectForm.document)
-      ? projectForm.document.trim()
-      : undefined;
     const payload = {
       title: projectForm.title,
       startDate: projectForm.startDate,
       dueDate: projectForm.dueDate,
       team: projectForm.team.filter(Boolean),
-      document: docId,
     };
     const ok = await createProject(payload, { refreshUserProjects: !isAdmin });
     if (!ok) return;
@@ -274,17 +256,12 @@ const TaskManager = () => {
       startDate: getTodayDateInput(),
       dueDate: getTodayDateInput(),
       team: [],
-      document: "",
-      documentFile: null,
     });
     showToast("success", "Project created successfully.");
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    const docId = isValidObjectId(taskForm.document)
-      ? taskForm.document.trim()
-      : undefined;
     const payload = {
       projectId: taskForm.projectId,
       title: taskForm.title,
@@ -292,7 +269,6 @@ const TaskManager = () => {
       startDate: taskForm.startDate,
       dueDate: taskForm.dueDate,
       team: taskForm.team.filter(Boolean),
-      document: docId,
     };
     const ok = await createTask(payload);
     if (!ok) return;
@@ -305,8 +281,6 @@ const TaskManager = () => {
       startDate: getTodayDateInput(),
       dueDate: getTodayDateInput(),
       team: [],
-      document: "",
-      documentFile: null,
     }));
     showToast("success", "Task created successfully.");
   };
@@ -739,17 +713,7 @@ const TaskManager = () => {
                 required
               />
             </div>
-            <UploadField
-              label="Project Document (optional)"
-              fileName={projectForm.documentFile?.name || projectForm.document}
-              onSelect={(file) =>
-                setProjectForm((p) => ({
-                  ...p,
-                  documentFile: file,
-                  document: file?.name || "",
-                }))
-              }
-            />
+
             <TeamCheckboxList
               employees={employees}
               selected={projectForm.team}
@@ -793,17 +757,7 @@ const TaskManager = () => {
                 required
               />
             </div>
-            <UploadField
-              label="Project Document (optional)"
-              fileName={editProjectForm.documentFile?.name || editProjectForm.document}
-              onSelect={(file) =>
-                setEditProjectForm((p) => ({
-                  ...p,
-                  documentFile: file,
-                  document: file?.name || "",
-                }))
-              }
-            />
+
             <TeamCheckboxList
               employees={employees}
               selected={editProjectForm.team}
@@ -869,17 +823,7 @@ const TaskManager = () => {
                 required
               />
             </div>
-            <UploadField
-              label="Task Document (optional)"
-              fileName={taskForm.documentFile?.name || taskForm.document}
-              onSelect={(file) =>
-                setTaskForm((p) => ({
-                  ...p,
-                  documentFile: file,
-                  document: file?.name || "",
-                }))
-              }
-            />
+
             <TeamCheckboxList
               employees={employees}
               selected={taskForm.team}
@@ -1491,35 +1435,7 @@ const SubmitActions = ({ onCancel }: { onCancel: () => void }) => (
   </div>
 );
 
-const UploadField = ({
-  label,
-  fileName,
-  onSelect,
-}: {
-  label: string;
-  fileName?: string;
-  onSelect: (file: File | null) => void;
-}) => (
-  <div>
-    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-      {label}
-    </label>
-    <label className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-[#3B00D9]/40 text-[#3B00D9] text-sm font-medium cursor-pointer hover:bg-[#3B00D9]/5">
-      Upload document
-      <input
-        type="file"
-        className="hidden"
-        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp"
-        onChange={(e) => onSelect(e.target.files?.[0] || null)}
-      />
-    </label>
-    {fileName && (
-      <p className="mt-2 text-xs text-gray-500 truncate">
-        Selected: {fileName}
-      </p>
-    )}
-  </div>
-);
+
 
 const TeamCheckboxList = ({
   employees,
