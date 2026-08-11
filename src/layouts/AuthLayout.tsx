@@ -1,174 +1,157 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { setCookie } from "../utils/cookies";
-import { a1, a2, a3 } from "../assets";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Users,
+  BarChart3,
+  ShieldCheck,
+  BookOpen,
+  Zap,
+  Globe,
+  ArrowRight,
+  Star,
+} from "lucide-react";
 
-const carouselItems = [
-  {
-    image: a1,
-    title: "Manage Organizations Efficiently",
-    description: "Seamlessly handle multiple client companies in one unified dashboard."
-  },
-  {
-    image: a2,
-    title: "Streamline Employee Data",
-    description: "Keep all your employee records organized, secure, and easily accessible."
-  },
-  {
-    image: a3,
-    title: "Optimize Performance Tracking",
-    description: "Empower your team with insightful performance metrics and goal management."
-  }
+const NAV_LINKS = [
+  { label: "Features", href: "#" },
+  { label: "Pricing", href: "#" },
+  { label: "Blog", href: "#" },
+  { label: "Docs", href: "#" },
+];
+
+const STATS = [
+  { value: "12k+", label: "Organizations" },
+  { value: "98%", label: "Uptime SLA" },
+  { value: "4.9★", label: "App Rating" },
+];
+
+const FEATURES = [
+  { icon: Users, text: "Employee lifecycle management" },
+  { icon: BarChart3, text: "Real-time attendance & payroll" },
+  { icon: ShieldCheck, text: "Role-based access control" },
+  { icon: Zap, text: "Automated workflows & alerts" },
 ];
 
 const AuthLayout = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   useEffect(() => {
     setCookie("hasVisitedLandingPage", "true");
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % carouselItems.length);
-    }, 5000);
-    return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-linear-to-br from-[#F8F9FF] via-white to-[#E9EDFF] relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/20 blur-[120px] rounded-full" />
+    <div className="flex flex-col min-h-screen w-full overflow-x-hidden bg-slate-950">
 
-      {/* Desktop Sidebar (Left) */}
-      <div className="hidden lg:flex lg:w-1/2 p-6 z-10">
-        <div className="relative w-full h-full bg-gray-100 rounded-[2.5rem] overflow-hidden flex flex-col items-center shadow-2xl shadow-indigo-500/10">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="absolute inset-0 w-full h-full"
+      {/* ── TOP NAVIGATION — sits above the image, solid bg ── */}
+      <header className="relative z-30 flex h-16 w-full items-center justify-between px-6 lg:px-14 border-b border-white/10 bg-[#0d0d14] shrink-0">
+        {/* Logo */}
+        <span className="text-xl font-bold text-white tracking-wide">
+          HRM<span className="text-[#E91EFA]">360</span>
+        </span>
+
+        {/* Nav Links — desktop */}
+        <nav className="hidden md:flex items-center gap-6">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className="text-sm text-white/60 hover:text-white transition-colors font-medium"
             >
-              <img
-                src={carouselItems[currentIndex].image}
-                alt={`Slide ${currentIndex + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-indigo-950/90 via-indigo-900/20 to-transparent"></div>
-            </motion.div>
-          </AnimatePresence>
+              {link.label}
+            </a>
+          ))}
+        </nav>
 
-          {/* Carousel Text (Desktop) */}
-          <div className="absolute bottom-24 left-0 right-0 px-16 text-center z-20">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`text-${currentIndex}`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <h3 className="text-4xl font-extrabold text-white mb-4 tracking-tight leading-tight">
-                  {carouselItems[currentIndex].title}
-                </h3>
-                <p className="text-indigo-100/90 text-lg max-w-md mx-auto leading-relaxed font-medium">
-                  {carouselItems[currentIndex].description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+        {/* Right CTA */}
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="hidden sm:inline-flex text-sm text-white/70 hover:text-white font-medium transition-colors"
+          >
+            Sign in
+          </Link>
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#2563EB] hover:bg-[#1d4ed8] text-white px-4 py-2 rounded-xl transition-colors"
+          >
+            Get started <ArrowRight size={14} />
+          </Link>
+        </div>
+      </header>
+
+      {/* ── MAIN AREA — image only lives here ── */}
+      <div className="relative flex-1 flex overflow-hidden">
+        {/* Background image scoped to main area */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hrlady.jpeg"
+            alt="Employee background"
+            className="h-full w-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
+        </div>
+
+        {/* LEFT — marketing copy (desktop only) */}
+        <div className="hidden lg:flex flex-col justify-center px-14 xl:px-20 py-12 w-[55%] shrink-0 relative z-10">
+
+          {/* Trust badge */}
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3 py-1.5 text-xs text-white/70 w-fit mb-8">
+            <Star size={12} className="text-[#E91EFA] fill-[#E91EFA]" />
+            Trusted by 12,000+ companies worldwide
           </div>
-          
-          <div className="absolute bottom-10 flex items-center justify-center gap-3 z-20">
-            {carouselItems.map((_, idx) => (
-              <button 
-                key={idx} 
-                onClick={() => setCurrentIndex(idx)}
-                className={`transition-all duration-700 rounded-full ${
-                  idx === currentIndex 
-                    ? "w-10 h-2 bg-white" 
-                    : "w-2 h-2 bg-white/30 hover:bg-white/60"
-                }`}
-              />
+
+          {/* Headline */}
+          <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.15] tracking-tight mb-5">
+            HR operations,<br />
+            <span className="text-[#E91EFA]">simplified.</span>
+          </h1>
+          <p className="text-base text-white/55 max-w-md leading-relaxed mb-10">
+            HRM360 brings attendance, payroll, recruitment, and performance into one streamlined platform built for modern teams.
+          </p>
+
+          {/* Features list */}
+          <ul className="space-y-3 mb-12">
+            {FEATURES.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-sm text-white/70">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#4A1D96]/60 border border-[#8B5CF6]/30 shrink-0">
+                  <Icon size={14} className="text-[#8B5CF6]" />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-8">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <p className="text-2xl font-bold text-white">{s.value}</p>
+                <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
-        {/* Mobile Carousel Header (Visible only on mobile/tablet) */}
-        <div className="lg:hidden h-[30vh] sm:h-[35vh] relative w-full overflow-hidden shrink-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`mobile-bg-${currentIndex}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="absolute inset-0"
-            >
-              <img
-                src={carouselItems[currentIndex].image}
-                alt="Mobile Slide"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-b from-black/50 via-transparent to-[#F8F9FF]"></div>
-            </motion.div>
-          </AnimatePresence>
-          
-          <div className="absolute top-8 left-0 right-0 px-6 flex justify-center items-center">
-            <span className="font-bold text-2xl text-white tracking-tight drop-shadow-md">Hrm360</span>
-          </div>
-
-          <div className="absolute bottom-6 left-0 right-0 px-6 text-center">
-             <AnimatePresence mode="wait">
-              <motion.div
-                key={`mobile-text-${currentIndex}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h3 className="text-xl font-bold text-white drop-shadow-lg mb-1">
-                  {carouselItems[currentIndex].title}
-                </h3>
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* Mobile Indicators */}
-            <div className="flex items-center justify-center gap-2 mt-2">
-              {carouselItems.map((_, idx) => (
-                <div 
-                  key={idx}
-                  className={`h-1 rounded-full transition-all duration-500 ${
-                    idx === currentIndex ? "w-6 bg-white" : "w-1.5 bg-white/40"
-                  }`}
-                />
-              ))}
-            </div>
+          {/* Bottom links */}
+          <div className="flex items-center gap-5 mt-12 pt-8 border-t border-white/10 text-xs text-white/35">
+            <a href="#" className="hover:text-white/60 transition-colors flex items-center gap-1.5">
+              <BookOpen size={12} /> Documentation
+            </a>
+            <a href="#" className="hover:text-white/60 transition-colors flex items-center gap-1.5">
+              <Globe size={12} /> Blog
+            </a>
+            <span>·</span>
+            <span>© 2025 HRM360</span>
           </div>
         </div>
 
-        {/* Form Container */}
-        <div className="flex-1 flex flex-col items-center justify-start lg:justify-center px-4 sm:px-10 py-8 lg:px-20 overflow-y-auto custom-scrollbar">
-          {/* Logo (Desktop only, already handled for mobile) */}
-          <div className="hidden lg:flex absolute top-12 right-12">
-             <span className="font-bold text-3xl text-[#3B00D9] tracking-tight">HRM360</span>
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-xl bg-white/80 backdrop-blur-2xl border border-white p-6 sm:p-10 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 lg:bg-transparent lg:backdrop-blur-none lg:border-none lg:shadow-none lg:p-0"
-          >
+        {/* RIGHT — form slot */}
+        <div className="relative z-10 flex flex-1 items-center justify-center lg:justify-end px-4 sm:px-8 lg:pr-16 xl:pr-24 py-8">
+          <div className="w-full max-w-sm">
             <Outlet />
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
   );
+
 };
 
 export default AuthLayout;
-

@@ -33,22 +33,15 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const newErrors = validate();
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     setErrors({});
-
     const success = await login({ email, password });
-
     if (!success) return;
-
     const orgId = getCookie("orgId");
-
     if (orgId) {
       navigate("/dashboard", { replace: true });
     } else {
@@ -57,36 +50,32 @@ const Login = () => {
   };
 
   const fieldCls = (field: string) =>
-    `w-full px-4 py-3 rounded-xl border transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 ${
+    `w-full px-4 py-3 bg-white/10 rounded-xl border text-sm text-white placeholder:text-white/40 transition-all outline-none focus:ring-2 ${
       errors[field]
-        ? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
-        : "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+        ? "border-rose-400/80 focus:ring-rose-400/20"
+        : "border-white/20 focus:ring-white/20 focus:border-white/40"
     }`;
 
   return (
-    <div className="w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
-          Welcome Back
-        </h2>
-
-        <p className="text-gray-500">
-          Enter your email and password to access your account.
+    <div className="w-full max-w-sm rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-8 shadow-xl">
+      <div className="mb-7">
+        <h2 className="text-2xl font-bold text-white mb-1.5">Sign in</h2>
+        <p className="text-sm text-white/50">
+          Enter your credentials to continue.
         </p>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {error && (
-          <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg border border-red-100">
+          <div className="p-3 text-xs text-rose-300 bg-rose-500/10 rounded-xl border border-rose-400/20">
             {error}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-xs font-medium text-white/60 mb-1.5">
             Email
           </label>
-
           <input
             type="email"
             value={email}
@@ -94,22 +83,26 @@ const Login = () => {
               setEmail(e.target.value);
               setErrors((prev) => ({ ...prev, email: "" }));
             }}
-            placeholder="you@example.com"
+            placeholder="name@company.com"
             className={fieldCls("email")}
           />
-
           {errors.email && (
-            <p className="mt-1.5 text-xs text-rose-500 font-medium">
-              {errors.email}
-            </p>
+            <p className="mt-1.5 text-xs text-rose-400">{errors.email}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Password
-          </label>
-
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-medium text-white/60">
+              Password
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-xs text-white/40 hover:text-white transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -118,50 +111,37 @@ const Login = () => {
                 setPassword(e.target.value);
                 setErrors((prev) => ({ ...prev, password: "" }));
               }}
-              placeholder="Enter your password"
+              placeholder="••••••••"
               className={fieldCls("password")}
             />
-
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-
           {errors.password && (
-            <p className="mt-1.5 text-xs text-rose-500 font-medium">
-              {errors.password}
-            </p>
+            <p className="mt-1.5 text-xs text-rose-400">{errors.password}</p>
           )}
-        </div>
-
-        <div className="flex justify-end">
-          <Link
-            to="/forgot-password"
-            className="text-sm text-[#2ecc71] hover:text-[#27ae60] font-medium transition-colors"
-          >
-            Forgot Password?
-          </Link>
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+          className="w-full mt-2 py-3 bg-[#2563EB] hover:bg-[#1d4ed8] text-white rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
         >
-          {isLoading && <Loader2 className="animate-spin" size={18} />}
-          Login
+          {isLoading && <Loader2 className="animate-spin" size={16} />}
+          Sign in
         </button>
       </form>
 
-      <p className="text-center mt-8 text-sm text-gray-500">
+      <p className="text-center mt-6 text-xs text-white/40">
         Don&apos;t have an account?{" "}
         <Link
           to="/register"
-          className="text-[#3B00D9] font-bold hover:underline"
+          className="text-white/70 font-semibold hover:text-white transition-colors"
         >
           Sign up
         </Link>

@@ -10,6 +10,7 @@ import {
 	GraduationCap,
 	TrendingUp,
 	BadgeCheck,
+	ClipboardCheck,
 	LineChart,
 	// Wallet,
 	// CheckCircle2,
@@ -31,6 +32,7 @@ const navItems = [
 	{ icon: GraduationCap, label: "Training", path: "/training" },
 	{ icon: BadgeCheck, label: "Permissions", path: "/permissions" },
 	{ icon: TrendingUp, label: "Promotions", path: "/promotion" },
+	{ icon: ClipboardCheck, label: "Probation", path: "/probation" },
 	{ icon: LineChart, label: "Task Manager", path: "/task-manager" },
 	// { icon: Wallet, label: "Loans", path: "/loans" },
 	// { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
@@ -58,7 +60,11 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 	const location = useLocation();
 	const { organizations, fetchOrganizations } = useOrgStore();
-	const { isAdmin } = useAuthStore();
+	const { isAdmin, user } = useAuthStore();
+	const role = String(user?.role || "").trim().toLowerCase();
+	const canManageProbation =
+		isAdmin ||
+		["hr", "hr_staff", "human resources", "admin", "owner", "super_admin"].includes(role);
 
 	useEffect(() => {
 		fetchOrganizations();
@@ -74,15 +80,16 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 	return (
 		<aside
 			className={`
-      fixed inset-y-0 left-0 z-50 h-[100dvh] w-[min(18rem,86vw)] bg-[#3B00D9] border-r border-[#4a1ae0] flex flex-col transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:translate-x-0
+      fixed inset-y-0 left-0 z-50 h-[100dvh] w-[min(18rem,86vw)] bg-[#4A1D96] border-r border-[#3d177d] flex flex-col transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:translate-x-0
       ${isOpen ? "translate-x-0" : "-translate-x-full"}
     `}
 		>
 			<div className='p-6 flex items-center justify-between'>
 				<div className='flex items-center gap-2'>
-					<span className='font-bold text-xl text-white'>
-						HRM360
+					<span className='font-bold text-xl text-white tracking-wide'>
+						HRM<span className="text-[#E91EFA]">360</span>
 					</span>
+					<span className="w-2 h-2 rounded-full bg-[#E91EFA] animate-pulse"></span>
 				</div>
 				<button
 					onClick={onClose}
@@ -94,48 +101,49 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
 			<div className='flex-1 overflow-y-auto px-4 custom-scrollbar pb-6'>
 				<nav className='space-y-1 mb-8'>
-				{navItems
-					.filter((item) => {
-						if (isAdmin) return true;
-						return [
-							"/dashboard",
-							"/attendance",
-							"/leave",
-							"/announcement",
-							"/training",
-							"/task-manager",
-							"/permissions",
-							"/promotion",
-							"/settings",
-						].includes(item.path);
-					})
-					.map((item) => {
-						const isActive = location.pathname === item.path;
-						const Icon = item.icon;
-						return (
-							<Link
-								key={item.path}
-								to={item.path}
-								onClick={() => {
-									if (window.innerWidth < 1024) onClose?.();
-								}}
-								className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors ${
-									isActive
-										? "text-white bg-white/15 font-medium border border-white/20 shadow-xs"
-										: "text-white/80 hover:bg-white/10 hover:text-white"
-								}`}
-							>
-								<Icon
-									size={18}
-									className={
-										isActive ? "text-white" : "text-white/70"
-									}
-								/>
-								{item.label}
-							</Link>
-						);
-					})}
-			</nav>
+					{navItems
+						.filter((item) => {
+							if (item.path === "/probation") return canManageProbation;
+							if (isAdmin) return true;
+							return [
+								"/dashboard",
+								"/attendance",
+								"/leave",
+								"/announcement",
+								"/training",
+								"/task-manager",
+								"/permissions",
+								"/promotion",
+								"/settings",
+							].includes(item.path);
+						})
+						.map((item) => {
+							const isActive = location.pathname === item.path;
+							const Icon = item.icon;
+							return (
+								<Link
+									key={item.path}
+									to={item.path}
+									onClick={() => {
+										if (window.innerWidth < 1024) onClose?.();
+									}}
+									className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+										isActive
+											? "text-white bg-[#8B5CF6] font-medium shadow-md shadow-[#8B5CF6]/30"
+											: "text-white/80 hover:bg-[#8B5CF6]/40 hover:text-white"
+									}`}
+								>
+									<Icon
+										size={18}
+										className={
+											isActive ? "text-white" : "text-white/70"
+										}
+									/>
+									{item.label}
+								</Link>
+							);
+						})}
+				</nav>
 
 				<div className='bg-white/10 rounded-2xl p-4 border border-white/10'>
 					<p className='text-xs font-semibold text-white/70 mb-3 uppercase tracking-wider'>
@@ -167,11 +175,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								</button>
 							);
 						})}
-
-						{/* <button className="flex items-center gap-2 w-full p-2 mt-2 text-[#3B00D9] hover:bg-indigo-50 rounded-lg transition-colors justify-center">
-              <Plus size={16} />
-              <span className="text-sm font-medium">Add New Company</span>
-            </button> */}
 					</div>
 				</div>
 			</div>

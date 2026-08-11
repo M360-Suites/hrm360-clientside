@@ -430,7 +430,7 @@ const TaskManager = () => {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-5">
+    <div className="w-full max-w-337.5 mx-auto space-y-5">
       {toast && (
         <div
           className={`fixed left-3 right-3 top-4 z-100 px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-lg sm:left-auto sm:right-6 sm:top-6 ${
@@ -466,7 +466,7 @@ const TaskManager = () => {
               <h3 className="font-semibold text-gray-800">Projects</h3>
               <div className="group relative flex items-center">
                 <Info size={14} className="text-gray-400 hover:text-[#3B00D9] cursor-help" />
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden w-max max-w-[200px] rounded-md bg-gray-800 px-2.5 py-1.5 text-[11px] text-white opacity-0 transition-opacity group-hover:block group-hover:opacity-100 z-50">
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden w-max max-w-50 rounded-md bg-gray-800 px-2.5 py-1.5 text-[11px] text-white opacity-0 transition-opacity group-hover:block group-hover:opacity-100 z-50">
                   Drag and drop projects to reorder them
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
                 </div>
@@ -515,7 +515,7 @@ const TaskManager = () => {
                     await updateProjectOrder(newProjects, isAdmin);
                     setDraggedProjectIdx(null);
                   }}
-                  className={`min-w-[220px] rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full cursor-grab active:cursor-grabbing ${
+                  className={`min-w-55 rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full cursor-grab active:cursor-grabbing ${
                     isActive
                       ? "bg-[#3B00D9] text-white border-[#3B00D9]"
                       : "bg-white border-gray-200 text-gray-700 hover:border-[#3B00D9]/40"
@@ -981,7 +981,7 @@ const BoardColumn = ({
           <span className="whitespace-nowrap text-right">Activity</span>
         </div>
         <div
-          className="min-h-[280px] max-h-none min-w-0 overflow-y-auto xl:max-h-[68vh]"
+          className="min-h-70 max-h-none min-w-0 overflow-y-auto xl:max-h-[68vh]"
           onDragOver={(e) => {
             e.preventDefault();
             setDragOverColumn(columnKey);

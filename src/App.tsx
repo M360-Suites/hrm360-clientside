@@ -30,6 +30,7 @@ import Recruitment from "./pages/recruitment/Recruitment";
 import Training from "./pages/training/Training";
 import Promotion from "./pages/promotion/Promotion";
 import Permission from "./pages/permission/Permission";
+import Probation from "./pages/probation/Probation";
 import Loans from "./pages/loans/Loans";
 import Performance from "./pages/performance/Performance";
 import Announcement from "./pages/announcement/Announcement";
@@ -126,6 +127,7 @@ const App = () => {
 						<Route path='/settings' element={<Settings />} />
 						<Route path='/promotion' element={<Promotion />} />
 						<Route path='/permissions' element={<Permission />} />
+						<Route path='/probation' element={<Probation />} />
 						<Route path='/loans' element={<Loans />} />
 						<Route path='/performance' element={<Performance />} />
 
