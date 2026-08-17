@@ -24,6 +24,8 @@ import { useEmployeeStore } from "../../store/useEmployeeStore";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
 import { useLeaveStore } from "../../store/useLeaveStore";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useAnnouncementStore } from "../../store/useAnnouncementStore";
+import type { AnnouncementItem } from "../../store/useAnnouncementStore";
 import { useNavigate } from "react-router-dom";
 
 type Toast = { type: "success" | "error"; message: string };
@@ -101,6 +103,12 @@ const Dashboard = () => {
   const { todayStats, fetchTodayStats } = useAttendanceStore();
   const { leaves, fetchLeaves } = useLeaveStore();
   const { user, isAdmin } = useAuthStore();
+  const {
+    announcements,
+    isLoading: announcementsLoading,
+    fetchAnnouncements,
+    fetchUserAnnouncements,
+  } = useAnnouncementStore();
 
   const employeeName = user?.name?.split(" ")[0] || "Employee";
 
@@ -111,7 +119,13 @@ const Dashboard = () => {
     fetchEmployees();
     fetchTodayStats();
     fetchLeaves();
-  }, [isAdmin, fetchEmployees, fetchTodayStats, fetchLeaves]);
+    fetchAnnouncements();
+  }, [isAdmin, fetchEmployees, fetchTodayStats, fetchLeaves, fetchAnnouncements]);
+
+  useEffect(() => {
+    if (isAdmin) return;
+    fetchUserAnnouncements();
+  }, [isAdmin, fetchUserAnnouncements]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -227,7 +241,7 @@ const Dashboard = () => {
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1.5">
-              {isAdmin ? "Welcome back" : `${greeting}, ${employeeName}`}
+              {isAdmin ? "Welcome back 👋" : `${greeting}, ${employeeName} 👋`}
             </h2>
             <p className="text-white/60 text-sm max-w-md">
               {isAdmin
@@ -371,73 +385,192 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ── CALENDAR ── */}
-      <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[#4A1D96]">
-              <Calendar size={16} />
-            </div>
-            <h3 className="font-semibold text-gray-800">Calendar</h3>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-600">{monthLabel}</span>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={() =>
-                  setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
-                }
-                className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
-                }
-                className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* ── CALENDAR + ANNOUNCEMENTS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2 font-semibold text-gray-400">
-          {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
-            <div key={day}>{day}</div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-gray-700">
-          {calendarCells.map((dateNum, i) => {
-            const isToday = isCurrentMonth && dateNum === new Date().getDate();
-            const isWeekend =
-              dateNum !== null &&
-              (() => {
-                const col = i % 7;
-                return col === 5 || col === 6;
-              })();
-            return (
-              <div
-                key={`${dateNum}-${i}`}
-                className={`p-1.5 rounded-xl min-h-9 flex items-center justify-center text-sm transition-colors ${
-                  isToday
-                    ? "bg-gradient-to-br from-[#4A1D96] to-[#8B5CF6] text-white font-bold shadow-md"
-                    : isWeekend && dateNum
-                    ? "text-[#8B5CF6] hover:bg-purple-50"
-                    : dateNum
-                    ? "hover:bg-gray-50"
-                    : ""
-                }`}
-              >
-                {dateNum || ""}
+        {/* Calendar */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[#4A1D96]">
+                <Calendar size={15} />
               </div>
-            );
-          })}
+              <h3 className="font-semibold text-gray-800 text-sm">Calendar</h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-500">{monthLabel}</span>
+              <div className="flex gap-0.5">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+                  }
+                  className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+                  }
+                  className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 gap-0.5 text-center text-[11px] mb-1.5 font-semibold text-gray-400">
+            {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
+              <div key={day}>{day}</div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-0.5 text-center font-medium text-gray-700">
+            {calendarCells.map((dateNum, i) => {
+              const isToday = isCurrentMonth && dateNum === new Date().getDate();
+              const isWeekend =
+                dateNum !== null &&
+                (() => {
+                  const col = i % 7;
+                  return col === 5 || col === 6;
+                })();
+              return (
+                <div
+                  key={`${dateNum}-${i}`}
+                  className={`py-1.5 rounded-lg flex items-center justify-center text-xs transition-colors ${
+                    isToday
+                      ? "bg-[#4A1D96] text-white font-bold"
+                      : isWeekend && dateNum
+                      ? "text-[#8B5CF6] hover:bg-purple-50"
+                      : dateNum
+                      ? "hover:bg-gray-50"
+                      : ""
+                  }`}
+                >
+                  {dateNum || ""}
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Announcements */}
+        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563EB]">
+                <Bell size={15} />
+              </div>
+              <h3 className="font-semibold text-gray-800 text-sm">Announcements</h3>
+            </div>
+            {announcements.length > 0 && (
+              <span className="text-xs text-[#2563EB] font-semibold cursor-pointer hover:underline"
+                onClick={() => navigate("/announcements")}>
+                View all
+              </span>
+            )}
+          </div>
+
+          {/* Loading */}
+          {announcementsLoading && (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-3 p-3 rounded-xl animate-pulse">
+                  <div className="h-8 w-8 rounded-lg bg-gray-100 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-gray-100 rounded w-3/4" />
+                    <div className="h-2.5 bg-gray-100 rounded w-full" />
+                    <div className="h-2 bg-gray-100 rounded w-1/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty */}
+          {!announcementsLoading && announcements.length === 0 && (
+            <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
+              <div className="h-12 w-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-3">
+                <Bell size={22} className="text-gray-300" />
+              </div>
+              <p className="text-sm font-medium text-gray-400">No announcements yet</p>
+              <p className="text-xs text-gray-300 mt-1">Check back later for updates</p>
+            </div>
+          )}
+
+          {/* Real data */}
+          {!announcementsLoading && announcements.length > 0 && (
+            <div className="flex flex-col gap-2.5 overflow-y-auto max-h-72 pr-0.5">
+              {announcements.slice(0, 5).map((item: AnnouncementItem, idx: number) => {
+                const id = item._id || item.id || String(idx);
+                const isFirst = idx === 0;
+                const body = item.body || item.message || "";
+                const dateStr = item.createdAt || item.date || item.updatedAt;
+                const timeAgo = dateStr
+                  ? (() => {
+                      const diff = Date.now() - new Date(dateStr).getTime();
+                      const mins = Math.floor(diff / 60000);
+                      if (mins < 60) return `${mins}m ago`;
+                      const hrs = Math.floor(mins / 60);
+                      if (hrs < 24) return `${hrs}h ago`;
+                      return `${Math.floor(hrs / 24)}d ago`;
+                    })()
+                  : "";
+                const createdBy =
+                  typeof item.createdBy === "string"
+                    ? item.createdBy
+                    : item.createdBy?.name || item.createdBy?.email || "Admin";
+                const isUnread = !(item.read || item.isRead);
+
+                return (
+                  <div
+                    key={id}
+                    className={`flex gap-3 p-3 rounded-xl border transition-colors ${
+                      isFirst
+                        ? "bg-[#4A1D96]/5 border-[#4A1D96]/10"
+                        : "border-transparent hover:bg-gray-50 hover:border-gray-100"
+                    }`}
+                  >
+                    <div
+                      className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                        isFirst ? "bg-[#4A1D96]" : "bg-[#2563EB]"
+                      }`}
+                    >
+                      {isFirst ? (
+                        <Sparkles size={14} className="text-white" />
+                      ) : (
+                        <Bell size={14} className="text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-xs font-bold text-gray-800 truncate">{item.title}</p>
+                        {isFirst && (
+                          <span className="shrink-0 text-[10px] font-semibold bg-[#4A1D96] text-white px-1.5 py-0.5 rounded-full">
+                            Latest
+                          </span>
+                        )}
+                        {isUnread && !isFirst && (
+                          <span className="shrink-0 h-2 w-2 rounded-full bg-[#2563EB]" />
+                        )}
+                      </div>
+                      {body && (
+                        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{body}</p>
+                      )}
+                      <p className="text-[10px] text-gray-400 mt-1.5">
+                        {timeAgo}{timeAgo && " · "}{createdBy}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* ── ADD EMPLOYEE MODAL ── */}
