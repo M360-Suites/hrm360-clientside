@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -6,6 +7,12 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
+  Users,
+  UserCheck,
+  CalendarOff,
+  Clock,
+  Calendar,
+  Bell,
 } from "lucide-react";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
 import { useAttendanceStore } from "../../store/useAttendanceStore";
@@ -216,44 +223,94 @@ const Dashboard = () => {
 
       {isAdmin ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-            <p className="text-sm font-medium text-gray-600 mb-2">Total Employees</p>
-            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{totalEmployeeCount}</h3>
+          {/* Total Employees Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">Total Employees</p>
+              <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[#4A1D96] group-hover:scale-110 transition-transform">
+                <Users size={20} />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{totalEmployeeCount}</h3>
+              <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                Active Staff
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-            <p className="text-sm font-medium text-gray-600 mb-2">Attendance Today</p>
-            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{todayStats?.present || 0}</h3>
-            <p className="text-xs text-gray-500 mt-2">Rate: {attendanceRate}</p>
+          {/* Attendance Today Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">Attendance Today</p>
+              <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563EB] group-hover:scale-110 transition-transform">
+                <UserCheck size={20} />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">{todayStats?.present || 0}</h3>
+              <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
+                Rate: {attendanceRate}
+              </span>
+            </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1">
-            <p className="text-sm font-medium text-gray-600 mb-2">On Leave</p>
-            <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {leaves?.filter((l: any) => String(l.status).toLowerCase() === "approved").length || 0}
-            </h3>
+          {/* On Leave Card */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">On Leave</p>
+              <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                <CalendarOff size={20} />
+              </div>
+            </div>
+            <div className="flex items-baseline justify-between">
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {leaves?.filter((l: any) => String(l.status).toLowerCase() === "approved").length || 0}
+              </h3>
+              <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-100">
+                Approved
+              </span>
+            </div>
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-            <p className="text-sm font-medium text-gray-600 mb-2">Current Time</p>
+          {/* Current Time */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">Current Time</p>
+              <div className="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                <Clock size={20} />
+              </div>
+            </div>
             <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 tabular-nums">
               {timeLabel}
             </h3>
-            <p className="text-xs text-gray-500 mt-2">Local workspace time</p>
+            <p className="text-xs text-gray-400 mt-2">Local workspace time</p>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
-            <p className="text-sm font-medium text-gray-600 mb-2">Today</p>
+          {/* Today Date */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">Today</p>
+              <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-[#8B5CF6] group-hover:scale-110 transition-transform">
+                <Calendar size={20} />
+              </div>
+            </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{dateLabel}</h3>
-            <p className="text-xs text-gray-500 mt-2">Plan your workday with the calendar below</p>
+            <p className="text-xs text-gray-400 mt-2">Plan your workday with the calendar</p>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs sm:col-span-2 lg:col-span-1">
-            <p className="text-sm font-medium text-gray-600 mb-2">Quick Reminder</p>
+          {/* Quick Reminder */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-gray-500">Quick Reminder</p>
+              <div className="h-10 w-10 rounded-xl bg-pink-50 border border-pink-100 flex items-center justify-center text-[#E91EFA] group-hover:scale-110 transition-transform">
+                <Bell size={20} />
+              </div>
+            </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Check attendance</h3>
-            <p className="text-xs text-gray-500 mt-2">Use the Attendance page to scan your workplace QR.</p>
+            <p className="text-xs text-gray-400 mt-2">Scan workplace QR or mark clock-in</p>
           </div>
         </div>
       )}
