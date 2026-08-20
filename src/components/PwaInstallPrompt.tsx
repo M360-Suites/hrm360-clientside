@@ -91,7 +91,7 @@ const PwaInstallPrompt = () => {
   if (!isVisible || isInstalled) return null;
 
   return (
-    <div className="fixed inset-x-3 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[120] mx-auto max-w-md rounded-3xl border border-white/70 bg-white/95 p-4 shadow-2xl shadow-[#3B00D9]/20 backdrop-blur-xl">
+    <div className="fixed inset-x-3 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[120] mx-auto max-w-md rounded-3xl border border-white/70 bg-white/95 p-4 shadow-2xl shadow-[#4A1D96]/20 backdrop-blur-xl">
       <button
         type="button"
         onClick={dismissPrompt}
@@ -102,7 +102,7 @@ const PwaInstallPrompt = () => {
       </button>
 
       <div className="flex gap-3 pr-7">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#3B00D9] text-white shadow-lg shadow-[#3B00D9]/25">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#4A1D96] text-white shadow-lg shadow-[#4A1D96]/25">
           {isIos ? <Share2 size={21} /> : <Download size={21} />}
         </div>
 
@@ -122,7 +122,7 @@ const PwaInstallPrompt = () => {
         <button
           type="button"
           onClick={installApp}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#3B00D9] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#3500c0]"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#4A1D96] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#8B5CF6]"
         >
           <Download size={16} />
           Install app

@@ -320,7 +320,7 @@ const Leave = () => {
           <button
             type="button"
             onClick={() => setShowRequestModal(true)}
-            className="bg-violet-100 text-[#3B00D9] px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-200 transition-colors"
+            className="bg-violet-100 text-[#4A1D96] px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-200 transition-colors"
           >
             + Request Leave
           </button>
@@ -346,7 +346,7 @@ const Leave = () => {
           <select
             value={selectedEmployeeId}
             onChange={(e) => setSelectedEmployeeId(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] sm:w-auto"
+            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] sm:w-auto"
           >
             <option value="all">All employees</option>
             {employees.map((emp: any, idx: number) => {
@@ -370,7 +370,7 @@ const Leave = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isAdmin ? "Search employee" : "Search leave details"}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
             />
           </div>
           <button className="text-sm font-medium text-gray-600 px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
@@ -381,7 +381,7 @@ const Leave = () => {
         <div className="min-h-[320px] relative">
           {isLoading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
-              <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
+              <Loader2 className="animate-spin text-[#4A1D96]" size={32} />
             </div>
           )}
 
@@ -598,7 +598,7 @@ const Leave = () => {
                       setFormData((prev) => ({ ...prev, type: e.target.value }));
                       setFormErrors((prev) => ({ ...prev, type: "" }));
                     }}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                   >
                     <option value="Annual Leave">Annual Leave</option>
                     <option value="Sick Leave">Sick Leave</option>
@@ -619,7 +619,7 @@ const Leave = () => {
                         setFormErrors((prev) => ({ ...prev, startDate: "", endDate: "" }));
                       }}
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                     />
                     {formErrors.startDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.startDate}</p>}
                   </div>
@@ -633,7 +633,7 @@ const Leave = () => {
                         setFormErrors((prev) => ({ ...prev, endDate: "" }));
                       }}
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                     />
                     {formErrors.endDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.endDate}</p>}
                   </div>
@@ -649,7 +649,7 @@ const Leave = () => {
                       setFormErrors((prev) => ({ ...prev, reason: "" }));
                     }}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                   />
                   {formErrors.reason && <p className="mt-1.5 text-xs text-rose-500">{formErrors.reason}</p>}
                 </div>
@@ -694,7 +694,7 @@ const Leave = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 py-3 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="flex-1 py-3 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {isLoading && <Loader2 className="animate-spin" size={16} />}
                     Submit Request

@@ -59,7 +59,7 @@ const ChangePassword = () => {
                 placeholder="Enter password"
                 required
                 minLength={8}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
               />
 
               <button
@@ -76,7 +76,7 @@ const ChangePassword = () => {
             <button
                     type="submit"
                     disabled={isChanging}
-                    className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
                 >
                     {isChanging && <Loader2 className="animate-spin" size={18} />}
                     Set Password

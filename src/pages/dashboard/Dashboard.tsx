@@ -171,7 +171,7 @@ const Dashboard = () => {
     `w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all ${
       formErrors[field]
         ? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
-        : "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+        : "border-gray-200 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
     }`;
 
   const handleAddEmployee = async (e: React.FormEvent) => {
@@ -640,7 +640,7 @@ const Dashboard = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="flex-1 py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {isLoading && <Loader2 className="animate-spin" size={16} />}
                     Add Member

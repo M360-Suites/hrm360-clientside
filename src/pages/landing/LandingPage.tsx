@@ -27,7 +27,7 @@ const LandingPage = () => {
 	}, [navigate]);
 
 	return (
-		<div className="min-h-screen bg-slate-50 font-sans selection:bg-[#3b00d9]/20 selection:text-[#3b00d9]">
+		<div className="min-h-screen bg-slate-50 font-sans selection:bg-[#4A1D96]/20 selection:text-[#4A1D96]">
 			<Navbar />
 			<main>
 				<Hero />

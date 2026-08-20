@@ -25,7 +25,7 @@ const Loans = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Loan Management</h2>
           <p className="text-sm text-gray-500">Track and manage employee loans</p>
         </div>
-        <button className="bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors shadow-xs">
+        <button className="bg-purple-50 text-[#4A1D96] px-4 py-2 rounded-xl text-sm font-medium hover:bg-purple-100 transition-colors shadow-xs">
           View loan policy
         </button>
       </div>
@@ -72,7 +72,7 @@ const Loans = () => {
           <input 
             type="text" 
             placeholder="Search courses.." 
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
           />
         </div>
       </div>
@@ -134,7 +134,7 @@ const Loans = () => {
             &larr; Previous
           </button>
           <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 text-[#3B00D9] text-sm font-medium">1</button>
+            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-50 text-[#4A1D96] text-sm font-medium">1</button>
             <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 text-sm">2</button>
             <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-50 text-sm">3</button>
             <span className="text-gray-400 mx-1">..</span>

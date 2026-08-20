@@ -465,7 +465,7 @@ const TaskManager = () => {
             <div className="flex items-center gap-1">
               <h3 className="font-semibold text-gray-800">Projects</h3>
               <div className="group relative flex items-center">
-                <Info size={14} className="text-gray-400 hover:text-[#3B00D9] cursor-help" />
+                <Info size={14} className="text-gray-400 hover:text-[#4A1D96] cursor-help" />
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 hidden w-max max-w-50 rounded-md bg-gray-800 px-2.5 py-1.5 text-[11px] text-white opacity-0 transition-opacity group-hover:block group-hover:opacity-100 z-50">
                   Drag and drop projects to reorder them
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800" />
@@ -517,8 +517,8 @@ const TaskManager = () => {
                   }}
                   className={`min-w-55 rounded-lg border text-sm flex items-center lg:min-w-0 lg:w-full cursor-grab active:cursor-grabbing ${
                     isActive
-                      ? "bg-[#3B00D9] text-white border-[#3B00D9]"
-                      : "bg-white border-gray-200 text-gray-700 hover:border-[#3B00D9]/40"
+                      ? "bg-[#4A1D96] text-white border-[#4A1D96]"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-[#4A1D96]/40"
                   }`}
                 >
                   <div className={`flex items-center pl-2 ${isActive ? "text-white/60" : "text-gray-400 hover:text-gray-600"}`}>
@@ -576,7 +576,7 @@ const TaskManager = () => {
             <button
               type="button"
               onClick={() => setShowProjectModal(true)}
-              className="w-full shrink-0 border border-dashed border-[#3B00D9]/40 text-[#3B00D9] rounded-lg py-2.5 text-sm font-medium hover:bg-[#3B00D9]/5 lg:w-full"
+              className="w-full shrink-0 border border-dashed border-[#4A1D96]/40 text-[#4A1D96] rounded-lg py-2.5 text-sm font-medium hover:bg-[#4A1D96]/5 lg:w-full"
             >
               + Add new project
             </button>
@@ -599,7 +599,7 @@ const TaskManager = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search task..."
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
               />
             </div>
           </div>
@@ -683,7 +683,7 @@ const TaskManager = () => {
 
       {isLoading && (
         <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] flex items-center justify-center">
-          <Loader2 className="animate-spin text-[#3B00D9]" size={30} />
+          <Loader2 className="animate-spin text-[#4A1D96]" size={30} />
         </div>
       )}
 
@@ -964,7 +964,7 @@ const BoardColumn = ({
     <div
       className={`bg-white border rounded-lg overflow-hidden transition-all ${
         dragOverColumn === columnKey
-          ? "border-[#3B00D9] ring-2 ring-[#3B00D9]/20 shadow-md"
+          ? "border-[#4A1D96] ring-2 ring-[#4A1D96]/20 shadow-md"
           : "border-gray-100"
       }`}
     >
@@ -1142,7 +1142,7 @@ const TaskCard = ({
           </p>
           <p className="mt-1 flex items-center gap-2 text-[10px] font-medium text-gray-400">
             <span>{assignees.length} member{assignees.length === 1 ? "" : "s"}</span>
-            <span className="text-[9px] px-1.5 py-0.5 bg-gray-100 rounded-sm text-gray-500 group-hover:bg-[#3B00D9]/10 group-hover:text-[#3B00D9] transition-colors">
+            <span className="text-[9px] px-1.5 py-0.5 bg-gray-100 rounded-sm text-gray-500 group-hover:bg-[#4A1D96]/10 group-hover:text-[#4A1D96] transition-colors">
               Click to expand details
             </span>
           </p>
@@ -1156,7 +1156,7 @@ const TaskCard = ({
           <button
             type="button"
             onClick={onToggleExpanded}
-            className="inline-flex items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-[#3B00D9] bg-gray-50 px-1.5 py-0.5 rounded"
+            className="inline-flex items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-[#4A1D96] bg-gray-50 px-1.5 py-0.5 rounded"
           >
             <MessageSquare size={10} /> {comments.length}
           </button>
@@ -1320,7 +1320,7 @@ const TaskCard = ({
                       onClick={() => handleSelectMention(emp)}
                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-center gap-2"
                     >
-                      <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-[10px] shrink-0">
+                      <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[#4A1D96] font-bold text-[10px] shrink-0">
                         {emp.name?.charAt(0) || "U"}
                       </div>
                       <span className="truncate">{emp.name}</span>
@@ -1336,13 +1336,13 @@ const TaskCard = ({
               value={commentDraft}
               onChange={handleInputChange}
               placeholder="Add a comment... (Type @ to mention)"
-              className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#3B00D9]"
+              className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs outline-none focus:border-[#4A1D96]"
             />
             <button
               type="button"
               onClick={onAddComment}
               disabled={!commentDraft.trim()}
-              className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#3B00D9] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#4A1D96] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
             >
               <Send size={12} /> Send
             </button>
@@ -1428,7 +1428,7 @@ const SubmitActions = ({ onCancel }: { onCancel: () => void }) => (
     </button>
     <button
       type="submit"
-      className="flex-1 py-2.5 rounded-xl bg-[#3B00D9] text-white hover:bg-[#3500c0]"
+      className="flex-1 py-2.5 rounded-xl bg-[#4A1D96] text-white hover:bg-[#8B5CF6]"
     >
       Save
     </button>
@@ -1463,7 +1463,7 @@ const TeamCheckboxList = ({
               type="checkbox"
               checked={checked}
               onChange={() => onToggle(id)}
-              className="accent-[#3B00D9]"
+              className="accent-[#4A1D96]"
             />
             <span className="truncate">{emp.name || emp.email}</span>
           </label>

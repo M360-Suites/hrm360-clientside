@@ -51,7 +51,7 @@ const Activation = () => {
     <div className="w-full text-center">
       {status === "loading" && (
         <>
-          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-50 text-[#3B00D9] flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-50 text-[#4A1D96] flex items-center justify-center">
             <Loader2 size={32} className="animate-spin" />
           </div>
 
@@ -82,7 +82,7 @@ const Activation = () => {
 
           <Link
             to="/login"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#3B00D9] text-white font-medium"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#4A1D96] text-white font-medium"
           >
             Continue to Login
           </Link>
@@ -106,7 +106,7 @@ const Activation = () => {
 
           <Link
             to="/register"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#3B00D9] text-white font-medium"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#4A1D96] text-white font-medium"
           >
             Create Account Again
           </Link>

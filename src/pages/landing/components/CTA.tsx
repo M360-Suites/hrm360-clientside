@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export const CTA = () => {
 	return (
-		<section className="py-24 bg-[#3b00d9] relative overflow-hidden">
+		<section className="py-24 bg-[#4A1D96] relative overflow-hidden">
 			{/* Decorative elements */}
 			<div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-10">
 				<div className="absolute -top-24 -left-24 w-96 h-96 bg-white rounded-full mix-blend-overlay"></div>
@@ -21,7 +21,7 @@ export const CTA = () => {
 						</p>
 
 						<div className="flex flex-col sm:flex-row gap-4 mb-12">
-							<Link to="/register" className="flex items-center justify-center gap-2 bg-white text-[#3b00d9] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg">
+							<Link to="/register" className="flex items-center justify-center gap-2 bg-white text-[#4A1D96] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg">
 								Get Started <ArrowRight className="w-5 h-5" />
 							</Link>
 							<button className="flex items-center justify-center gap-2 bg-[#3000b3] text-white border border-[#4d14e8] px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#280099] transition-colors">
@@ -50,7 +50,7 @@ export const CTA = () => {
 						<div className="absolute inset-0 bg-[#3000b3]/50 rounded-3xl transform -rotate-2"></div>
 						<div className="relative bg-white rounded-3xl p-8 shadow-2xl">
 							<div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-								<div className="w-12 h-12 rounded-xl bg-[#3b00d9] flex items-center justify-center">
+								<div className="w-12 h-12 rounded-xl bg-[#4A1D96] flex items-center justify-center">
 									<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
 								</div>
 								<div>
@@ -62,9 +62,9 @@ export const CTA = () => {
 								Get a personalised walkthrough of HRM360 with one of our product experts.
 							</p>
 							<form className="space-y-4">
-								<input type="text" placeholder="Full Name" className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#3b00d9] focus:ring-1 focus:ring-[#3b00d9]" />
-								<input type="email" placeholder="Work Email" className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#3b00d9] focus:ring-1 focus:ring-[#3b00d9]" />
-								<button className="w-full bg-[#3b00d9] text-white font-bold py-3 rounded-lg hover:bg-[#3000b3] transition-colors flex items-center justify-center gap-2">
+								<input type="text" placeholder="Full Name" className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#4A1D96] focus:ring-1 focus:ring-[#4A1D96]" />
+								<input type="email" placeholder="Work Email" className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-[#4A1D96] focus:ring-1 focus:ring-[#4A1D96]" />
+								<button className="w-full bg-[#4A1D96] text-white font-bold py-3 rounded-lg hover:bg-[#3000b3] transition-colors flex items-center justify-center gap-2">
 									<Calendar className="w-4 h-4" /> Book Demo
 								</button>
 							</form>

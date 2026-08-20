@@ -45,11 +45,11 @@ const Performance = () => {
           </span>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-purple-200 border-dashed bg-purple-50/30 flex flex-col justify-center">
-          <div className="bg-[#3B00D9] text-white text-sm font-medium text-center py-2 rounded-lg mb-3 shadow-xs">
+          <div className="bg-[#4A1D96] text-white text-sm font-medium text-center py-2 rounded-lg mb-3 shadow-xs">
             Quick Actions
           </div>
           <div className="space-y-2">
-            <button className="w-full py-2 bg-purple-50 text-[#3B00D9] font-medium rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors">
+            <button className="w-full py-2 bg-purple-50 text-[#4A1D96] font-medium rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors">
               <Plus size={16} /> Create Goal
             </button>
             <button className="w-full py-2 bg-white border border-gray-200 text-gray-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
@@ -70,7 +70,7 @@ const Performance = () => {
           <input 
             type="text" 
             placeholder="Search courses.." 
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
           />
         </div>
       </div>
@@ -80,7 +80,7 @@ const Performance = () => {
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs h-80 flex flex-col">
              <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-800">Performance Overview</h3>
-              <button className="flex items-center gap-2 text-sm font-medium text-[#3B00D9] bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+              <button className="flex items-center gap-2 text-sm font-medium text-[#4A1D96] bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
                 Q1 2026 <ChevronDown size={14} />
               </button>
             </div>
@@ -139,7 +139,7 @@ const Performance = () => {
              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs h-64 flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-800">Top performer</h3>
-                  <button className="flex items-center gap-1 text-xs font-medium text-[#3B00D9] bg-indigo-50 px-2 py-1 rounded-lg">
+                  <button className="flex items-center gap-1 text-xs font-medium text-[#4A1D96] bg-indigo-50 px-2 py-1 rounded-lg">
                     Q1 2026 <ChevronDown size={12} />
                   </button>
                 </div>

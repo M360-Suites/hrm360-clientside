@@ -114,7 +114,7 @@ const Employees = () => {
 		`w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-hidden focus:ring-2 transition-all ${
 			formErrors[field]
 				? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
-				: "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+				: "border-gray-200 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
 		}`;
 
 	const handleAddEmployee = async (e: React.FormEvent) => {
@@ -361,7 +361,7 @@ const Employees = () => {
 						resetForm();
 						setIsModalOpen(true);
 					}}
-					className='w-full sm:w-auto bg-[#3B00D9] text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#3500c0] transition-all shadow-xs'
+					className='w-full sm:w-auto bg-[#4A1D96] text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#8B5CF6] transition-all shadow-xs'
 				>
 					<Plus size={16} /> Add new employee
 				</button>
@@ -370,7 +370,7 @@ const Employees = () => {
 			<div className='bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden'>
 				<div className='p-4 border-b border-gray-100 overflow-x-auto'>
 					<div className='flex gap-4 min-w-max text-sm'>
-						<button className='font-medium text-[#3B00D9] border-b-2 border-[#3B00D9] pb-4 px-2'>
+						<button className='font-medium text-[#4A1D96] border-b-2 border-[#4A1D96] pb-4 px-2'>
 							All Employees
 						</button>
 						{/* <button className='font-medium text-gray-500 pb-4 px-2 hover:text-gray-700'>
@@ -390,7 +390,7 @@ const Employees = () => {
 							placeholder='Search employee'
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm'
+							className='w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm'
 						/>
 					</div>
 
@@ -439,7 +439,7 @@ const Employees = () => {
 					{isLoading && (
 						<div className='absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10'>
 							<Loader2
-								className='animate-spin text-[#3B00D9]'
+								className='animate-spin text-[#4A1D96]'
 								size={32}
 							/>
 						</div>
@@ -469,7 +469,7 @@ const Employees = () => {
 									>
 										<td className='px-6 py-4'>
 											<div className='flex items-center gap-3'>
-												<div className='w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold'>
+												<div className='w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-[#4A1D96] font-bold'>
 													{emp.name?.charAt(0)}
 												</div>
 
@@ -493,7 +493,7 @@ const Employees = () => {
 										</td>
 
 										<td className='px-6 py-4'>
-											<span className='inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-[#3B00D9]'>
+											<span className='inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-[#4A1D96]'>
 												{typeof emp.orgId === "object"
 													? emp.orgId.name
 													: emp.orgId || "N/A"}
@@ -530,7 +530,7 @@ const Employees = () => {
 												<button
 													type='button'
 													onClick={() => openEditModal(emp)}
-													className='text-[#3B00D9] hover:bg-[#3B00D9]/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors'
+													className='text-[#4A1D96] hover:bg-[#4A1D96]/10 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors'
 												>
 													Edit
 												</button>
@@ -558,7 +558,7 @@ const Employees = () => {
 								<div key={employeeId} className='p-4 space-y-4'>
 									<div className='flex items-center justify-between'>
 										<div className='flex items-center gap-3'>
-											<div className='w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-lg'>
+											<div className='w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-[#4A1D96] font-bold text-lg'>
 												{emp.name?.charAt(0)}
 											</div>
 											<div>
@@ -845,7 +845,7 @@ const Employees = () => {
 									<button
 										type='submit'
 										disabled={isLoading}
-										className='flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
+										className='flex-1 py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
 									>
 										{isLoading && (
 											<Loader2 className='animate-spin' size={16} />
@@ -987,7 +987,7 @@ const Employees = () => {
 									<button
 										type='submit'
 										disabled={isLoading}
-										className='flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
+										className='flex-1 py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
 									>
 										{isLoading && (
 											<Loader2 className='animate-spin' size={16} />

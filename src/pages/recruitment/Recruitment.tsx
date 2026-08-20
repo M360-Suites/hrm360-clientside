@@ -101,11 +101,11 @@ const downloadJobPosting = (job: Job) => {
     "<title>" + escapeHtml(job.title) + "</title>",
     "<style>",
     "body{font-family:Arial,sans-serif;color:#1f2937;line-height:1.6;margin:48px;}",
-    "header{border-bottom:3px solid #3B00D9;padding-bottom:22px;margin-bottom:28px;}",
-    "h1{color:#210078;font-size:30px;margin:0 0 8px;}h2{font-size:17px;color:#3B00D9;margin-top:28px;}",
-    ".meta{color:#4b5563;font-size:14px}.badge{display:inline-block;background:#ede9fe;color:#3B00D9;padding:5px 10px;border-radius:999px;margin:0 6px 6px 0;}",
+    "header{border-bottom:3px solid #4A1D96;padding-bottom:22px;margin-bottom:28px;}",
+    "h1{color:#210078;font-size:30px;margin:0 0 8px;}h2{font-size:17px;color:#4A1D96;margin-top:28px;}",
+    ".meta{color:#4b5563;font-size:14px}.badge{display:inline-block;background:#ede9fe;color:#4A1D96;padding:5px 10px;border-radius:999px;margin:0 6px 6px 0;}",
     "ul{padding-left:22px}li{margin-bottom:7px}.footer{margin-top:42px;padding-top:18px;border-top:1px solid #e5e7eb;color:#6b7280;font-size:12px}",
-    "</style></head><body><header><p style='color:#3B00D9;font-weight:700;margin:0 0 8px'>HRM360 JOB OPENING</p>",
+    "</style></head><body><header><p style='color:#4A1D96;font-weight:700;margin:0 0 8px'>HRM360 JOB OPENING</p>",
     "<h1>" + escapeHtml(job.title) + "</h1>",
     "<div class='meta'><span class='badge'>" + escapeHtml(job.department) + "</span><span class='badge'>" + escapeHtml(job.type) + "</span><br>",
     escapeHtml(job.location) + " &nbsp;|&nbsp; " + escapeHtml(job.salaryRange) + " &nbsp;|&nbsp; Closes " + escapeHtml(formatDate(job.closingDate)) + "</div></header>",
@@ -128,7 +128,7 @@ const downloadJobPosting = (job: Job) => {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-hidden transition focus:border-[#3B00D9] focus:ring-2 focus:ring-[#3B00D9]/10";
+  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-hidden transition focus:border-[#4A1D96] focus:ring-2 focus:ring-[#4A1D96]/10";
 
 const Recruitment = () => {
   const { user, isAdmin } = useAuthStore();
@@ -231,14 +231,14 @@ const Recruitment = () => {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#3B00D9]">Talent acquisition</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Talent acquisition</p>
           <h2 className="text-2xl font-semibold text-gray-900">Recruitment</h2>
           <p className="mt-1 text-sm text-gray-500">Publish openings, share job briefs, and receive applications.</p>
         </div>
         {canManageJobs && (
           <button
             onClick={() => { clearError(); setShowPostModal(true); }}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#3B00D9] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-[#3100b5] sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-[#8B5CF6] sm:w-auto"
           >
             <Plus size={17} /> Post a job
           </button>
@@ -282,7 +282,7 @@ const Recruitment = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex min-h-72 items-center justify-center text-[#3B00D9]">
+          <div className="flex min-h-72 items-center justify-center text-[#4A1D96]">
             <Loader2 className="animate-spin" size={28} />
           </div>
         ) : filteredJobs.length ? (
@@ -295,27 +295,27 @@ const Recruitment = () => {
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-[#3B00D9]">{job.department || "General"}</span>
+                        <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-[#4A1D96]">{job.department || "General"}</span>
                         <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">{job.type || "Not specified"}</span>
                         {expired && <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600">Closed</span>}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
                       <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-6 text-gray-500">{job.description || "No description provided."}</p>
                       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-gray-500">
-                        <span className="flex items-center gap-1.5"><MapPin size={15} className="text-[#3B00D9]" />{job.location || "Not specified"}</span>
-                        <span className="flex items-center gap-1.5"><Clock3 size={15} className="text-[#3B00D9]" />Closes {formatDate(job.closingDate)}</span>
-                        <span className="flex items-center gap-1.5"><Users size={15} className="text-[#3B00D9]" />{job.applicants || 0} applicants</span>
+                        <span className="flex items-center gap-1.5"><MapPin size={15} className="text-[#4A1D96]" />{job.location || "Not specified"}</span>
+                        <span className="flex items-center gap-1.5"><Clock3 size={15} className="text-[#4A1D96]" />Closes {formatDate(job.closingDate)}</span>
+                        <span className="flex items-center gap-1.5"><Users size={15} className="text-[#4A1D96]" />{job.applicants || 0} applicants</span>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 lg:justify-end">
-                      <button onClick={() => downloadJobPosting(job)} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#3B00D9]/30 hover:bg-indigo-50 hover:text-[#3B00D9]">
+                      <button onClick={() => downloadJobPosting(job)} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-[#4A1D96]/30 hover:bg-indigo-50 hover:text-[#4A1D96]">
                         <Download size={16} /> Download
                       </button>
-                      <button onClick={() => setSelectedJob(job)} className="inline-flex items-center gap-2 rounded-xl border border-[#3B00D9]/15 bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-[#3B00D9] transition hover:bg-indigo-100">
+                      <button onClick={() => setSelectedJob(job)} className="inline-flex items-center gap-2 rounded-xl border border-[#4A1D96]/15 bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-[#4A1D96] transition hover:bg-indigo-100">
                         <Eye size={16} /> View details
                       </button>
                       {!expired && (
-                        <button onClick={() => openApplication(job)} className="inline-flex items-center gap-2 rounded-xl bg-[#3B00D9] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3100b5]">
+                        <button onClick={() => openApplication(job)} className="inline-flex items-center gap-2 rounded-xl bg-[#4A1D96] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#8B5CF6]">
                           <Send size={16} /> Apply
                         </button>
                       )}
@@ -327,7 +327,7 @@ const Recruitment = () => {
           </div>
         ) : (
           <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-            <div className="mb-4 rounded-2xl bg-indigo-50 p-4 text-[#3B00D9]"><BriefcaseBusiness size={28} /></div>
+            <div className="mb-4 rounded-2xl bg-indigo-50 p-4 text-[#4A1D96]"><BriefcaseBusiness size={28} /></div>
             <h3 className="font-semibold text-gray-900">No job openings found</h3>
             <p className="mt-1 max-w-sm text-sm text-gray-500">Try changing your search filters or post a new opening.</p>
           </div>
@@ -342,7 +342,7 @@ const Recruitment = () => {
               <Download size={17} /> Download posting
             </button>
             {(getDaysUntilClosing(selectedJob.closingDate) ?? 0) >= 0 && (
-              <button onClick={() => openApplication(selectedJob)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B00D9] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3100b5]">
+              <button onClick={() => openApplication(selectedJob)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white hover:bg-[#8B5CF6]">
                 <Send size={17} /> Apply for this role
               </button>
             )}
@@ -372,7 +372,7 @@ const Recruitment = () => {
       {showApplyModal && selectedJob && (
         <Modal title="Submit application" subtitle={"Applying for " + selectedJob.title} onClose={() => { setShowApplyModal(false); setSelectedJob(null); }} maxWidth="max-w-2xl">
           <div className="mb-5 flex items-start gap-3 rounded-2xl bg-indigo-50 p-4">
-            <div className="rounded-xl bg-white p-2 text-[#3B00D9]"><BriefcaseBusiness size={20} /></div>
+            <div className="rounded-xl bg-white p-2 text-[#4A1D96]"><BriefcaseBusiness size={20} /></div>
             <div><p className="font-semibold text-gray-900">{selectedJob.title}</p><p className="mt-1 text-xs text-gray-500">{selectedJob.department} Â· {selectedJob.location} Â· {selectedJob.type}</p></div>
           </div>
           <form onSubmit={handleApplication} className="space-y-4">
@@ -394,7 +394,7 @@ const Recruitment = () => {
 };
 
 const StatCard = ({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: number; tone: "indigo" | "blue" | "amber" | "emerald" }) => {
-  const colors = { indigo: "bg-indigo-50 text-[#3B00D9]", blue: "bg-blue-50 text-blue-600", amber: "bg-amber-50 text-amber-600", emerald: "bg-emerald-50 text-emerald-600" };
+  const colors = { indigo: "bg-indigo-50 text-[#4A1D96]", blue: "bg-blue-50 text-blue-600", amber: "bg-amber-50 text-amber-600", emerald: "bg-emerald-50 text-emerald-600" };
   return <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-xs sm:p-5"><div className="mb-4 flex items-center justify-between"><div className={"rounded-xl p-2.5 " + colors[tone]}>{icon}</div></div><p className="text-2xl font-bold text-gray-900">{value}</p><p className="mt-1 text-xs font-medium text-gray-500 sm:text-sm">{label}</p></div>;
 };
 
@@ -402,12 +402,12 @@ const Field = ({ label, hint, children }: { label: string; hint?: string; childr
 
 const Modal = ({ title, subtitle, onClose, maxWidth, children }: { title: string; subtitle?: string; onClose: () => void; maxWidth: string; children: React.ReactNode }) => <div className="fixed inset-0 z-60 flex items-end justify-center bg-gray-950/45 p-0 backdrop-blur-xs sm:items-center sm:p-4"><div className={"mobile-safe-bottom max-h-[94dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl sm:p-7 " + maxWidth}><div className="mb-6 flex items-start justify-between gap-4"><div><h3 className="text-xl font-semibold text-gray-900">{title}</h3>{subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}</div><button onClick={onClose} className="rounded-xl p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Close modal"><X size={20} /></button></div>{children}</div></div>;
 
-const ModalActions = ({ onCancel, loading, submitLabel }: { onCancel: () => void; loading: boolean; submitLabel: string }) => <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end"><button type="button" onClick={onCancel} className="rounded-xl px-5 py-3 text-sm font-semibold text-gray-600 transition hover:bg-gray-100">Cancel</button><button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B00D9] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#3100b5] disabled:cursor-not-allowed disabled:opacity-60">{loading && <Loader2 className="animate-spin" size={17} />}{submitLabel}</button></div>;
+const ModalActions = ({ onCancel, loading, submitLabel }: { onCancel: () => void; loading: boolean; submitLabel: string }) => <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end"><button type="button" onClick={onCancel} className="rounded-xl px-5 py-3 text-sm font-semibold text-gray-600 transition hover:bg-gray-100">Cancel</button><button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#8B5CF6] disabled:cursor-not-allowed disabled:opacity-60">{loading && <Loader2 className="animate-spin" size={17} />}{submitLabel}</button></div>;
 
-const JobDetails = ({ job }: { job: Job }) => <div><div className="rounded-3xl bg-linear-to-br from-[#2B009B] to-[#5B21E8] p-6 text-white"><div className="flex flex-wrap gap-2 text-xs font-semibold"><span className="rounded-full bg-white/15 px-3 py-1.5">{job.department}</span><span className="rounded-full bg-white/15 px-3 py-1.5">{job.type}</span></div><h2 className="mt-5 text-2xl font-semibold">{job.title}</h2><div className="mt-4 flex flex-wrap gap-4 text-sm text-indigo-100"><span className="flex items-center gap-1.5"><MapPin size={16} />{job.location}</span><span className="flex items-center gap-1.5"><CalendarDays size={16} />Closes {formatDate(job.closingDate)}</span><span className="flex items-center gap-1.5"><Building2 size={16} />{job.salaryRange}</span></div></div><div className="mt-7 space-y-7"><DetailSection title="About the role" text={job.description} /><DetailList title="Key responsibilities" value={job.responsibilities} /><DetailList title="Requirements" value={job.requirements} /></div></div>;
+const JobDetails = ({ job }: { job: Job }) => <div><div className="rounded-3xl bg-linear-to-br from-[#4A1D96] to-[#8B5CF6] p-6 text-white"><div className="flex flex-wrap gap-2 text-xs font-semibold"><span className="rounded-full bg-white/15 px-3 py-1.5">{job.department}</span><span className="rounded-full bg-white/15 px-3 py-1.5">{job.type}</span></div><h2 className="mt-5 text-2xl font-semibold">{job.title}</h2><div className="mt-4 flex flex-wrap gap-4 text-sm text-indigo-100"><span className="flex items-center gap-1.5"><MapPin size={16} />{job.location}</span><span className="flex items-center gap-1.5"><CalendarDays size={16} />Closes {formatDate(job.closingDate)}</span><span className="flex items-center gap-1.5"><Building2 size={16} />{job.salaryRange}</span></div></div><div className="mt-7 space-y-7"><DetailSection title="About the role" text={job.description} /><DetailList title="Key responsibilities" value={job.responsibilities} /><DetailList title="Requirements" value={job.requirements} /></div></div>;
 
 const DetailSection = ({ title, text }: { title: string; text?: string }) => <section><h4 className="mb-2 font-semibold text-gray-900">{title}</h4><p className="whitespace-pre-line text-sm leading-7 text-gray-600">{text || "Not specified."}</p></section>;
 
-const DetailList = ({ title, value }: { title: string; value?: string }) => { const items = splitDetails(value); return <section><h4 className="mb-3 font-semibold text-gray-900">{title}</h4>{items.length ? <ul className="space-y-2.5">{items.map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-gray-600"><CheckCircle2 className="mt-1 shrink-0 text-[#3B00D9]" size={16} />{item}</li>)}</ul> : <p className="text-sm text-gray-500">Not specified.</p>}</section>; };
+const DetailList = ({ title, value }: { title: string; value?: string }) => { const items = splitDetails(value); return <section><h4 className="mb-3 font-semibold text-gray-900">{title}</h4>{items.length ? <ul className="space-y-2.5">{items.map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-gray-600"><CheckCircle2 className="mt-1 shrink-0 text-[#4A1D96]" size={16} />{item}</li>)}</ul> : <p className="text-sm text-gray-500">Not specified.</p>}</section>; };
 
 export default Recruitment;

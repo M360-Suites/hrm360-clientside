@@ -93,14 +93,14 @@ const ForgotPassword = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Send Code
@@ -121,14 +121,14 @@ const ForgotPassword = () => {
               onChange={(e) => setCode(e.target.value)}
               placeholder="Enter verification code"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Verify Code
@@ -151,7 +151,7 @@ const ForgotPassword = () => {
                 placeholder="Enter new password"
                 required
                 minLength={8}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 transition-all text-sm placeholder:text-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
               />
 
               <button
@@ -167,7 +167,7 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
+            className="w-full py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium transition-all shadow-xs shadow-indigo-500/30 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Reset Password
@@ -177,7 +177,7 @@ const ForgotPassword = () => {
 
       <p className="text-center mt-8 text-sm text-gray-500">
         Remembered your password?{" "}
-        <Link to="/login" className="text-[#3B00D9] font-bold hover:underline">
+        <Link to="/login" className="text-[#4A1D96] font-bold hover:underline">
           Login
         </Link>
       </p>

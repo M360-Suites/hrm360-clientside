@@ -85,7 +85,7 @@ const Training = () => {
           <p className="text-sm text-gray-500">Manage employee training and development programs</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto bg-purple-50 text-[#3B00D9] px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs">
+          <button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto bg-purple-50 text-[#4A1D96] px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs">
             <Plus size={16} /> Add course
           </button>
         )}
@@ -134,7 +134,7 @@ const Training = () => {
             placeholder="Search courses.." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
           />
         </div>
       </div>
@@ -164,7 +164,7 @@ const Training = () => {
             </div>
             <div className="w-full bg-gray-100 rounded-full h-1.5">
               <div 
-                className="bg-[#3B00D9] h-1.5 rounded-full" 
+                className="bg-[#4A1D96] h-1.5 rounded-full" 
                 style={{ width: `${Math.min((completed / total) * 100, 100)}%` }}
               ></div>
             </div>
@@ -180,7 +180,7 @@ const Training = () => {
                 <button
                   type="button"
                   onClick={() => handleEnroll(course._id)}
-                  className="w-full px-3 py-2 rounded-lg bg-[#3B00D9] text-white text-xs font-medium hover:bg-[#3500c0]"
+                  className="w-full px-3 py-2 rounded-lg bg-[#4A1D96] text-white text-xs font-medium hover:bg-[#8B5CF6]"
                 >
                   Enroll
                 </button>
@@ -213,31 +213,31 @@ const Training = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Course Title</label>
-                  <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" />
+                  <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
-                  <input required type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" placeholder="e.g. Compliance" />
+                  <input required type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" placeholder="e.g. Compliance" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Instructor</label>
-                  <input required type="text" value={formData.instructor} onChange={e => setFormData({...formData, instructor: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" />
+                  <input required type="text" value={formData.instructor} onChange={e => setFormData({...formData, instructor: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Duration</label>
-                  <input required type="text" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" placeholder="e.g. 4 hours" />
+                  <input required type="text" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" placeholder="e.g. 4 hours" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">End Date</label>
-                  <input required type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" />
+                  <input required type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Max Capacity</label>
-                  <input required type="number" min="1" value={formData.maxCapacity || ""} onChange={e => setFormData({...formData, maxCapacity: parseInt(e.target.value) || 0})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm" />
+                  <input required type="number" min="1" value={formData.maxCapacity || ""} onChange={e => setFormData({...formData, maxCapacity: parseInt(e.target.value) || 0})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 mb-1">Course Type</label>
-                  <select value={formData.courseType} onChange={e => setFormData({...formData, courseType: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm bg-white">
+                  <select value={formData.courseType} onChange={e => setFormData({...formData, courseType: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm bg-white">
                     <option value="internal">Internal</option>
                     <option value="external">External</option>
                   </select>
@@ -246,7 +246,7 @@ const Training = () => {
 
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
-                  <textarea required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={4} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm resize-none" placeholder="Course overview..." />
+                  <textarea required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={4} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm resize-none" placeholder="Course overview..." />
                 </div>
               </div>
 
@@ -254,7 +254,7 @@ const Training = () => {
                 <button type="button" onClick={() => setShowAddModal(false)} className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors border border-gray-200 sm:border-0">
                   Cancel
                 </button>
-                <button type="submit" disabled={isLoading} className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium bg-[#3B00D9] text-white hover:bg-[#3500c0] transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
+                <button type="submit" disabled={isLoading} className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium bg-[#4A1D96] text-white hover:bg-[#8B5CF6] transition-colors disabled:opacity-70 flex items-center justify-center gap-2">
                   {isLoading && <Loader2 className="animate-spin" size={16} />}
                   Add Course
                 </button>
@@ -314,7 +314,7 @@ const Training = () => {
                 <button
                   type="button"
                   onClick={() => handleEnroll(courseDetails._id)}
-                  className="w-full px-4 py-3 rounded-xl bg-[#3B00D9] text-white text-sm font-medium hover:bg-[#3500c0]"
+                  className="w-full px-4 py-3 rounded-xl bg-[#4A1D96] text-white text-sm font-medium hover:bg-[#8B5CF6]"
                 >
                   Enroll in Course
                 </button>

@@ -616,7 +616,7 @@ const Attendance = () => {
                       fetchQrCode();
                       setShowQrModal(true);
                     }}
-                    className="flex items-center justify-center gap-1.5 text-xs bg-[#3B00D9] text-white px-3 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                    className="flex items-center justify-center gap-1.5 text-xs bg-[#4A1D96] text-white px-3 py-2 rounded-full font-medium hover:bg-indigo-700 transition-colors shadow-sm"
                   >
                     <QrCode size={14} />
                     Show Today&apos;s QR
@@ -634,7 +634,7 @@ const Attendance = () => {
                   placeholder="Search employee..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
                 />
               </div>
             </div>
@@ -668,7 +668,7 @@ const Attendance = () => {
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-[#3B00D9] font-bold text-[10px]">
+                            <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-[#4A1D96] font-bold text-[10px]">
                               {emp.name?.charAt(0) || "E"}
                             </div>
                             <div>
@@ -903,7 +903,7 @@ const AdminQrModal = ({
 
         <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 border border-gray-100 min-h-62.5">
           {isLoading && !qrCode ? (
-            <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
+            <Loader2 className="animate-spin text-[#4A1D96]" size={32} />
           ) : qrCode ? (
             <div className="text-center w-full">
               <div className="w-48 h-48 bg-white p-2 border border-gray-200 rounded-xl shadow-sm mb-4 mx-auto flex items-center justify-center overflow-hidden">
@@ -1142,7 +1142,7 @@ const MonthlyReportModal = ({ employee, onClose }: { employee: any, onClose: () 
           <select 
             value={month} 
             onChange={(e) => setMonth(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#3B00D9] focus:border-[#3B00D9] p-2.5 outline-none"
+            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#4A1D96] focus:border-[#4A1D96] p-2.5 outline-none"
           >
             {Array.from({length: 12}, (_, i) => i + 1).map(m => (
               <option key={m} value={m}>{new Date(2000, m - 1).toLocaleString('default', { month: 'long' })}</option>
@@ -1151,7 +1151,7 @@ const MonthlyReportModal = ({ employee, onClose }: { employee: any, onClose: () 
           <select 
             value={year} 
             onChange={(e) => setYear(e.target.value)}
-            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#3B00D9] focus:border-[#3B00D9] p-2.5 outline-none"
+            className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#4A1D96] focus:border-[#4A1D96] p-2.5 outline-none"
           >
             {[0, 1, 2].map(offset => (
               <option key={offset} value={new Date().getFullYear() - offset}>{new Date().getFullYear() - offset}</option>
@@ -1170,7 +1170,7 @@ const MonthlyReportModal = ({ employee, onClose }: { employee: any, onClose: () 
 
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center py-12">
-            <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
+            <Loader2 className="animate-spin text-[#4A1D96]" size={32} />
           </div>
         ) : !employeeMonthlyReport ? (
           <div className="flex-1 flex items-center justify-center py-12 text-slate-500 text-sm">

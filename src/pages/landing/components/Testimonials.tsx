@@ -15,12 +15,12 @@ export const Testimonials = () => {
 		<section id="testimonials" className="py-24 bg-slate-50 border-t border-gray-100">
 			<div className="max-w-7xl mx-auto px-6">
 				<div className="text-center max-w-3xl mx-auto mb-16">
-					<div className="inline-flex items-center gap-2 text-[#3b00d9] font-semibold mb-4 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+					<div className="inline-flex items-center gap-2 text-[#4A1D96] font-semibold mb-4 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
 						Testimonials
 					</div>
 					<h2 className="text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
 						HR Leaders Love<br/>
-						<span className="text-[#3b00d9]">HRM360</span>
+						<span className="text-[#4A1D96]">HRM360</span>
 					</h2>
 					<p className="text-lg text-gray-600">
 						Real reviews from real HR professionals who transformed their organisations with HRM360.
@@ -42,7 +42,7 @@ export const Testimonials = () => {
 								"{test.quote}"
 							</p>
 							<div className="flex items-center gap-4 mt-auto">
-								<div className="w-12 h-12 rounded-full bg-[#3b00d9] text-white flex items-center justify-center font-bold text-lg">
+								<div className="w-12 h-12 rounded-full bg-[#4A1D96] text-white flex items-center justify-center font-bold text-lg">
 									{test.initials}
 								</div>
 								<div>

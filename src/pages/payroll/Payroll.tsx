@@ -255,7 +255,7 @@ const Payroll = () => {
           {isAdmin && (
             <button
               onClick={() => setShowSetupPinModal(true)}
-              className="flex-1 sm:flex-none bg-white border border-purple-200 text-[#3B00D9] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-50 transition-colors shadow-xs"
+              className="flex-1 sm:flex-none bg-white border border-purple-200 text-[#4A1D96] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-50 transition-colors shadow-xs"
             >
               <ShieldCheck size={16} /> {isPayrollPinConfigured ? "Update PIN" : "Set Payroll PIN"}
             </button>
@@ -263,7 +263,7 @@ const Payroll = () => {
           {isAdmin && (
             <button
               onClick={() => setShowRunPinModal(true)}
-              className="flex-1 sm:flex-none bg-purple-50 text-[#3B00D9] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
+              className="flex-1 sm:flex-none bg-purple-50 text-[#4A1D96] px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs"
             >
               <RefreshCw size={16} /> Run payroll
             </button>
@@ -283,7 +283,7 @@ const Payroll = () => {
           <button
             type="button"
             onClick={() => setShowSetupPinModal(true)}
-            className="shrink-0 px-4 py-2 rounded-lg bg-[#3B00D9] text-white text-sm font-semibold hover:bg-[#3500c0]"
+            className="shrink-0 px-4 py-2 rounded-lg bg-[#4A1D96] text-white text-sm font-semibold hover:bg-[#8B5CF6]"
           >
             Configure PIN
           </button>
@@ -340,7 +340,7 @@ const Payroll = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search employee"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
             />
           </div>
         </div>
@@ -348,7 +348,7 @@ const Payroll = () => {
         <div className="ios-scroll overflow-x-auto min-h-[400px] relative">
           {isLoading && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center z-10">
-              <Loader2 className="animate-spin text-[#3B00D9]" size={32} />
+              <Loader2 className="animate-spin text-[#4A1D96]" size={32} />
             </div>
           )}
           <table className="w-full min-w-[920px] text-left text-sm text-gray-600 whitespace-nowrap">
@@ -369,7 +369,7 @@ const Payroll = () => {
                 <tr key={emp.id || emp._id || idx} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-[#3B00D9] font-bold">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-[#4A1D96] font-bold">
                         {emp.name?.charAt(0) || "E"}
                       </div>
                       <div>
@@ -399,7 +399,7 @@ const Payroll = () => {
                       <button
                         type="button"
                         onClick={() => openPayModal(emp)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#3B00D9] text-white hover:bg-[#3500c0]"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#4A1D96] text-white hover:bg-[#8B5CF6]"
                       >
                         Pay
                       </button>
@@ -424,13 +424,13 @@ const Payroll = () => {
 
       {isPayrollLocked && (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center sm:p-10">
-          <ShieldCheck className="mx-auto text-[#3B00D9]" size={42} />
+          <ShieldCheck className="mx-auto text-[#4A1D96]" size={42} />
           <h3 className="mt-4 text-lg font-semibold text-gray-900">Payroll is locked</h3>
           <p className="text-sm text-gray-500 mt-1">Enter payroll PIN to access payroll dashboard.</p>
           <button
             type="button"
             onClick={() => setShowAccessPinModal(true)}
-            className="mt-5 px-5 py-2.5 rounded-xl bg-[#3B00D9] text-white text-sm font-medium hover:bg-[#3500c0]"
+            className="mt-5 px-5 py-2.5 rounded-xl bg-[#4A1D96] text-white text-sm font-medium hover:bg-[#8B5CF6]"
           >
             Unlock Payroll
           </button>
@@ -568,7 +568,7 @@ const PinModal = ({
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
           placeholder="Enter PIN"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] mb-6 text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] mb-6 text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
           maxLength={6}
         />
 
@@ -582,7 +582,7 @@ const PinModal = ({
           <button
             onClick={onConfirm}
             disabled={pin.length < 4 || isLoading}
-            className="flex-1 py-3 bg-[#3B00D9] text-white rounded-xl font-medium hover:bg-[#3500c0] disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-[#4A1D96] text-white rounded-xl font-medium hover:bg-[#8B5CF6] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             {confirmLabel}
@@ -625,7 +625,7 @@ const SetupPinModal = ({
             value={setupPin}
             onChange={(e) => setSetupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="New PIN"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
             maxLength={6}
           />
           <input
@@ -634,7 +634,7 @@ const SetupPinModal = ({
             value={confirmSetupPin}
             onChange={(e) => setConfirmSetupPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
             placeholder="Confirm PIN"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-center text-xl tracking-[0.35em] placeholder:tracking-normal placeholder:text-sm"
             maxLength={6}
           />
         </div>
@@ -649,7 +649,7 @@ const SetupPinModal = ({
           <button
             onClick={onConfirm}
             disabled={setupPin.length < 4 || confirmSetupPin.length < 4 || isLoading}
-            className="flex-1 py-3 bg-[#3B00D9] text-white rounded-xl font-medium hover:bg-[#3500c0] disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-[#4A1D96] text-white rounded-xl font-medium hover:bg-[#8B5CF6] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             Save PIN

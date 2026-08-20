@@ -101,7 +101,7 @@ const DashboardEmployee = () => {
         `w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all ${
             formErrors[field]
                 ? "border-rose-400 focus:ring-rose-200 focus:border-rose-400"
-                : "border-gray-200 focus:ring-[#3B00D9]/20 focus:border-[#3B00D9]"
+                : "border-gray-200 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
         }`;
 
     const handleAddEmployee = async (e: React.FormEvent) => {
@@ -233,7 +233,7 @@ const DashboardEmployee = () => {
                             <h3 className='font-semibold text-gray-800'>
                                 Employee Overview
                             </h3>
-                            <button className='flex items-center gap-2 text-sm font-medium text-[#3B00D9] bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100'>
+                            <button className='flex items-center gap-2 text-sm font-medium text-[#4A1D96] bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100'>
                                 Today <ChevronDown size={14} />
                             </button>
                         </div>
@@ -265,7 +265,7 @@ const DashboardEmployee = () => {
                                 resetForm();
                                 setIsModalOpen(true);
                             }}
-                            className='w-full py-2.5 bg-purple-100 text-[#3B00D9] font-medium rounded-xl text-sm flex items-center justify-center gap-2 mb-3'
+                            className='w-full py-2.5 bg-purple-100 text-[#4A1D96] font-medium rounded-xl text-sm flex items-center justify-center gap-2 mb-3'
                         >
                             <span className='text-lg'>+</span> Add new employee
                         </button>
@@ -430,7 +430,7 @@ const DashboardEmployee = () => {
                                     <button
                                         type='submit'
                                         disabled={isLoading}
-                                        className='flex-1 py-3.5 bg-[#3B00D9] hover:bg-[#3500c0] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
+                                        className='flex-1 py-3.5 bg-[#4A1D96] hover:bg-[#8B5CF6] text-white rounded-xl font-medium flex items-center justify-center gap-2 disabled:opacity-70'
                                     >
                                         {isLoading && (
                                             <Loader2 className='animate-spin' size={16} />

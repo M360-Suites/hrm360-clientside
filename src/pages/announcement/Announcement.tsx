@@ -239,7 +239,7 @@ const Announcement = () => {
           <button
             type="button"
             onClick={openCreateModal}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-violet-50 px-4 py-2.5 text-sm font-semibold text-[#3B00D9] transition hover:bg-violet-100 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-violet-50 px-4 py-2.5 text-sm font-semibold text-[#4A1D96] transition hover:bg-violet-100 sm:w-auto"
           >
             <Plus size={16} />
             New announcement
@@ -267,7 +267,7 @@ const Announcement = () => {
                       onClick={() => openDetails(announcement)}
                       className={`w-full rounded-xl border p-4 text-left transition ${
                         active
-                          ? "border-[#3B00D9]/20 bg-violet-50"
+                          ? "border-[#4A1D96]/20 bg-violet-50"
                           : "border-gray-100 bg-white hover:border-violet-100 hover:bg-gray-50"
                       }`}
                     >
@@ -280,7 +280,7 @@ const Announcement = () => {
                           {formatDate(getAnnouncementDate(announcement))}
                         </span>
                         {unread && (
-                          <span className="rounded-full bg-[#3B00D9] px-2 py-0.5 text-white">
+                          <span className="rounded-full bg-[#4A1D96] px-2 py-0.5 text-white">
                             New
                           </span>
                         )}
@@ -300,7 +300,7 @@ const Announcement = () => {
                 <button
                   type="button"
                   onClick={openCreateModal}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-violet-50 px-4 py-2 text-xs font-semibold text-[#3B00D9] hover:bg-violet-100"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-violet-50 px-4 py-2 text-xs font-semibold text-[#4A1D96] hover:bg-violet-100"
                 >
                   <Plus size={14} />
                   New announcement
@@ -313,7 +313,7 @@ const Announcement = () => {
         <section className="relative rounded-sm bg-white p-5 shadow-xs ring-1 ring-gray-100 sm:p-8 lg:min-h-[72dvh]">
           {isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
-              <Loader2 className="animate-spin text-[#3B00D9]" size={30} />
+              <Loader2 className="animate-spin text-[#4A1D96]" size={30} />
             </div>
           )}
 
@@ -356,7 +356,7 @@ const Announcement = () => {
               {mode === "compose" && isAdmin ? (
                 <div className="flex min-h-[360px] items-center justify-center">
                   <div className="max-w-md rounded-3xl border border-dashed border-violet-200 bg-violet-50/40 p-8 text-center">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#3B00D9] shadow-sm">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#4A1D96] shadow-sm">
                       <Megaphone size={24} />
                     </div>
                     <h4 className="mt-5 text-base font-semibold text-gray-900">
@@ -369,7 +369,7 @@ const Announcement = () => {
                     <button
                       type="button"
                       onClick={openCreateModal}
-                      className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#3B00D9] px-5 py-3 text-sm font-semibold text-white hover:bg-[#3500c0]"
+                      className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white hover:bg-[#8B5CF6]"
                     >
                       <Plus size={16} />
                       Compose announcement
@@ -432,7 +432,7 @@ const Announcement = () => {
               {isAdmin && mode === "view" && selectedAnnouncement && (
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#3B00D9] px-6 py-3 text-sm font-semibold text-white"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#4A1D96] px-6 py-3 text-sm font-semibold text-white"
                 >
                   <Paperclip size={16} />
                   Pin
@@ -526,7 +526,7 @@ const SendAnnouncementModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg bg-violet-50 px-2 py-1 text-xs font-semibold text-[#3B00D9]"
+            className="rounded-lg bg-violet-50 px-2 py-1 text-xs font-semibold text-[#4A1D96]"
           >
             Close <X size={12} className="inline" />
           </button>
@@ -546,7 +546,7 @@ const SendAnnouncementModal = ({
                 }))
               }
               placeholder="Marketing 360 Testing"
-              className="w-full rounded-xl border border-gray-200 px-4 py-4 text-sm outline-none focus:border-[#3B00D9] focus:ring-2 focus:ring-[#3B00D9]/15"
+              className="w-full rounded-xl border border-gray-200 px-4 py-4 text-sm outline-none focus:border-[#4A1D96] focus:ring-2 focus:ring-[#4A1D96]/15"
             />
           </div>
 
@@ -564,7 +564,7 @@ const SendAnnouncementModal = ({
               }
               placeholder="Write the full announcement..."
               rows={5}
-              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-4 text-sm leading-7 outline-none focus:border-[#3B00D9] focus:ring-2 focus:ring-[#3B00D9]/15"
+              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-4 text-sm leading-7 outline-none focus:border-[#4A1D96] focus:ring-2 focus:ring-[#4A1D96]/15"
             />
           </div>
 
@@ -574,7 +574,7 @@ const SendAnnouncementModal = ({
             </label>
             <div className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3">
               <span className="inline-flex items-center gap-3 rounded-full bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#3B00D9] text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#4A1D96] text-white">
                   A
                 </span>
                 All employees
@@ -590,7 +590,7 @@ const SendAnnouncementModal = ({
             type="button"
             onClick={onSubmit}
             disabled={!canSubmit || isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3B00D9] px-5 py-4 text-base font-bold text-white transition hover:bg-[#3500c0] disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-4 text-base font-bold text-white transition hover:bg-[#8B5CF6] disabled:cursor-not-allowed disabled:bg-gray-300"
           >
             {isLoading && <Loader2 className="animate-spin" size={18} />}
             {isEditing ? "Update announcement" : "Create announcement"}

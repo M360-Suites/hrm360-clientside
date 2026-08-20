@@ -7,7 +7,7 @@ const VerifyNotice = () => {
 
   return (
     <div className="w-full text-center">
-      <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-50 text-[#3B00D9] flex items-center justify-center">
+      <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-indigo-50 text-[#4A1D96] flex items-center justify-center">
         <MailCheck size={32} />
       </div>
 
@@ -26,7 +26,7 @@ const VerifyNotice = () => {
 
       <p className="text-sm text-gray-500">
         Already verified?{" "}
-        <Link to="/login" className="text-[#3B00D9] font-bold hover:underline">
+        <Link to="/login" className="text-[#4A1D96] font-bold hover:underline">
           Login
         </Link>
       </p>
