@@ -16,6 +16,7 @@ import {
 	// CheckCircle2,
 	Megaphone,
 	Settings,
+	Scale,
 	// FileText,
 	X,
 } from "lucide-react";
@@ -34,6 +35,7 @@ const navItems = [
 	{ icon: TrendingUp, label: "Promotions", path: "/promotion" },
 	{ icon: ClipboardCheck, label: "Probation", path: "/probation" },
 	{ icon: LineChart, label: "Task Manager", path: "/task-manager" },
+	{ icon: Scale, label: "Grievances", path: "/grievances" },
 	// { icon: Wallet, label: "Loans", path: "/loans" },
 	// { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
 	{ icon: Megaphone, label: "Announcement", path: "/announcement" },

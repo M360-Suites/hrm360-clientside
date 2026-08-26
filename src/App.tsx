@@ -38,6 +38,7 @@ import TaskManager from "./pages/task-manager/TaskManager";
 import Settings from "./pages/settings/Settings";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import LandingPage from "./pages/landing/LandingPage";
+import Grievances from "./pages/grievance/Grievances";
 
 const RequireAuth = () => {
 	const token = getCookie("token");
@@ -130,6 +131,7 @@ const App = () => {
 						<Route path='/probation' element={<Probation />} />
 						<Route path='/loans' element={<Loans />} />
 						<Route path='/performance' element={<Performance />} />
+						<Route path='/grievances' element={<Grievances />} />
 
 						<Route
 							path='/confirmation'

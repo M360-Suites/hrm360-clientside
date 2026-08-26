@@ -390,22 +390,17 @@ const Attendance = () => {
   if (!isAdmin) {
     return (
       <div className="w-full max-w-5xl mx-auto pb-12">
-        <div className="flex flex-col items-start justify-between gap-3 mb-6 sm:flex-row sm:gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Attendance</h2>
-            <p className="text-sm text-slate-500">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Time Tracking</p>
+            <h2 className="text-2xl font-semibold text-gray-900">Attendance</h2>
+            <p className="mt-1 text-sm text-gray-500">
               Scan your workplace QR code to check in or out.
             </p>
           </div>
-
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <CalendarDays size={14} />
-            <span>
-              {time.toLocaleDateString("en-GB", {
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
+          <div className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700">
+            <CalendarDays size={16} className="text-[#4A1D96]" />
+            {time.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
           </div>
         </div>
 
@@ -551,27 +546,21 @@ const Attendance = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
-      <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-1">
-            Attendance Tracking
-          </h2>
-          <p className="text-sm text-gray-500">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Time Tracking</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Attendance Tracking</h2>
+          <p className="mt-1 text-sm text-gray-500">
             Generate today’s QR code and monitor employee attendance.
           </p>
         </div>
-
-        <div className="text-left sm:text-right w-full sm:w-auto p-4 bg-white rounded-2xl border border-gray-100 sm:bg-transparent sm:border-0 sm:p-0">
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
-            Current Time
-          </p>
-          <div className="text-2xl font-bold text-gray-900 tabular-nums">
-            {formatTime(time)}
-          </div>
+        <div className="inline-flex items-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white">
+          <Clock size={17} />
+          {formatTime(time)}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           label="Present Today"
           value={todayStats?.present || 0}
@@ -596,8 +585,8 @@ const Attendance = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
+          <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs">
+            <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:p-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                 <div>
                   <h3 className="font-bold text-gray-900">Manage Attendance</h3>
@@ -729,12 +718,12 @@ const Attendance = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </section>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
+          <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs">
+            <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <h3 className="font-bold text-gray-900">Today’s Logs</h3>
               <p className="mt-1 text-xs text-gray-500">{formatDate(time)}</p>
             </div>
@@ -789,7 +778,7 @@ const Attendance = () => {
                 </div>
               )}
             </div>
-          </div>
+          </section>
         </div>
       </div>
 

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Calendar, Loader2, X, MoreVertical, Download, CheckCircle, AlertCircle } from "lucide-react";
+import { Search, Plus, MessageSquare, Calendar, Loader2, X, MoreVertical, Download, CheckCircle, AlertCircle } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useLeaveStore } from "../../store/useLeaveStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useEmployeeStore } from "../../store/useEmployeeStore";
@@ -308,26 +310,36 @@ const Leave = () => {
         </div>
       )}
 
-      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-1">Leave Management</h2>
-          <p className="text-sm text-gray-500">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Time Away During Work Hours</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Leave Management</h2>
+          <p className="mt-1 text-sm text-gray-500">
             {isAdmin ? "Track and manage employee leave requests" : "Track your leave requests"}
           </p>
         </div>
 
-        {!isAdmin && (
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setShowRequestModal(true)}
-            className="bg-violet-100 text-[#4A1D96] px-4 py-2 rounded-lg text-sm font-medium hover:bg-violet-200 transition-colors"
+            onClick={() => alert("Feedback clicked")}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
-            + Request Leave
+            <MessageSquare size={17} />Feedback
           </button>
-        )}
+          {!isAdmin && (
+            <button
+              type="button"
+              onClick={() => setShowRequestModal(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white"
+            >
+              <Plus size={17} />Request Leave
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {statsCards.map((item, i) => (
           <div key={i} className="bg-white p-4 rounded-2xl border border-gray-100">
             <div className="flex items-center gap-2 mb-2">

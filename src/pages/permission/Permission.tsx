@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   X,
   XCircle,
+  MessageSquare,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -180,7 +181,10 @@ const Permission = () => {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div><p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Time away during work hours</p><h2 className="text-2xl font-semibold text-gray-900">Permissions</h2><p className="mt-1 text-sm text-gray-500">{canReview ? "Review employee movement requests and monitor return compliance." : "Request short time away and record when you leave or return."}</p></div>
-        {!canReview && <button onClick={() => { clearError(); setShowRequest(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white"><Plus size={17} />Request permission</button>}
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => alert("Feedback clicked")} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"><MessageSquare size={17} />Feedback</button>
+          {!canReview && <button onClick={() => { clearError(); setShowRequest(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white"><Plus size={17} />Request permission</button>}
+        </div>
       </div>
 
       {error && <div className="flex items-center justify-between rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700"><span>{error}</span><button onClick={clearError}>Dismiss</button></div>}

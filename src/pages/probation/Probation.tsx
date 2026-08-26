@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useEmployeeStore } from "../../store/useEmployeeStore";
 import {
   type ProbationAction,
   type ProbationObjective,
@@ -78,6 +79,7 @@ const statusStyle = (status?: string) => {
 
 const Probation = () => {
   const { user, isAdmin } = useAuthStore();
+  const { employees, fetchEmployees } = useEmployeeStore();
   const {
     staff,
     selectedStaff,
@@ -110,7 +112,8 @@ const Probation = () => {
     if (!canManageProbation) return;
     void fetchProbationStaff();
     void fetchProbationStats();
-  }, [canManageProbation, fetchProbationStaff, fetchProbationStats]);
+    void fetchEmployees({ page: 1, limit: 100 });
+  }, [canManageProbation, fetchProbationStaff, fetchProbationStats, fetchEmployees]);
 
   const filteredStaff = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -207,9 +210,43 @@ const Probation = () => {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><Stat icon={<Users size={20} />} label="Tracked staff" value={displayStats.tracked} tone="indigo" /><Stat icon={<Clock3 size={20} />} label="On probation" value={displayStats.onProbation} tone="amber" /><Stat icon={<AlertTriangle size={20} />} label="Due within 14 days" value={displayStats.due} tone="rose" /><Stat icon={<TimerReset size={20} />} label="Extended" value={displayStats.extended} tone="blue" /></div>
 
-      <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs"><div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:p-5"><label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} className={inputClass + " pl-10"} placeholder="Search name, email, role, or work mode" /></label><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClass + " sm:w-52"}><option>All</option><option>On probation</option><option>Extended</option><option>Confirmed</option><option>Terminated</option></select></div>{isLoading ? <div className="flex min-h-72 items-center justify-center text-[#4A1D96]"><Loader2 className="animate-spin" size={28} /></div> : filteredStaff.length ? <div className="divide-y divide-gray-100">{filteredStaff.map((item, index) => <ProbationRow key={probationId(item) || index} staff={item} loading={activeAction === "details-" + probationId(item)} onView={() => void openDetails(item)} />)}</div> : <EmptyState />}</section>
+      <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs"><div className="space-y-3 border-b border-gray-100 p-4 sm:p-5">
+  <div className="flex gap-2 overflow-x-auto pb-1">
+    {["All", "On probation", "Extended", "Confirmed", "Terminated"].map((status) => (
+      <button key={status} onClick={() => setStatusFilter(status)} className={"whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold " + (statusFilter === status ? "bg-[#4A1D96] text-white" : "bg-gray-50 text-gray-600")}>{status}</button>
+    ))}
+  </div>
+  <div className="flex flex-col gap-3 sm:flex-row">
+    <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClass + " sm:w-52 hidden"}>
+      <option>All</option><option>On probation</option><option>Extended</option><option>Confirmed</option><option>Terminated</option>
+    </select>
+    <label className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} className={inputClass + " pl-10"} placeholder="Search name, email, role, or work mode" /></label>
+  </div>
+</div>{isLoading ? <div className="flex min-h-72 items-center justify-center text-[#4A1D96]"><Loader2 className="animate-spin" size={28} /></div> : filteredStaff.length ? <div className="divide-y divide-gray-100">{filteredStaff.map((item, index) => <ProbationRow key={probationId(item) || index} staff={item} loading={activeAction === "details-" + probationId(item)} onView={() => void openDetails(item)} />)}</div> : <EmptyState />}</section>
 
-      {showAdd && <Modal title="Add probation staff" subtitle="Create a probation record and define measurable objectives." onClose={() => setShowAdd(false)}><form onSubmit={submitNewStaff} className="space-y-4"><div className="grid gap-4 sm:grid-cols-2"><Field label="Full name"><input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className={inputClass} placeholder="Employee name" /></Field><Field label="Email address"><input required type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className={inputClass} placeholder="employee@example.com" /></Field><Field label="Role"><input required value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} className={inputClass} placeholder="e.g. Product Analyst" /></Field><Field label="Work mode"><select value={form.workMode} onChange={(event) => setForm({ ...form, workMode: event.target.value })} className={inputClass}><option>Onsite</option><option>Remote</option><option>Hybrid</option></select></Field><Field label="Start date"><input required type="date" value={form.startDate} onChange={(event) => setForm({ ...form, startDate: event.target.value })} className={inputClass} /></Field><Field label="End date"><input required min={form.startDate || localToday()} type="date" value={form.endDate} onChange={(event) => setForm({ ...form, endDate: event.target.value })} className={inputClass} /></Field></div><Field label="Probation objectives"><textarea required rows={6} value={form.objectives} onChange={(event) => setForm({ ...form, objectives: event.target.value })} className={inputClass + " resize-y"} placeholder={"Complete onboarding milestones;\nDeliver first project independently;\nMeet agreed performance targets"} /><span className="mt-1.5 block text-xs text-gray-400">Enter one objective per line or separate objectives with semicolons.</span></Field><ModalActions onCancel={() => setShowAdd(false)} loading={activeAction === "add"} submitLabel="Add staff" /></form></Modal>}
+      {showAdd && <Modal title="Add probation staff" subtitle="Create a probation record and define measurable objectives." onClose={() => setShowAdd(false)}><form onSubmit={submitNewStaff} className="space-y-4"><div className="grid gap-4 sm:grid-cols-2">
+  <Field label="Select employee">
+    <select 
+      required 
+      className={inputClass}
+      onChange={(e) => {
+        const emp = employees.find(x => (x._id || x.id || x.user?._id) === e.target.value);
+        if (emp) {
+          setForm({ ...form, name: emp.name || emp.fullName || emp.email, email: emp.email || "", role: emp.role || emp.designation || "" });
+        }
+      }}
+    >
+      <option value="">Choose employee</option>
+      {employees.map((emp, idx) => (
+        <option key={emp._id || emp.id || emp.user?._id || idx} value={emp._id || emp.id || emp.user?._id}>
+          {emp.name || emp.fullName || emp.email}
+        </option>
+      ))}
+    </select>
+  </Field>
+  <Field label="Full name"><input required value={form.name} readOnly className={inputClass + " bg-gray-50"} placeholder="Auto-filled" /></Field>
+  <Field label="Email address"><input required type="email" value={form.email} readOnly className={inputClass + " bg-gray-50"} placeholder="Auto-filled" /></Field>
+  <Field label="Role"><input required value={form.role} readOnly className={inputClass + " bg-gray-50"} placeholder="Auto-filled" /></Field><Field label="Work mode"><select value={form.workMode} onChange={(event) => setForm({ ...form, workMode: event.target.value })} className={inputClass}><option>Onsite</option><option>Remote</option><option>Hybrid</option></select></Field><Field label="Start date"><input required type="date" value={form.startDate} onChange={(event) => setForm({ ...form, startDate: event.target.value })} className={inputClass} /></Field><Field label="End date"><input required min={form.startDate || localToday()} type="date" value={form.endDate} onChange={(event) => setForm({ ...form, endDate: event.target.value })} className={inputClass} /></Field></div><Field label="Probation objectives"><textarea required rows={6} value={form.objectives} onChange={(event) => setForm({ ...form, objectives: event.target.value })} className={inputClass + " resize-y"} placeholder={"Complete onboarding milestones;\nDeliver first project independently;\nMeet agreed performance targets"} /><span className="mt-1.5 block text-xs text-gray-400">Enter one objective per line or separate objectives with semicolons.</span></Field><ModalActions onCancel={() => setShowAdd(false)} loading={activeAction === "add"} submitLabel="Add staff" /></form></Modal>}
 
       {showDetails && selectedStaff && <Modal title="Probation details" subtitle="Review employee progress and update objective completion." onClose={() => setShowDetails(false)}><ProbationDetails staff={selectedStaff} activeAction={activeAction} onToggle={(objective) => void toggleObjective(objective)} /><div className="mt-6 grid gap-2 border-t border-gray-100 pt-5 sm:grid-cols-3"><button onClick={() => openAction("Confirm")} className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white"><UserCheck size={16} />Confirm</button><button onClick={() => openAction("Extend")} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"><TimerReset size={16} />Extend</button><button onClick={() => openAction("Terminate")} className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white"><UserMinus size={16} />Terminate</button></div></Modal>}
 

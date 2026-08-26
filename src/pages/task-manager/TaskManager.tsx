@@ -441,26 +441,27 @@ const TaskManager = () => {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-2">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Task Manager</h2>
-          <p className="text-sm text-gray-500">
-            Projects, owners, dates, and task status in one place
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Productivity</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Task Manager</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Projects, owners, dates, and task status in one place.
           </p>
         </div>
         {canCreateTasks && (
           <button
             type="button"
             onClick={() => setShowTaskModal(true)}
-            className="inline-flex w-full items-center justify-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 w-full sm:w-auto"
           >
-            <Plus size={16} /> Create Task
+            <Plus size={17} />Create Task
           </button>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-4 lg:gap-6">
-        <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3 h-fit min-w-0">
+        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs p-5 space-y-4 h-fit min-w-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">
               <h3 className="font-semibold text-gray-800">Projects</h3>
@@ -584,7 +585,7 @@ const TaskManager = () => {
         </div>
 
         <div className="min-w-0 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-gray-100 shadow-xs mb-4">
             <h3 className="min-w-0 text-lg font-semibold text-gray-900 truncate">
               {selectedProject?.title ||
                 selectedProject?.name ||
