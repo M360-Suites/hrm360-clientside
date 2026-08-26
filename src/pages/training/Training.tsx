@@ -1,4 +1,4 @@
-import { Plus, BookOpen, Users, Award, Clock, Search, X, Loader2 } from "lucide-react";
+import { Plus, BookOpen, Users, Award, Clock, Search, X, Loader2, Calendar, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTrainingStore } from "../../store/useTrainingStore";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -79,20 +79,21 @@ const Training = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-1">Training Management</h2>
-          <p className="text-sm text-gray-500">Manage employee training and development programs</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#4A1D96]">Development</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Training Management</h2>
+          <p className="mt-1 text-sm text-gray-500">Manage employee training and development programs.</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setShowAddModal(true)} className="w-full sm:w-auto bg-purple-50 text-[#4A1D96] px-4 py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-purple-100 transition-colors shadow-xs">
-            <Plus size={16} /> Add course
+          <button onClick={() => setShowAddModal(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4A1D96] px-5 py-3 text-sm font-semibold text-white">
+            <Plus size={17} />Add Course
           </button>
         )}
       </div>
 
       {trainingStats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
             <div className="flex items-center gap-3 mb-3 text-indigo-500">
               <div className="p-2 bg-indigo-50 rounded-lg"><BookOpen size={18} /></div>
@@ -125,74 +126,100 @@ const Training = () => {
       )}
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-8">
-        <h3 className="text-lg font-semibold text-gray-800">All courses</h3>
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input 
-            type="text" 
-            placeholder="Search courses.." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96] text-sm"
-          />
+      <section className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs mt-8">
+        <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <button className="whitespace-nowrap rounded-xl bg-[#4A1D96] px-3 py-2 text-xs font-semibold text-white transition">All Courses</button>
+          </div>
+          <label className="relative sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input 
+              type="text" 
+              placeholder="Search courses.." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 pl-10 text-sm text-gray-800 outline-hidden transition focus:border-[#4A1D96] focus:ring-2 focus:ring-[#4A1D96]/10"
+            />
+          </label>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredCourses.length > 0 ? filteredCourses.map((course, idx) => {
-          const enrolled = course.enrolled || 0;
-          const total = course.maxCapacity || course.total || 1;
-          const completed = course.completed || 0;
-          
-          return (
-          <div
-            key={course._id || idx}
-            className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[11px] font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
-                {course.category || course.tag}
-              </span>
-              <span className="text-[11px] text-gray-500">{course.duration}</span>
+        <div className="min-h-72 relative">
+          {isLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-xs z-10 text-[#4A1D96]">
+              <Loader2 className="animate-spin" size={32} />
             </div>
-            <h4 className="font-semibold text-gray-900 mb-6 text-sm">{course.title}</h4>
-            
-            <div className="flex items-end justify-between text-xs text-gray-500 mb-2">
-              <span>{enrolled} enrolled</span>
-              <span>{completed}/{total} completed</span>
+          ) : filteredCourses.length > 0 ? (
+            <div className="divide-y divide-gray-100">
+              {filteredCourses.map((course, idx) => {
+                const enrolled = course.enrolled || 0;
+                const total = course.maxCapacity || course.total || 1;
+                const completed = course.completed || 0;
+                
+                return (
+                  <article key={course._id || idx} className="p-5 transition hover:bg-[#FAFAFF] sm:p-6 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                          {course.category || course.tag}
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900">{course.title}</h3>
+                      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-gray-500">
+                        <span className="flex items-center gap-1.5">
+                          <Clock size={15} className="text-[#4A1D96]" />
+                          {course.duration}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Users size={15} className="text-[#4A1D96]" />
+                          {enrolled} enrolled
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Award size={15} className="text-[#4A1D96]" />
+                          {completed}/{total} completed
+                        </span>
+                      </div>
+                      <div className="mt-4 max-w-xs w-full bg-gray-100 rounded-full h-1.5">
+                        <div 
+                          className="bg-[#4A1D96] h-1.5 rounded-full transition-all duration-1000 ease-out" 
+                          style={{ width: `${Math.min((completed / total) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openCourseDetails(course._id)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                      >
+                        Details
+                      </button>
+                      {!isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => handleEnroll(course._id)}
+                          className="inline-flex items-center gap-2 rounded-xl bg-[#4A1D96] px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+                        >
+                          Enroll
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-1.5">
-              <div 
-                className="bg-[#4A1D96] h-1.5 rounded-full" 
-                style={{ width: `${Math.min((completed / total) * 100, 100)}%` }}
-              ></div>
+          ) : (
+            <div className="flex min-h-72 flex-col items-center justify-center p-8 text-center">
+              <div className="rounded-2xl bg-indigo-50 p-4 text-[#4A1D96]">
+                <BookOpen size={28} />
+              </div>
+              <h3 className="mt-4 font-semibold text-gray-900">No courses found</h3>
+              <p className="mt-1 max-w-sm text-sm text-gray-500">
+                Check back later or adjust your search.
+              </p>
             </div>
-            <div className="mt-5 flex flex-col sm:flex-row gap-2">
-              <button
-                type="button"
-                onClick={() => openCourseDetails(course._id)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              >
-                View details
-              </button>
-              {!isAdmin && (
-                <button
-                  type="button"
-                  onClick={() => handleEnroll(course._id)}
-                  className="w-full px-3 py-2 rounded-lg bg-[#4A1D96] text-white text-xs font-medium hover:bg-[#8B5CF6]"
-                >
-                  Enroll
-                </button>
-              )}
-            </div>
-          </div>
-        )}) : (
-          <div className="col-span-full p-10 text-center text-gray-500 text-sm italic">
-            No courses found.
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </section>
 
       {/* Add Course Modal */}
       {showAddModal && isAdmin && (
@@ -279,7 +306,7 @@ const Training = () => {
             </div>
 
             <div className="p-5 sm:p-6 space-y-4 overflow-y-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <p><span className="text-gray-500">Category:</span> {courseDetails.category}</p>
                 <p><span className="text-gray-500">Instructor:</span> {courseDetails.instructor}</p>
                 <p><span className="text-gray-500">Duration:</span> {courseDetails.duration}</p>
