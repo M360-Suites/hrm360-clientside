@@ -17,6 +17,7 @@ import {
 	Megaphone,
 	Settings,
 	Scale,
+	LogOut,
 	// FileText,
 	X,
 } from "lucide-react";
@@ -38,6 +39,7 @@ const navItems = [
 	{ icon: Scale, label: "Grievances", path: "/grievances" },
 	// { icon: Wallet, label: "Loans", path: "/loans" },
 	// { icon: CheckCircle2, label: "Confirmation", path: "/confirmation" },
+	{ icon: LogOut, label: "Exit", path: "/exit" },
 	{ icon: Megaphone, label: "Announcement", path: "/announcement" },
 	{ icon: Settings, label: "Settings", path: "/settings" },
 	// { icon: FileText, label: "Documents", path: "/documents" },

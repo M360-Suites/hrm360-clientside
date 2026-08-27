@@ -39,6 +39,7 @@ import Settings from "./pages/settings/Settings";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import LandingPage from "./pages/landing/LandingPage";
 import Grievances from "./pages/grievance/Grievances";
+import Exit from "./pages/exit/Exit";
 
 const RequireAuth = () => {
 	const token = getCookie("token");
@@ -132,6 +133,7 @@ const App = () => {
 						<Route path='/loans' element={<Loans />} />
 						<Route path='/performance' element={<Performance />} />
 						<Route path='/grievances' element={<Grievances />} />
+						<Route path='/exit' element={<Exit />} />
 
 						<Route
 							path='/confirmation'
