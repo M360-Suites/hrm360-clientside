@@ -118,6 +118,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								"/task-manager",
 								"/permissions",
 								"/promotion",
+								"/grievances",
+								"/exit",
 								"/settings",
 							].includes(item.path);
 						})
