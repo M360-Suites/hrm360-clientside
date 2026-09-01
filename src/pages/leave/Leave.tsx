@@ -211,7 +211,8 @@ const Leave = () => {
       showToast("error", "Leave ID is missing. Please refresh and try again.");
       return;
     }
-    const success = await approveLeave(leaveId);
+    const feedback = window.prompt("Optional feedback/reason for approval:") || undefined;
+    const success = await approveLeave(leaveId, feedback);
     if (!success) {
       const errorMessage = useLeaveStore.getState().error || "Failed to approve leave request.";
       showToast("error", errorMessage);
@@ -228,7 +229,8 @@ const Leave = () => {
       showToast("error", "Leave ID is missing. Please refresh and try again.");
       return;
     }
-    const success = await rejectLeave(leaveId);
+    const feedback = window.prompt("Optional feedback/reason for rejection:") || undefined;
+    const success = await rejectLeave(leaveId, feedback);
     if (!success) {
       const errorMessage = useLeaveStore.getState().error || "Failed to reject leave request.";
       showToast("error", errorMessage);
@@ -320,13 +322,7 @@ const Leave = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => alert("Feedback clicked")}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-          >
-            <MessageSquare size={17} />Feedback
-          </button>
+
           {!isAdmin && (
             <button
               type="button"
@@ -499,6 +495,15 @@ const Leave = () => {
                       <p className="text-sm text-gray-700">{leave.reason || "-"}</p>
                     </div>
 
+                    {(leave.hrFeedback || leave.feedback) && (
+                      <div className="mt-4 bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 p-3 rounded-lg">
+                        <p className="text-xs font-semibold text-[#4A1D96] mb-1 flex items-center gap-1.5">
+                          <MessageSquare size={14} /> HR Feedback
+                        </p>
+                        <p className="text-sm text-gray-700">{leave.hrFeedback || leave.feedback}</p>
+                      </div>
+                    )}
+
                     {leave.document && (
                       <div className="mt-4 inline-flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600">
                         <span>{docLabel || "Document"}</span>
@@ -556,6 +561,15 @@ const Leave = () => {
                 <h4 className="text-sm font-semibold text-gray-800 mb-2">Reason for Leave</h4>
                 <p className="text-sm text-gray-600">{selectedLeave.reason || "-"}</p>
               </div>
+
+              {(selectedLeave.hrFeedback || selectedLeave.feedback) && (
+                <div className="bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 p-4 rounded-xl">
+                  <h4 className="text-sm font-semibold text-[#4A1D96] mb-2 flex items-center gap-2">
+                    <MessageSquare size={16} /> HR Feedback
+                  </h4>
+                  <p className="text-sm text-gray-700">{selectedLeave.hrFeedback || selectedLeave.feedback}</p>
+                </div>
+              )}
 
               {selectedLeave.document && (
                 <div>

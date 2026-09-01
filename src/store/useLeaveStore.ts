@@ -12,8 +12,8 @@ interface LeaveState {
   fetchLeaves: () => Promise<void>;
   fetchEmployeeLeaves: (employeeId: string) => Promise<void>;
   requestLeave: (data: any) => Promise<boolean>;
-  approveLeave: (leaveId: string) => Promise<boolean>;
-  rejectLeave: (leaveId: string) => Promise<boolean>;
+  approveLeave: (leaveId: string, feedback?: string) => Promise<boolean>;
+  rejectLeave: (leaveId: string, feedback?: string) => Promise<boolean>;
   fetchOrgLeaveStats: () => Promise<void>;
   fetchUserLeaveStats: () => Promise<void>;
 }
@@ -209,14 +209,19 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
     }
   },
 
-  approveLeave: async (leaveId) => {
+  approveLeave: async (leaveId, feedback) => {
     set({ isLoading: true, error: null });
 
     try {
       const encodedLeaveId = encodeURIComponent(String(leaveId));
+      const payload: any = { status: "Approved", decision: "approve" };
+      if (feedback) payload.feedback = feedback;
+      if (feedback) payload.hrFeedback = feedback;
+      if (feedback) payload.reason = feedback;
+
       await api.put(
         `/leave/${encodedLeaveId}/approve`,
-        { status: "Approved", decision: "approve" },
+        payload,
         getOrgConfig(),
       );
       await get().fetchLeaves();
@@ -245,14 +250,19 @@ export const useLeaveStore = create<LeaveState>((set, get) => ({
     }
   },
 
-  rejectLeave: async (leaveId) => {
+  rejectLeave: async (leaveId, feedback) => {
     set({ isLoading: true, error: null });
 
     try {
       const encodedLeaveId = encodeURIComponent(String(leaveId));
+      const payload: any = { status: "Rejected", decision: "reject" };
+      if (feedback) payload.feedback = feedback;
+      if (feedback) payload.hrFeedback = feedback;
+      if (feedback) payload.reason = feedback;
+      
       await api.put(
         `/leave/${encodedLeaveId}/reject`,
-        { status: "Rejected", decision: "reject" },
+        payload,
         getOrgConfig(),
       );
       await get().fetchLeaves();
