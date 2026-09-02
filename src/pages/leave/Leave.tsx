@@ -637,29 +637,39 @@ const Leave = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">Start Date</label>
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => {
-                        setFormData((prev) => ({ ...prev, startDate: e.target.value }));
+                    <DatePicker
+                      selected={formData.startDate ? new Date(formData.startDate) : null}
+                      onChange={(date) => {
+                        setFormData((prev) => ({ ...prev, startDate: date ? date.toISOString() : "" }));
                         setFormErrors((prev) => ({ ...prev, startDate: "", endDate: "" }));
                       }}
-                      required
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
+                      selectsStart
+                      startDate={formData.startDate ? new Date(formData.startDate) : undefined}
+                      endDate={formData.endDate ? new Date(formData.endDate) : undefined}
+                      minDate={new Date()}
+                      placeholderText="Select start date"
+                      dateFormat="MMM d, yyyy"
+                      wrapperClassName="w-full block"
+                      className="w-full block px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                     />
                     {formErrors.startDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.startDate}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">End Date</label>
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => {
-                        setFormData((prev) => ({ ...prev, endDate: e.target.value }));
+                    <DatePicker
+                      selected={formData.endDate ? new Date(formData.endDate) : null}
+                      onChange={(date) => {
+                        setFormData((prev) => ({ ...prev, endDate: date ? date.toISOString() : "" }));
                         setFormErrors((prev) => ({ ...prev, endDate: "" }));
                       }}
-                      required
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
+                      selectsEnd
+                      startDate={formData.startDate ? new Date(formData.startDate) : undefined}
+                      endDate={formData.endDate ? new Date(formData.endDate) : undefined}
+                      minDate={formData.startDate ? new Date(formData.startDate) : new Date()}
+                      placeholderText="Select end date"
+                      dateFormat="MMM d, yyyy"
+                      wrapperClassName="w-full block"
+                      className="w-full block px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-[#4A1D96]/20 focus:border-[#4A1D96]"
                     />
                     {formErrors.endDate && <p className="mt-1.5 text-xs text-rose-500">{formErrors.endDate}</p>}
                   </div>
