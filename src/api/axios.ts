@@ -7,7 +7,7 @@ import { getCookie, removeCookie, setCookie } from "../utils/cookies";
 const api = axios.create({
 	baseURL:
 		import.meta.env.VITE_API_URL ||
-		"https://hrm360-backend.onrender.com/api",
+		"https://hrm360-backend-yrhr.onrender.com/api",
 	withCredentials: true,
 });
 
@@ -131,7 +131,7 @@ api.interceptors.response.use(
 			const refreshToken = getCookie("refreshToken");
 
 			const refreshResponse = await axios.post(
-				`${import.meta.env.VITE_API_URL || "https://hrm360-backend.onrender.com/api"}/auth/refresh`,
+				`${import.meta.env.VITE_API_URL || "https://hrm360-backend-yrhr.onrender.com/api"}/auth/refresh`,
 				refreshToken ? { refreshToken } : {},
 				{
 					withCredentials: true,
