@@ -68,15 +68,7 @@ api.interceptors.request.use(
 			config.headers["x-org-id"] = orgId;
 		}
 
-		console.log(
-			"API Request:",
-			config.method?.toUpperCase(),
-			config.url,
-			{
-				headers: config.headers,
-				body: config.data,
-			},
-		);
+
 
 		return config;
 	},
@@ -85,7 +77,7 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
 	(response) => {
-		console.log("API Response:", response.config.url, response.data);
+
 		return response;
 	},
 	async (error: AxiosError<any>) => {
@@ -108,6 +100,16 @@ api.interceptors.response.use(
 				url: error.config?.url,
 				message: error.response?.data,
 			});
+
+			if (status === 401) {
+				removeCookie("token");
+				removeCookie("refreshToken");
+				removeCookie("user");
+				removeCookie("orgId");
+				removeCookie("isOnboarded");
+				removeCookie("resetToken");
+				window.location.href = "/login";
+			}
 
 			return Promise.reject(error);
 		}
@@ -138,7 +140,7 @@ api.interceptors.response.use(
 				},
 			);
 
-			console.log("REFRESH RESPONSE:", refreshResponse.data);
+
 
 			const responseData =
 				refreshResponse.data?.data || refreshResponse.data;

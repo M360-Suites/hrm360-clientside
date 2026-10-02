@@ -41,10 +41,23 @@ import LandingPage from "./pages/landing/LandingPage";
 import Grievances from "./pages/grievance/Grievances";
 import Exit from "./pages/exit/Exit";
 
+const isValidToken = (token: string | null) => {
+	if (!token) return false;
+	const parts = token.split('.');
+	if (parts.length !== 3) return false;
+	try {
+		const payload = JSON.parse(atob(parts[1]));
+		if (payload.exp && payload.exp * 1000 < Date.now()) return false;
+		return true;
+	} catch {
+		return false;
+	}
+};
+
 const RequireAuth = () => {
 	const token = getCookie("token");
 
-	if (!token) {
+	if (!isValidToken(token)) {
 		return <Navigate to='/login' replace />;
 	}
 
@@ -56,7 +69,7 @@ const RequireOrganization = () => {
 	const orgId = getCookie("orgId");
 	const isOnboarded = getCookie("isOnboarded") === "true";
 
-	if (!token) {
+	if (!isValidToken(token)) {
 		return <Navigate to='/login' replace />;
 	}
 
@@ -72,11 +85,11 @@ const RedirectIfAuthenticated = () => {
 	const orgId = getCookie("orgId");
 	const isOnboarded = getCookie("isOnboarded") === "true";
 
-	if (token && orgId && isOnboarded) {
+	if (isValidToken(token) && orgId && isOnboarded) {
 		return <Navigate to='/dashboard' replace />;
 	}
 
-	if (token && (!orgId || !isOnboarded)) {
+	if (isValidToken(token) && (!orgId || !isOnboarded)) {
 		return <Navigate to='/onboarding' replace />;
 	}
 

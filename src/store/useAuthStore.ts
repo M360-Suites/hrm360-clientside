@@ -186,8 +186,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
 			const response = await api.post("/auth/signin", credentials);
 
-			console.log("LOGIN FULL RESPONSE:", response.data);
-
 			const token = extractToken(response.data);
 			const refreshToken = extractRefreshToken(response.data);
 			const user = extractUser(response.data);
@@ -414,7 +412,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 				},
 			});
 
-			console.log("ACTIVATION RESPONSE:", response.data);
 
 			set({
 				isLoading: false,

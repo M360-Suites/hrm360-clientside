@@ -179,8 +179,8 @@ export const useEmployeeStore = create<EmployeeState>((set, get) => ({
         paystackRecipientCode: data.paystackRecipientCode,
       });
 
-      console.log("CREATE EMPLOYEE PAYLOAD:", payload);
-      console.log("CREATE EMPLOYEE HEADERS:", getOrgConfig());
+
+
 
       await api.post("/employee", payload, getOrgConfig());
 
